@@ -73,9 +73,9 @@ function Grassmann(
         val = if init == :undef
             Array{T, N}(undef, inds_size...)
         elseif init == :random
-            rand(T, inds_size...)
+            N == 0 ? fill(rand(T)) : rand(T, inds_size...)
         elseif init == :zeros
-            zeros(T, inds_size...)
+            N == 0 ? fill(zero(T)) : zeros(T, inds_size...)
         else
             throw(ArgumentError("Unsupported initialization scheme: $init"))
         end
@@ -187,11 +187,11 @@ function _fixed_parity_blocks(
 
     mask_even_blocks, mask_range = _parity_mask(total_size, even_parity_size)
 
-    estimated_size = min(2^N, prod(i -> length(mask_even_blocks[i][1]:mask_even_blocks[i][2]), 1:N))
     dict = Dict{NTuple{N, Int}, Vector{UnitRange{Int}}}()
-    sizehint!(dict, estimated_size)
+    isempty(mask_even_blocks) && isempty(mask_range) && (dict[()] = UnitRange{Int}[]; return dict)
 
-    N == 0 && return dict
+    estimated_size = min(2^N, prod(i -> length(mask_even_blocks[i][1]:mask_even_blocks[i][2]), 1:N))
+    sizehint!(dict, estimated_size)
 
     iter = ntuple(i -> mask_even_blocks[i][1]:mask_even_blocks[i][2], Val(N))
     target_parity = (parity === :even ? 0 : 1)
@@ -270,6 +270,8 @@ Convert the Grassmann tensor to the dense array for testing purposes (type stabl
 function Base.convert(
     ::Type{Array}, 
     t::Grassmann{T, N}) where {T, N}
+
+    N == 0 && return fill(scalar(t))
 
     total_size = size(t)
     even_size = even(t)
