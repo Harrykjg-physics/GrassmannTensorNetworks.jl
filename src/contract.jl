@@ -147,6 +147,11 @@ function trace!(
                 count += 1
             end
         end
+
+        if count == 0
+            # The sector `inds` is redundant and set to zeros
+            fill!(To[inds], zero(S))
+        end
     end
 end
 

@@ -18,6 +18,17 @@ function _grassmann_inner(
 end
 
 """
+Conjugate data blocks of a Grassmann tensor in-place (without changing index types).
+Used to correct the pullback when the forward operation involves conjugation of the input.
+"""
+function _conj_data!(t::Grassmann)
+    @inbounds for (key, block) in nonzero_pairs(t)
+        t[key] = conj.(block)
+    end
+    return t
+end
+
+"""
 Given a linear map `op`, build the reverse-mode pullback by explicit basis projection.
 """
 
@@ -64,11 +75,16 @@ function _trace_pullback(
     if Δy_unthunk isa AbstractZero
         return ZeroTangent()
     end
-    return _adjoint_linear_map(
+    result = _adjoint_linear_map(
         T,
         Δy_unthunk,
         t -> trace(t, inds_tr; sign_function=sign_function, cj=cj, perm=perm, pbc=pbc),
     )
+    # When cj=true, trace is conjugate-linear: y = L(conj(x)).
+    # _adjoint_linear_map computes L^H Δy, but the correct pullback is
+    # L^T conj(Δy) = conj(L^H Δy), so we conjugate the data blocks.
+    cj && _conj_data!(result)
+    return result
 end
 
 # ─── trace: single traced index ────────────────────────────────────────────────
@@ -147,6 +163,11 @@ function _contract_pullback(
         Δy_unthunk,
         t -> contract(T1, t, contr_inds; sign_function=sign_function, perm=perm, cj=cj),
     )
+    # When cj[1]=true, contraction is conjugate-linear in T1: y = M(conj(T1), T2).
+    # _adjoint_linear_map computes M^H Δy, but correct pullback is conj(M^H Δy).
+    cj[1] && _conj_data!(ΔT1)
+    # When cj[2]=true, contraction is conjugate-linear in T2: y = M(T1, conj(T2)).
+    cj[2] && _conj_data!(ΔT2)
     return ΔT1, ΔT2
 end
 
