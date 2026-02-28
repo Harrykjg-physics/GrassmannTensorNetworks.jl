@@ -1,7 +1,7 @@
 
 @non_differentiable Grassmann(total_size, even_size, index_types, T)
 @non_differentiable _parity_mask(total_size, even_parity_size)
-@non_differentiable _fixed_parity_blocks(total_size, even_parity_size; parity)
+# @non_differentiable _fixed_parity_blocks(total_size, even_parity_size; parity)
 
 function ChainRulesCore.rrule(
                             ::Grassmann, 
