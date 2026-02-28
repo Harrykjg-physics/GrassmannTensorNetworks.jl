@@ -2,10 +2,11 @@ module Grassmanntn
 
 using TensorOperations
 using TupleTools
-using TupleTools: flatten, permute, insertat, insertafter, deleteat, getindices
+using TupleTools:flatten, permute, insertat, insertafter, deleteat, getindices
 using VectorInterface
 using Shuffle
 using ChainRulesCore, Zygote
+using Zygote:bufferfrom
 using LinearAlgebra
 
 include("grassmann.jl")
@@ -21,10 +22,11 @@ include("../ext/GrassmannChainRulesCoreExt/base.jl")
 include("../ext/GrassmannChainRulesCoreExt/contract.jl")
 
 export Grassmann
-export even, data, index_type, tensor_parity, tensor_rank, index_conjugation, nonzero_pairs, nonzero_keys
+export even, data, index_type, tensor_parity, tensor_rank, scalar, index_conjugation, nonzero_pairs, nonzero_keys
 
 export auto_sign, trivial_sign, add_parity_sign, add_perm_sign
 
+export trace, contract
 
 end
 

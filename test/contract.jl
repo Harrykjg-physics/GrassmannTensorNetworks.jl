@@ -1474,17 +1474,17 @@ function test_tr2_ad(
     sign_perm::Bool=false, 
     sign_bc::Bool=false) where {F}
 
-    T = Grassmann(total_size, even_size, (:out, :in, :out, :in, :out, :in), ComplexF64; 
+    T = Grassmann(total_size, even_size, (:out, :in, :out, :in, :out, :in), elemtype; 
     init=:random, parity=p_flag)
 
-    g = gradient(x -> sum(trace(x, ((2, 3), (5, 4)); perm=perm, cj=cj, pbc=pbc, sign_function=sign_function)), T)[1]
+    g = gradient(x -> abs(sum(trace(x, ((2, 3), (5, 4)); perm=perm, cj=cj, pbc=pbc, sign_function=sign_function))), T)[1]
     g_array = convert(Array, g)
 
     T_array = convert(Array, T)
-    g_array_test = gradient(x -> sum(manual_tr2(x, total_size, even_size; perm=perm, cj=cj, sign_conj=sign_conj, sign_tr=sign_tr, 
-    sign_perm=sign_perm, sign_bc=sign_bc, pbc=pbc)), T_array)[1]
+    g_array_test = gradient(x -> abs(sum(manual_tr2(x, total_size, even_size; perm=perm, cj=cj, sign_conj=sign_conj, sign_tr=sign_tr, 
+    sign_perm=sign_perm, sign_bc=sign_bc, pbc=pbc))), T_array)[1]
     
-    (g_array ≈ g_array_test)
+    (g_array ≈ mask_parity_sector(g_array_test, even_size, p_flag))
 end
 
 function test_tr3_ad(
@@ -1499,17 +1499,17 @@ function test_tr3_ad(
     sign_tr::Bool=false, 
     sign_bc::Bool=false) where {F}
 
-    T = Grassmann(total_size, even_size, (:out, :in, :out, :in, :out, :in), ComplexF64; 
+    T = Grassmann(total_size, even_size, (:out, :in, :out, :in, :out, :in), elemtype; 
     init=:random, parity=p_flag)
 
-    g = gradient(x -> sum(trace(x, ((2, 3, 1), (5, 4, 6)); cj=cj, pbc=pbc, sign_function=sign_function)), T)[1]
+    g = gradient(x -> abs(sum(trace(x, ((2, 3, 1), (5, 4, 6)); cj=cj, pbc=pbc, sign_function=sign_function))), T)[1]
     g_array = convert(Array, g)
 
     T_array = convert(Array, T)
-    g_array_test = gradient(x -> sum(manual_tr3(x, total_size, even_size; cj=cj, sign_conj=sign_conj, sign_tr=sign_tr, 
-    sign_bc=sign_bc, pbc=pbc)), T_array)[1]
+    g_array_test = gradient(x -> abs(sum(manual_tr3(x, total_size, even_size; cj=cj, sign_conj=sign_conj, sign_tr=sign_tr, 
+    sign_bc=sign_bc, pbc=pbc))), T_array)[1]
     
-    (g_array ≈ g_array_test)
+    (g_array ≈ mask_parity_sector(g_array_test, even_size, p_flag))
 end
 
 function test_contr0_ad(
@@ -1527,27 +1527,27 @@ function test_contr0_ad(
     sign_conj2::Bool=false, 
     sign_perm::Bool=false) where {F}
 
-    T1 = Grassmann(total_size1, even_size1, (:out, :in, :out, :in), ComplexF64; 
+    T1 = Grassmann(total_size1, even_size1, (:out, :in, :out, :in), elemtype; 
     init=:random, parity=p_flag1)
-    T2 = Grassmann(total_size2, even_size2, (:in, :in, :out, :out), ComplexF64; 
+    T2 = Grassmann(total_size2, even_size2, (:in, :in, :out, :out), elemtype; 
     init=:random, parity=p_flag2)
 
     T1_array = convert(Array, T1)
     T2_array = convert(Array, T2)
 
     # Test gradient w.r.t. T1
-    g1 = gradient(x -> sum(contract(x, T2; perm=perm, cj=cj, sign_function=sign_function)), T1)[1]
+    g1 = gradient(x -> abs(sum(contract(x, T2; perm=perm, cj=cj, sign_function=sign_function))), T1)[1]
     g1_array = convert(Array, g1)
-    g1_array_test = gradient(x -> sum(manual_contr0(x, T2_array, total_size1, even_size1, total_size2, even_size2; 
-    perm=perm, cj=cj, sign_conj1=sign_conj1, sign_conj2=sign_conj2, sign_perm=sign_perm)), T1_array)[1]
+    g1_array_test = gradient(x -> abs(sum(manual_contr0(x, T2_array, total_size1, even_size1, total_size2, even_size2; 
+    perm=perm, cj=cj, sign_conj1=sign_conj1, sign_conj2=sign_conj2, sign_perm=sign_perm))), T1_array)[1]
 
     # Test gradient w.r.t. T2
-    g2 = gradient(x -> sum(contract(T1, x; perm=perm, cj=cj, sign_function=sign_function)), T2)[1]
+    g2 = gradient(x -> abs(sum(contract(T1, x; perm=perm, cj=cj, sign_function=sign_function)), T2))[1]
     g2_array = convert(Array, g2)
-    g2_array_test = gradient(x -> sum(manual_contr0(T1_array, x, total_size1, even_size1, total_size2, even_size2; 
-    perm=perm, cj=cj, sign_conj1=sign_conj1, sign_conj2=sign_conj2, sign_perm=sign_perm)), T2_array)[1]
+    g2_array_test = gradient(x -> abs(sum(manual_contr0(T1_array, x, total_size1, even_size1, total_size2, even_size2; 
+    perm=perm, cj=cj, sign_conj1=sign_conj1, sign_conj2=sign_conj2, sign_perm=sign_perm))), T2_array)[1]
     
-    (g1_array ≈ g1_array_test) && (g2_array ≈ g2_array_test)
+    (g1_array ≈ mask_parity_sector(g1_array_test, even_size1, p_flag1)) && (g2_array ≈ mask_parity_sector(g2_array_test, even_size2, p_flag2))
 end
 
 function test_contr1_ad(
@@ -1669,8 +1669,8 @@ end
 
 # ------------------------- trace a single index -------------------------
 
-@timedtestset "test trace operations on one index for even-parity tensor" verbose=true begin
-    @timedtestset "test ordinary trace operations" verbose=true begin
+@timedtestset "AD test: test trace operations on one index for even-parity tensor" verbose=true begin
+    @timedtestset "AD test: test ordinary trace operations" verbose=true begin
         # Float64
         @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :even, Float64)
         @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :even, Float64; perm=(4, 2, 3, 1))
@@ -1682,7 +1682,7 @@ end
         @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :even, ComplexF64; cj=true)
         @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :even, ComplexF64; perm=(4, 2, 3, 1), cj=true)
     end
-    @timedtestset "test Fermionic trace operations" verbose=true begin
+    @timedtestset "AD test: test Fermionic trace operations" verbose=true begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :even, Float64; sign_tr=true, sign_function=auto_sign)
@@ -1706,5 +1706,216 @@ end
         sign_perm=true,
         sign_bc=true,
         pbc=false, cj=true, perm=(4, 2, 3, 1), sign_function=auto_sign)
+    end
+end
+
+@timedtestset "AD test: test trace operations on one index for odd-parity tensor" verbose=true begin
+    @timedtestset "AD test: test ordinary trace operations" verbose=true begin
+        # Float64
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, Float64)
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, Float64; perm=(4, 2, 3, 1))
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, Float64; cj=true)
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, Float64; perm=(4, 2, 3, 1), cj=true)
+        # ComplexF64
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, ComplexF64)
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, ComplexF64; perm=(4, 2, 3, 1))
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, ComplexF64; cj=true)
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, ComplexF64; perm=(4, 2, 3, 1), cj=true)
+    end
+    @timedtestset "AD test: test Fermionic trace operations" verbose=true begin
+        # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
+        # Float64
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, Float64; sign_tr=true, sign_function=auto_sign)
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, Float64; sign_tr=true, sign_bc=true, pbc=false, sign_function=auto_sign)
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, Float64; sign_tr=true, sign_perm=true, perm=(4, 2, 3, 1), sign_function=auto_sign)
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, Float64; sign_tr=true, sign_conj=true, cj=true, sign_function=auto_sign)
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, Float64; sign_tr=true, sign_conj=true, sign_perm=true,
+        cj=true, perm=(4, 2, 3, 1), sign_function=auto_sign)
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, Float64; sign_tr=true, sign_conj=true,
+        sign_perm=true,
+        sign_bc=true,
+        pbc=false, cj=true, perm=(4, 2, 3, 1), sign_function=auto_sign)
+        # ComplexF64
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, ComplexF64; sign_tr=true, sign_function=auto_sign)
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, ComplexF64; sign_tr=true, sign_bc=true, pbc=false, sign_function=auto_sign)
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, ComplexF64; sign_tr=true, sign_perm=true, perm=(4, 2, 3, 1), sign_function=auto_sign)
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, ComplexF64; sign_tr=true, sign_conj=true, cj=true, sign_function=auto_sign)
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, ComplexF64; sign_tr=true, sign_conj=true, sign_perm=true,
+        cj=true, perm=(4, 2, 3, 1), sign_function=auto_sign)
+        @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, ComplexF64; sign_tr=true, sign_conj=true,
+        sign_perm=true,
+        sign_bc=true,
+        pbc=false, cj=true, perm=(4, 2, 3, 1), sign_function=auto_sign)
+    end
+end
+
+# ------------------------- trace two indices -------------------------
+
+@timedtestset "AD test: test trace operations on two indices for even-parity tensor" verbose=true begin
+    @timedtestset "AD test: test ordinary trace operations" verbose=true begin
+        # Float64
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; perm=(2, 1))
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; cj=true)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; perm=(2, 1), cj=true)
+        # ComplexF64
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; perm=(2, 1))
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; cj=true)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; perm=(2, 1), cj=true)
+    end
+    @timedtestset "AD test: test Fermionic trace operations" verbose=true begin
+        # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
+        # Float64
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; sign_tr=true, sign_function=auto_sign)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; sign_tr=true, sign_bc=true, pbc=(false, false), sign_function=auto_sign)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; sign_tr=true, sign_perm=true, perm=(2, 1), sign_function=auto_sign)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; sign_tr=true, sign_conj=true, cj=true, sign_function=auto_sign)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; sign_tr=true, sign_conj=true, sign_perm=true,
+        cj=true, perm=(2, 1), sign_function=auto_sign)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; sign_tr=true,
+        sign_conj=true,
+        sign_perm=true,
+        sign_bc=true,
+        pbc=(false, false), cj=true, perm=(2, 1), sign_function=auto_sign)
+        # ComplexF64
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; sign_tr=true, sign_function=auto_sign)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; sign_tr=true, sign_bc=true, pbc=(false, false), sign_function=auto_sign)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; sign_tr=true, sign_perm=true, perm=(2, 1), sign_function=auto_sign)
+        @test test_tr2_ad((4    , 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even,
+        ComplexF64; sign_tr=true,
+        sign_conj=true,
+        cj=true,
+        sign_function=auto_sign)
+        @test test_tr2_ad((4 ,5 ,3 ,3 ,5 ,4) , (2 ,2 ,2 ,2 ,2 ,2) , :even ,ComplexF64 ;sign_tr=true ,
+        sign_conj=true ,
+        sign_perm=true ,
+        cj=true, perm=(2, 1), sign_function=auto_sign)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; sign_tr=true,
+        sign_conj=true,
+        sign_perm=true,
+        sign_bc=true,
+        pbc=(false, false), cj=true, perm=(2, 1), sign_function=auto_sign)
+    end
+end
+
+@timedtestset "AD test: test trace operations on two indices for odd-parity tensor" verbose=true begin
+    @timedtestset "AD test: test ordinary trace operations" verbose=true begin
+        # Float64
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, Float64)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, Float64; perm=(2, 1))
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, Float64; cj=true)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, Float64; perm=(2, 1), cj=true)
+        # ComplexF64
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, ComplexF64)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, ComplexF64; perm=(2, 1))
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, ComplexF64; cj=true)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, ComplexF64; perm=(2, 1), cj=true)
+    end
+    @timedtestset "AD test: test Fermionic trace operations" verbose=true begin
+        # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
+        # Float64
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, Float64; sign_tr=true, sign_function=auto_sign)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, Float64; sign_tr=true, sign_bc=true, pbc=(false, false), sign_function=auto_sign)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, Float64; sign_tr=true, sign_perm=true, perm=(2, 1), sign_function=auto_sign)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, Float64; sign_tr=true, sign_conj=true, cj=true, sign_function=auto_sign)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, Float64; sign_tr=true, sign_conj=true, sign_perm=true,
+        cj=true, perm=(2, 1), sign_function=auto_sign)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, Float64; sign_tr=true,
+        sign_conj=true,
+        sign_perm=true,
+        sign_bc=true,
+        pbc=(false, false), cj=true, perm=(2, 1), sign_function=auto_sign)
+        # ComplexF64
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, ComplexF64; sign_tr=true, sign_function=auto_sign)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, ComplexF64; sign_tr=true, sign_bc=true, pbc=(false, false), sign_function=auto_sign)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, ComplexF64; sign_tr=true, sign_perm=true, perm=(2, 1), sign_function=auto_sign)
+        @test test_tr2_ad((4    , 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd,
+        ComplexF64; sign_tr=true,
+        sign_conj=true,
+        cj=true,
+        sign_function=auto_sign)
+        @test test_tr2_ad((4 ,5 ,3 ,3 ,5 ,4) , (2 ,2 ,2 ,2 ,2 ,2) , :odd ,ComplexF64 ;sign_tr=true ,
+        sign_conj=true ,
+        sign_perm=true ,
+        cj=true, perm=(2, 1), sign_function=auto_sign)
+        @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, ComplexF64; sign_tr=true,
+        sign_conj=true,
+        sign_perm=true,
+        sign_bc=true,
+        pbc=(false, false), cj=true, perm=(2, 1), sign_function=auto_sign)
+    end
+end
+
+# ------------------------- trace all the indices -------------------------
+
+@timedtestset "AD test: est trace operations on all indices for even-parity tensor" verbose=true begin
+    @timedtestset "AD test: test ordinary trace operations" verbose=true begin
+        # Float64
+        @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64)
+        @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; cj=true)
+        # ComplexF64
+        @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64)
+        @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; cj=true)
+    end
+    @timedtestset "AD test: test Fermionic trace operations" verbose=true begin
+        # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
+        # Float64
+        @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; sign_tr=true, sign_function=auto_sign)
+        @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; sign_tr=true, sign_bc=true, pbc=(true, false, false), sign_function=auto_sign)
+        @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; sign_tr=true, sign_bc=true, pbc=(false, true, false), sign_function=auto_sign)
+        @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; sign_tr=true, sign_bc=true, pbc=(false, false, true), sign_function=auto_sign)
+        @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; sign_tr=true, sign_bc=true, pbc=(false, false, false), sign_function=auto_sign)
+        @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; sign_tr=true, sign_conj=true, cj=true, sign_function=auto_sign)
+        @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; sign_tr=true, sign_conj=true, sign_bc=true, 
+        pbc=(false, false, false), cj=true, sign_function=auto_sign)
+        # ComplexF64
+        @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; sign_tr=true, sign_function=auto_sign)
+        @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; sign_tr=true, sign_bc=true, pbc=(true, false, false), sign_function=auto_sign)
+        @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; sign_tr=true, sign_bc=true, pbc=(false, true, false), sign_function=auto_sign)
+        @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; sign_tr=true, sign_bc=true, pbc=(false, false, true), sign_function=auto_sign)
+        @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; sign_tr=true, sign_bc=true, pbc=(false, false, false), sign_function=auto_sign)
+        @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; sign_tr=true, sign_conj=true, cj=true, sign_function=auto_sign)
+        @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; sign_tr=true, sign_conj=true, sign_bc=true, 
+        pbc=(false, false, false), cj=true, sign_function=auto_sign)
+    end
+end
+
+# ------------------------- contract 0 index(a.k.a direct product) -------------------------
+
+@timedtestset "AD test: test contract operations on 0 index (even-even)" verbose=true begin
+    @timedtestset "AD test: test ordinary contract operations" verbose=true begin
+        # Float64
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64)
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; cj=(true, false))
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; cj=(false, true))
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; cj=(true, true))
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; perm=(3, 1, 2, 4, 7, 5, 6, 8))
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; cj=(true, true), perm=(3, 1, 2, 4, 7, 5, 6, 8))
+        # ComplexF64
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64)
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; cj=(true, false))
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; cj=(false, true))
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; cj=(true, true))
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; perm=(3, 1, 2, 4, 7, 5, 6, 8))
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; cj=(true, true), perm=(3, 1, 2, 4, 7, 5, 6, 8))
+    end
+    @timedtestset "AD test: test Fermionic contract operations" verbose=true begin
+        # Float64
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; sign_function=auto_sign)
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; sign_conj1=true, sign_conj2=true, 
+        cj=(true, true), sign_function=auto_sign)
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; sign_perm=true, 
+        perm=(3, 1, 2, 4, 7, 5, 6, 8), sign_function=auto_sign)
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; sign_perm=true, sign_conj1=true, sign_conj2=true, 
+        cj=(true, true), perm=(3, 1, 2, 4, 7, 5, 6, 8), sign_function=auto_sign)
+        # ComplexF64
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; sign_function=auto_sign)
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; sign_conj1=true, sign_conj2=true, 
+        cj=(true, true), sign_function=auto_sign)
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; sign_perm=true, 
+        perm=(3, 1, 2, 4, 7, 5, 6, 8), sign_function=auto_sign)
+        @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; sign_perm=true, sign_conj1=true, sign_conj2=true, 
+        cj=(true, true), perm=(3, 1, 2, 4, 7, 5, 6, 8), sign_function=auto_sign)
     end
 end
