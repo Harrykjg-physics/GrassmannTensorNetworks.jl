@@ -453,9 +453,11 @@ function manual_contr0(
     T1_array = (cj[1] ? conj(T1_array) : T1_array)
     T2_array = (cj[2] ? conj(T2_array) : T2_array)
 
-    total_size_out = flatten(total_size1, total_size2)
-    total_size_out = permute(total_size_out, perm)
-    T_array_contr = bufferfrom(zeros(T, total_size_out))
+    total_size_out1 = flatten(total_size1, total_size2)
+    # avoid AD error
+    # total_size_out2 = permute(total_size_out1, perm) 
+    total_size_out2 = ntuple(i -> total_size_out1[perm[i]], Val(8))
+    T_array_contr = bufferfrom(zeros(T, total_size_out2))
 
     dim_a, dim_b, dim_c, dim_d = total_size1
     dim_e, dim_f, dim_g, dim_h = total_size2
@@ -1542,7 +1544,7 @@ function test_contr0_ad(
     perm=perm, cj=cj, sign_conj1=sign_conj1, sign_conj2=sign_conj2, sign_perm=sign_perm))), T1_array)[1]
 
     # Test gradient w.r.t. T2
-    g2 = gradient(x -> abs(sum(contract(T1, x; perm=perm, cj=cj, sign_function=sign_function)), T2))[1]
+    g2 = gradient(x -> abs(sum(contract(T1, x; perm=perm, cj=cj, sign_function=sign_function))), T2)[1]
     g2_array = convert(Array, g2)
     g2_array_test = gradient(x -> abs(sum(manual_contr0(T1_array, x, total_size1, even_size1, total_size2, even_size2; 
     perm=perm, cj=cj, sign_conj1=sign_conj1, sign_conj2=sign_conj2, sign_perm=sign_perm))), T2_array)[1]
