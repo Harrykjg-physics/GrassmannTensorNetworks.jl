@@ -14,6 +14,8 @@ Ti = time()
 include("grassmann.jl")
 include("fermionsign.jl")
 include("base.jl")
+include("fusion.jl")
+include("fusion.jl")
 
 Tf = time()
 
