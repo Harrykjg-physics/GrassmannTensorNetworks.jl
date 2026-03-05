@@ -24,7 +24,7 @@ include("../ext/GrassmannChainRulesCoreExt/contract.jl")
 include("../ext/GrassmannChainRulesCoreExt/fusion.jl")
 
 export Grassmann, _fixed_parity_blocks
-export even, data, index_type, tensor_parity, tensor_rank, scalar, index_conjugation, nonzero_pairs, nonzero_keys
+export even, data, index_type, tensor_parity, tensor_rank, scalar, index_conjugation, nonzero_pairs, nonzero_keys, nonzero_vals
 
 export auto_sign, trivial_sign, add_parity_sign, add_perm_sign
 
