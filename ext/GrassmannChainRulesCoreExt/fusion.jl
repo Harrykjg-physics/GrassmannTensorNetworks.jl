@@ -8,8 +8,8 @@ function ChainRulesCore.rrule(
     ::typeof(fuse),
     tensor::Grassmann{T, N1, AT},
     inds::NTuple{N2, Int};
-    index_type_fused::Symbol=:in,
-) where {T, N1, N2, AT}
+    index_type_fused::Symbol=:in) where {T, N1, N2, AT}
+    
     y = fuse(tensor, inds; index_type_fused=index_type_fused)
     min_ind = minimum(inds)
     total_size_in = size(tensor)
@@ -34,8 +34,8 @@ function ChainRulesCore.rrule(
     ind::Int,
     total_size_split::NTuple{N2, Int},
     even_size_split::NTuple{N2, Int},
-    index_type_split::NTuple{N2, Symbol},
-) where {T, N1, N2, AT}
+    index_type_split::NTuple{N2, Symbol}) where {T, N1, N2, AT}
+
     y = split(tensor, ind, total_size_split, even_size_split, index_type_split)
     N = N2 - N1
     inds_split = ntuple(i -> i - 1 + ind, N + 1)
