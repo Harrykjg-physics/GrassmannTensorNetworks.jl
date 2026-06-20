@@ -603,4 +603,258 @@ end
 
 ############################## tests AD ##############################
 
+# analytic gradient for sum(U) where U is the left singular vector of A with no truncation
+function dense_svd_sum_U_grad_full(B)
 
+    F = svd(B)
+    U = F.U
+    σ = F.S
+    V = F.V
+
+    GU = ones(eltype(B), size(U))
+    K = U' * GU
+
+    k = length(σ)
+    σ2 = σ .^ 2
+
+    Fmat = zeros(eltype(B), k, k)
+    for j in 1:k, i in 1:k
+        if i != j
+            denom = σ2[j] - σ2[i]
+            if abs(denom) > 1e-10
+                Fmat[i, j] = inv(denom)
+            end
+        end
+    end
+
+    # Full square SVD, only U has upstream cotangent.
+    return U * ((Fmat .* (K - K')) * Diagonal(σ)) * V'
+end
+
+function analytic_gsvd_sum_U_grad_full(A)
+
+    grad_data = Dict{NTuple{2, Int}, Matrix{eltype(A)}}()
+
+    for (sec, block) in nonzero_pairs(A)
+        grad_data[sec] = dense_svd_sum_U_grad_full(block)
+    end
+
+    return Grassmann(size(A), even(A), index_type(A), grad_data)
+end
+
+function svd_sum_U_grad_dense(A)
+
+    A_array = convert(Array, A)
+
+    A_grad_dense = gradient(x -> begin
+        u, _, _ = svd(x)
+        sum(u)
+    end, A_array)[1]
+
+    return A_grad_dense
+end
+
+function test_gsvd_sum_U_a(
+    total_size::NTuple{N, Int}, 
+    even_size::NTuple{N, Int}) where {N}
+
+    A = Grassmann(total_size, even_size, (:out, :in), Float64; init=:random, parity=:even)
+    A_grad_analytic = analytic_gsvd_sum_U_grad_full(A)
+    A_grad_numeric = gradient(x -> sum(gsvd(x, 100000; trunc=false)[1]), A)[1]
+
+    return A_grad_analytic ≈ A_grad_numeric
+end
+
+function test_gsvd_sum_U_b(
+    total_size::NTuple{N, Int}, 
+    even_size::NTuple{N, Int}) where {N}
+
+    odd_size = total_size .- even_size
+
+    A = Grassmann(total_size, even_size, (:out, :in), Float64; init=:random, parity=:even)
+    A_grad_dense = svd_sum_U_grad_dense(A)
+    A_grad_numeric = gradient(x -> sum(gsvd(x, 100000; trunc=false)[1]), A)[1]
+
+    flag1 = (A_grad_dense[1:even_size[1], 1:even_size[2]] ≈ A_grad_numeric[(0, 0)])
+    flag2 = (A_grad_dense[even_size[1]+1:end, even_size[2]+1:end] ≈ A_grad_numeric[(1, 1)])
+
+    return flag1 && flag2
+end
+
+"""
+@test test_gsvd_sum_U_a((4, 4), (2, 2))
+@test test_gsvd_sum_U_a((4, 4), (4, 4))
+@test test_gsvd_sum_U_a((4, 4), (0, 0))
+@test test_gsvd_sum_U_b((4, 4), (2, 2))
+"""
+
+function dense_svd_sum_S_grad_full(B)
+    F = svd(B)
+    U = F.U
+    V = F.V
+
+    # f(B) = sum(S), where S is diagonal singular-value matrix.
+    # Upstream cotangent on singular values is ones.
+    return U * V'
+end
+
+function analytic_gsvd_sum_S_grad_full(A)
+    grad_data = Dict{NTuple{2, Int}, Matrix{eltype(A)}}()
+
+    for (sec, block) in nonzero_pairs(A)
+        grad_data[sec] = dense_svd_sum_S_grad_full(block)
+    end
+
+    return Grassmann(size(A), even(A), index_type(A), grad_data)
+end
+
+function svd_sum_S_grad_dense(A)
+
+    A_array = convert(Array, A)
+
+    A_grad_dense = gradient(x -> begin
+        _, s, _ = svd(x)
+        sum(s)
+    end, A_array)[1]
+
+    return A_grad_dense
+end
+
+function test_gsvd_sum_S_a(
+    total_size::NTuple{N, Int}, 
+    even_size::NTuple{N, Int}) where {N}
+
+    A = Grassmann(total_size, even_size, (:out, :in), Float64; init=:random, parity=:even)
+
+    A_grad_analytic = analytic_gsvd_sum_S_grad_full(A)
+    A_grad_numeric = gradient(x -> sum(gsvd(x, 100000; trunc=false)[2]), A)[1]
+
+    return A_grad_analytic ≈ A_grad_numeric
+end
+
+function test_gsvd_sum_S_b(
+    total_size::NTuple{N, Int}, 
+    even_size::NTuple{N, Int}) where {N}
+
+    odd_size = total_size .- even_size
+
+    A = Grassmann(total_size, even_size, (:out, :in), Float64; init=:random, parity=:even)
+    A_grad_dense = svd_sum_S_grad_dense(A)
+    A_grad_numeric = gradient(x -> sum(gsvd(x, 100000; trunc=false)[2]), A)[1]
+
+    flag1 = (A_grad_dense[1:even_size[1], 1:even_size[2]] ≈ A_grad_numeric[(0, 0)])
+    flag2 = (A_grad_dense[even_size[1]+1:end, even_size[2]+1:end] ≈ A_grad_numeric[(1, 1)])
+
+    return flag1 && flag2
+end
+
+"""
+@test test_gsvd_sum_S_a((4, 4), (2, 2))
+@test test_gsvd_sum_S_a((4, 4), (4, 4))
+@test test_gsvd_sum_S_a((4, 4), (0, 0))
+@test test_gsvd_sum_S_b((4, 4), (2, 2))
+"""
+
+function dense_svd_sum_V_grad_full(B)
+    F = svd(B)
+    U = F.U
+    σ = F.S
+    V = F.V
+
+    GV = ones(eltype(B), size(V))
+    L = V' * GV
+
+    k = length(σ)
+    σ2 = σ .^ 2
+
+    Fmat = zeros(eltype(B), k, k)
+    for j in 1:k, i in 1:k
+        if i != j
+            denom = σ2[j] - σ2[i]
+            if abs(denom) > 1e-10
+                Fmat[i, j] = inv(denom)
+            end
+        end
+    end
+
+    # Full square SVD, only V has upstream cotangent.
+    return U * (Diagonal(σ) * (Fmat .* (L - L'))) * V'
+end
+
+function analytic_gsvd_sum_V_grad_full(A)
+    grad_data = Dict{NTuple{2, Int}, Matrix{eltype(A)}}()
+
+    for (sec, block) in nonzero_pairs(A)
+        grad_data[sec] = dense_svd_sum_V_grad_full(block)
+    end
+
+    return Grassmann(size(A), even(A), index_type(A), grad_data)
+end
+
+function svd_sum_V_grad_dense(A)
+
+    A_array = convert(Array, A)
+
+    A_grad_dense = gradient(x -> begin
+        _, _, v = svd(x)
+        sum(v)
+    end, A_array)[1]
+
+    return A_grad_dense
+end
+
+function test_gsvd_sum_V_a(
+    total_size::NTuple{N, Int}, 
+    even_size::NTuple{N, Int}) where {N}
+
+    A = Grassmann(total_size, even_size, (:out, :in), Float64; init=:random, parity=:even)
+
+    A_grad_analytic = analytic_gsvd_sum_V_grad_full(A)
+    A_grad_numeric = gradient(x -> sum(gsvd(x, 100000; trunc=false)[3]), A)[1]
+
+    return A_grad_analytic ≈ A_grad_numeric
+end
+
+function test_gsvd_sum_V_b(
+    total_size::NTuple{N, Int}, 
+    even_size::NTuple{N, Int}) where {N}
+
+    odd_size = total_size .- even_size
+
+    A = Grassmann(total_size, even_size, (:out, :in), Float64; init=:random, parity=:even)
+    A_grad_dense = svd_sum_V_grad_dense(A)
+    A_grad_numeric = gradient(x -> sum(gsvd(x, 100000; trunc=false)[3]), A)[1]
+
+    flag1 = (A_grad_dense[1:even_size[1], 1:even_size[2]] ≈ A_grad_numeric[(0, 0)])
+    flag2 = (A_grad_dense[even_size[1]+1:end, even_size[2]+1:end] ≈ A_grad_numeric[(1, 1)])
+
+    return flag1 && flag2
+end
+
+"""
+@test test_gsvd_sum_V_a((4, 4), (2, 2))
+@test test_gsvd_sum_V_a((4, 4), (4, 4))
+@test test_gsvd_sum_V_a((4, 4), (0, 0))
+@test test_gsvd_sum_V_b((4, 4), (2, 2))
+"""
+
+@timedtestset "Test ad of gsvd (square matrix, no truncation)" begin
+    @timedtestset "Test with U" begin
+        @test test_gsvd_sum_U_a((4, 4), (2, 2))
+        @test test_gsvd_sum_U_a((4, 4), (4, 4))
+        @test test_gsvd_sum_U_a((4, 4), (0, 0))
+        @test test_gsvd_sum_U_b((4, 4), (2, 2))
+    end
+    @timedtestset "Test with S" begin
+        @test test_gsvd_sum_S_a((4, 4), (2, 2))
+        @test test_gsvd_sum_S_a((4, 4), (4, 4))
+        @test test_gsvd_sum_S_a((4, 4), (0, 0))
+        @test test_gsvd_sum_S_b((4, 4), (2, 2))
+    end
+    @timedtestset "Test with V" begin
+        @test test_gsvd_sum_V_a((4, 4), (2, 2))
+        @test test_gsvd_sum_V_a((4, 4), (4, 4))
+        @test test_gsvd_sum_V_a((4, 4), (0, 0))
+        @test test_gsvd_sum_V_b((4, 4), (2, 2))
+    end
+end

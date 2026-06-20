@@ -1,27 +1,121 @@
 ################################ AD rules for decomp.jl operations ################################
+function _tuple_cotangent_get(Δout, i::Int)
+    Δ = ChainRulesCore.unthunk(Δout)
+    Δ isa AbstractZero && return ZeroTangent()
 
+    if Δ isa Tuple
+        return i <= length(Δ) ? Δ[i] : ZeroTangent()
+    elseif Δ isa NamedTuple
+        key = Symbol(string(i))
+        key in keys(Δ) && return Δ[key]
+        :tuple in keys(Δ) && return _tuple_cotangent_get(Δ[:tuple], i)
+        :args in keys(Δ) && return _tuple_cotangent_get(Δ[:args], i)
+        return ZeroTangent()
+    end
+
+    try
+        return Δ[i]
+    catch
+    end
+
+    try
+        return _tuple_cotangent_get(getfield(Δ, :backing), i)
+    catch
+    end
+
+    try
+        return getproperty(Δ, Symbol(string(i)))
+    catch
+    end
+
+    return ZeroTangent()
+end
+
+function _deep_unthunk(x)
+    y = x
+    for _ in 1:8
+        z = ChainRulesCore.unthunk(y)
+        z === y && return z
+        y = z
+    end
+    return y
+end
+
+function _zero_block(::Type{S}, dims::Vararg{Int}) where {S}
+    return zeros(S, dims...)
+end
+
+function _normalize_block_cotangent(block, ::Type{S}, dims::Vararg{Int}) where {S}
+    block_unthunked = _deep_unthunk(block)
+    (block_unthunked isa AbstractZero || block_unthunked === nothing) && return _zero_block(S, dims...)
+
+    for field in (:backing, :value, :val)
+        try
+            block_unthunked = _deep_unthunk(getfield(block_unthunked, field))
+            break
+        catch
+        end
+    end
+
+    block_unthunked isa AbstractArray || return _zero_block(S, dims...)
+    size(block_unthunked) == dims || return _zero_block(S, dims...)
+    return Array(block_unthunked)
+end
+
+function _block_cotangent_or_zeros(Δ, sec, ::Type{S}, dims::Vararg{Int}) where {S}
+    Δ_unthunked = _deep_unthunk(Δ)
+    (Δ_unthunked isa AbstractZero || Δ_unthunked === nothing) && return _zero_block(S, dims...)
+
+    try
+        if haskey(Δ_unthunked, sec)
+            return _normalize_block_cotangent(Δ_unthunked[sec], S, dims...)
+        end
+        return _zero_block(S, dims...)
+    catch
+    end
+
+    try
+        data_blocks = _deep_unthunk(getproperty(Δ_unthunked, :data))
+        if haskey(data_blocks, sec)
+            return _normalize_block_cotangent(data_blocks[sec], S, dims...)
+        end
+        return _zero_block(S, dims...)
+    catch
+    end
+
+    try
+        backing = _deep_unthunk(getfield(Δ_unthunked, :backing))
+        data_blocks = _deep_unthunk(backing[:data])
+        if haskey(data_blocks, sec)
+            return _normalize_block_cotangent(data_blocks[sec], S, dims...)
+        end
+    catch
+    end
+
+    return _zero_block(S, dims...)
+end
 # ─── Block-level SVD reverse-mode pullback ────────────────────────────────────
 #
-# For A = U * diagm(S) * Vt  (real, economy SVD with Vt = V^T).
+# For A = U * diagm(S) * V'  (real, economy SVD; Julia returns V, not V').
 #
-# Given cotangents dU, dS_vec, dVt, computes dA using the closed-form SVD
+# Given cotangents dU, dS_vec, dV, computes dA using the closed-form SVD
 # pullback (Giles 2008 / Townsend 2016).
 #
 # The "economy" size convention:
-#   A : m × n,   U : m × k,   S : length k,   Vt : k × n,   k = n (= m for square)
+#   A : m x n,   U : m x k,   S : length k,   V : n x k
 #
 # Fᵢⱼ = 0  if i=j or |σⱼ² - σᵢ²| < tol,  else  1 / (σⱼ² − σᵢ²)
 
 function _svd_block_rev(
     U::Matrix{S},
     S_vec::Vector{Float64},
-    Vt::Matrix{S},
+    V::Matrix{S},
     dU::Matrix{S},
     dS_vec::Vector{Float64},
-    dVt::Matrix{S}) where {S<:Number}
+    dV::Matrix{S}) where {S<:Number}
 
     m, k = size(U)          # U : m × k
-    kV, n = size(Vt)        # Vt : k × n
+    n, kV = size(V)         # V : n x k
     @assert k == kV == length(S_vec)
 
     S2 = S_vec .^ 2
@@ -41,13 +135,13 @@ function _svd_block_rev(
     dS_mat = diagm(dS_vec)
 
     Ut_dU = U' * dU                     # k × k
-    Vt_dVtT = Vt * dVt'                 # k × k  ( = Vt * dV,  since dVt' = dV )
+    Vt_dV = V' * dV                    # k x k
 
     term = dS_mat
     term += (F .* (Ut_dU - Ut_dU')) * S_mat
-    term -= S_mat * (F .* (Vt_dVtT - Vt_dVtT'))
+    term += S_mat * (F .* (Vt_dV - Vt_dV'))
 
-    dA_core = U * term * Vt
+    dA_core = U * term * V'
 
     # ---- orthogonal complement (zero for square full-rank) -------------------
     Im = Matrix{S}(I, m, m)
@@ -60,8 +154,8 @@ function _svd_block_rev(
     end
     S_inv_mat = diagm(S_inv)
 
-    dA_orth = (Im - U * U') * dU * S_inv_mat * Vt +
-              U * S_inv_mat * dVt * (In - Vt' * Vt)
+    dA_orth = (Im - U * U') * dU * S_inv_mat * V' +
+              U * S_inv_mat * dV' * (In - V * V')
 
     return dA_core + dA_orth
 end
@@ -305,10 +399,10 @@ function ChainRulesCore.rrule(
     V_out = Grassmann(total_size_V_out, even_size_V_out, index_type_V_out, data_V_dict)
 
     # ────── pullback ────────────────────────────────────────────────────────
-    function gsvd_pullback(ΔU_gr, ΔS_gr, ΔV_gr, Δtrunc_err)
-        ΔU = ChainRulesCore.unthunk(ΔU_gr)
-        ΔS = ChainRulesCore.unthunk(ΔS_gr)
-        ΔV = ChainRulesCore.unthunk(ΔV_gr)
+    function gsvd_pullback(Δout)
+        ΔU = ChainRulesCore.unthunk(_tuple_cotangent_get(Δout, 1))
+        ΔS = ChainRulesCore.unthunk(_tuple_cotangent_get(Δout, 2))
+        ΔV = ChainRulesCore.unthunk(_tuple_cotangent_get(Δout, 3))
 
         if ΔU isa AbstractZero && ΔS isa AbstractZero && ΔV isa AbstractZero
             return (NoTangent(), ZeroTangent(), NoTangent())
@@ -324,9 +418,10 @@ function ChainRulesCore.rrule(
             kf = length(S_f)
 
             # extract block cotangents (or zeros for missing blocks)
-            dU_blk = haskey(ΔU, sec) ? ΔU[sec] : zeros(S, size(U_f, 1), kt)
-            dS_blk_vec = haskey(ΔS, sec) ? diag(ΔS[sec]) : zeros(S, kt)
-            dV_blk = haskey(ΔV, sec) ? ΔV[sec] : zeros(S, size(Vt_f, 1), kt)
+            dU_blk = _block_cotangent_or_zeros(ΔU, sec, S, size(U_f, 1), kt)
+            dS_blk = _block_cotangent_or_zeros(ΔS, sec, S, kt, kt)
+            dS_blk_vec = diag(dS_blk)
+            dV_blk = _block_cotangent_or_zeros(ΔV, sec, S, size(Vt_f, 1), kt)
 
             # pad with zeros for the truncated dimensions
             dU_pad = hcat(dU_blk, zeros(S, size(U_f, 1), kf - kt))
@@ -493,9 +588,9 @@ function ChainRulesCore.rrule(
     Λ_out = Grassmann(total_size_Λ_out, even_size_Λ_out, index_type_Λ_out, data_Λ_dict)
 
     # ────── pullback ────────────────────────────────────────────────────────
-    function gevd_pullback(ΔU_gr, ΔΛ_gr, Δtrunc_err)
-        ΔU = ChainRulesCore.unthunk(ΔU_gr)
-        ΔΛ = ChainRulesCore.unthunk(ΔΛ_gr)
+    function gevd_pullback(Δout)
+        ΔU = ChainRulesCore.unthunk(_tuple_cotangent_get(Δout, 1))
+        ΔΛ = ChainRulesCore.unthunk(_tuple_cotangent_get(Δout, 2))
 
         if ΔU isa AbstractZero && ΔΛ isa AbstractZero
             return (NoTangent(), ZeroTangent(), NoTangent())
@@ -509,8 +604,9 @@ function ChainRulesCore.rrule(
             kt = block_k_trunc[sec]
             kf = length(Λ_f)
 
-            dU_blk = haskey(ΔU, sec) ? ΔU[sec] : zeros(S, size(U_f, 1), kt)
-            dΛ_blk_vec = haskey(ΔΛ, sec) ? diag(ΔΛ[sec]) : zeros(S, kt)
+            dU_blk = _block_cotangent_or_zeros(ΔU, sec, S, size(U_f, 1), kt)
+            dΛ_blk = _block_cotangent_or_zeros(ΔΛ, sec, S, kt, kt)
+            dΛ_blk_vec = diag(dΛ_blk)
 
             # pad with zeros for truncated dimensions
             dU_pad = hcat(dU_blk, zeros(S, size(U_f, 1), kf - kt))
@@ -597,9 +693,9 @@ function ChainRulesCore.rrule(
     M2_out = Grassmann(total_size_M2_out, even_size_M2_out, index_type_M2_out, data_M2_dict)
 
     # ────── pullback ────────────────────────────────────────────────────────
-    function gortho_pullback(ΔM1_gr, ΔM2_gr)
-        ΔM1 = ChainRulesCore.unthunk(ΔM1_gr)
-        ΔM2 = ChainRulesCore.unthunk(ΔM2_gr)
+    function gortho_pullback(Δout)
+        ΔM1 = ChainRulesCore.unthunk(_tuple_cotangent_get(Δout, 1))
+        ΔM2 = ChainRulesCore.unthunk(_tuple_cotangent_get(Δout, 2))
 
         if ΔM1 isa AbstractZero && ΔM2 isa AbstractZero
             return (NoTangent(), ZeroTangent())
@@ -611,8 +707,8 @@ function ChainRulesCore.rrule(
             M1 = block_M1[sec]
             M2 = block_M2[sec]
 
-            dM1_blk = haskey(ΔM1, sec) ? ΔM1[sec] : zeros(S, size(M1))
-            dM2_blk = haskey(ΔM2, sec) ? ΔM2[sec] : zeros(S, size(M2))
+            dM1_blk = _block_cotangent_or_zeros(ΔM1, sec, S, size(M1)...)
+            dM2_blk = _block_cotangent_or_zeros(ΔM2, sec, S, size(M2)...)
 
             dA_block = if is_qr
                 _qr_block_rev(M1, M2, dM1_blk, dM2_blk)
