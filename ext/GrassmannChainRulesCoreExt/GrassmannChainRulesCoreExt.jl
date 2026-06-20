@@ -3,6 +3,7 @@ module GrassmannChainRulesCoreExt
 using GrassmannTN
 using ChainRulesCore
 using Zygote
+using LinearAlgebra
 
 import GrassmannTN: Grassmann, AbstractGrassmann,
     nonzero_pairs, nonzero_keys, nonzero_vals, data,
@@ -11,7 +12,8 @@ import GrassmannTN: Grassmann, AbstractGrassmann,
     add_parity_sign, add_perm_sign,
     index_conjugation, convert2array, prepare_range_dict,
     _parity_mask, _fixed_parity_blocks, _similar_arraytype,
-    conjugate, fuse, calculate_sectors, calculate_fused_size, prepare_fused_info
+    conjugate, fuse, calculate_sectors, calculate_fused_size, prepare_fused_info,
+    gsvd, gevd, gortho, truncation, check_parity
 
 # AD rules for grassmann.jl (constructors, convert, index_conjugation)
 include("grassmann.jl")
@@ -24,5 +26,8 @@ include("base.jl")
 
 # AD rules for fusion.jl (fuse, split)
 include("fusion.jl")
+
+# AD rules for decomp.jl (gsvd, gevd, gortho)
+include("decomp.jl")
 
 end  # module GrassmannChainRulesCoreExt

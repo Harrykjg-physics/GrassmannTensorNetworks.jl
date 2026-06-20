@@ -1,2 +1,0 @@
-# Grassmanntn
-Grassmann tensor operations
