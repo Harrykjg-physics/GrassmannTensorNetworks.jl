@@ -44,7 +44,7 @@ end
 
 function test_GSVD_rank2_1(total_size, even_size, Dcut)
 
-    T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
+    T = Grassmann(total_size, even_size, (:out, :in), ComplexF64; init=:random, parity=:even)
 
     Uout, Sout, Vout, _  = gsvd(T, Dcut)
 
@@ -63,7 +63,7 @@ end
 
 function test_GSVD_rank2_2(total_size, even_size, Dcut)
 
-    T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
+    T = Grassmann(total_size, even_size, (:out, :in), ComplexF64; init=:random, parity=:even)
     Uout, Sout, Vout, _ = gsvd(T, Dcut)
     T_00 = T[(0, 0)]; T_11 = T[(1, 1)]
     U_00, S_00, V_00 = svd(T_00)
@@ -74,7 +74,7 @@ end
 
 function test_GSVD_rank2_3(total_size, even_size, Dcut)
 
-    T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
+    T = Grassmann(total_size, even_size, (:out, :in), ComplexF64; init=:random, parity=:even)
     Uout, Sout, Vout, _ = gsvd(T, Dcut)
     T1 = contract(Uout, Sout, (2, 1))
     T2 = contract(T1, Vout, (2, 2); cj=(false, true))
@@ -85,7 +85,7 @@ end
 
 function test_GSVD_rank2_4(total_size, even_size, Dcut)
 
-    T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
+    T = Grassmann(total_size, even_size, (:out, :in), ComplexF64; init=:random, parity=:even)
     Uout, Sout, Vout, _ = gsvd(T, Dcut)
     T1 = contract(Uout, Sout, (2, 1))
     T2 = contract(T1, Vout, (2, 2); cj=(false, true))
@@ -101,7 +101,7 @@ end
 
 function test_GSVD_rank2_5(total_size, even_size, Dcut)
 
-    T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
+    T = Grassmann(total_size, even_size, (:out, :in), ComplexF64; init=:random, parity=:even)
     Uout, Sout, Vout, _ = gsvd(T, Dcut)
     I_U = contract(Uout, Uout, (1, 1); cj=(false, true))
     I_V = contract(Vout, Vout, (1, 1); cj=(false, true))
@@ -112,7 +112,7 @@ end
 
 function test_GSVD_rank2_6(total_size, even_size, Dcut)
 
-    T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
+    T = Grassmann(total_size, even_size, (:out, :in), ComplexF64; init=:random, parity=:even)
     Uout, Sout, Vout, _  = gsvd(T, Dcut)
 
     I_U1 = contract(Uout, Uout, (1, 1); cj=(false, true))
@@ -129,7 +129,7 @@ end
 
 function test_GSVD_rank2_7(total_size, even_size, Dcut)
 
-    T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
+    T = Grassmann(total_size, even_size, (:out, :in), ComplexF64; init=:random, parity=:even)
     Uout1, Sout1, Vout1, _  = gsvd(T, Dcut; trunc=false)
     Sout1, dim_even_trunc1, dim_odd_trunc1 = truncation(Sout1, Dcut)
     Uout1 = Uout1[2, (dim_even_trunc1, dim_odd_trunc1)]
@@ -146,7 +146,7 @@ function test_GSVD_rank4_1(
     indscol::NTuple{N2, Int}; 
     sign_function=trivial_sign) where {N1, N2}
 
-    T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
+    T = Grassmann(total_size, even_size, (:out, :out, :in, :in), ComplexF64; init=:random, parity=:even)
     U_out, S_out, V_out, _ = gsvd(T, indsrow, indscol, 10000; sign_function=sign_function)
     T1 = contract(U_out, S_out, (N1+1, 1); sign_function=sign_function)
     T2 = contract(T1, V_out, (N1+1, N2+1); cj=(false, true), sign_function=sign_function)
@@ -159,7 +159,7 @@ function test_GSVD_rank4_2(
     indsrow::NTuple{N1, Int}, 
     indscol::NTuple{N2, Int}) where {N1, N2}
 
-    T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
+    T = Grassmann(total_size, even_size, (:out, :out, :in, :in), ComplexF64; init=:random, parity=:even)
     Uout, Sout, Vout, _  = gsvd(T, indsrow, indscol, 10000)
     inds_U = ntuple(i->i, N1)
     inds_V = ntuple(i->i, N2)
@@ -175,7 +175,7 @@ function test_GSVD_rank4_3(
     indsrow::NTuple{N1, Int}, 
     indscol::NTuple{N2, Int}) where {N1, N2}
 
-    T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
+    T = Grassmann(total_size, even_size, (:out, :out, :in, :in), ComplexF64; init=:random, parity=:even)
     Uout, Sout, Vout, _  = gsvd(T, indsrow, indscol, Dcut)
     inds_U = ntuple(i->i, N1)
     inds_V = ntuple(i->i, N2)
@@ -186,15 +186,55 @@ function test_GSVD_rank4_3(
     return I_U_array, I_V_array
 end
 
-const test_GSVD_rank6_1 = test_GSVD_rank4_1
+function test_GSVD_rank6_1(
+    total_size, even_size, 
+    indsrow::NTuple{N1, Int}, 
+    indscol::NTuple{N2, Int}; 
+    sign_function=trivial_sign) where {N1, N2}
 
-const test_GSVD_rank6_2 = test_GSVD_rank4_2
+    T = Grassmann(total_size, even_size, (:out, :out, :out, :in, :in, :in), ComplexF64; init=:random, parity=:even)
+    U_out, S_out, V_out, _ = gsvd(T, indsrow, indscol, 10000; sign_function=sign_function)
+    T1 = contract(U_out, S_out, (N1+1, 1); sign_function=sign_function)
+    T2 = contract(T1, V_out, (N1+1, N2+1); cj=(false, true), sign_function=sign_function)
+    T ≈ T2
+end
 
-const test_GSVD_rank6_3 = test_GSVD_rank4_3
+function test_GSVD_rank6_2(
+    total_size, 
+    even_size, 
+    indsrow::NTuple{N1, Int}, 
+    indscol::NTuple{N2, Int}) where {N1, N2}
+
+    T = Grassmann(total_size, even_size, (:out, :out, :out, :in, :in, :in), ComplexF64; init=:random, parity=:even)
+    Uout, Sout, Vout, _  = gsvd(T, indsrow, indscol, 10000)
+    inds_U = ntuple(i->i, N1)
+    inds_V = ntuple(i->i, N2)
+    I_U = contract(Uout, Uout, (inds_U, inds_U); cj=(false, true))
+    I_V = contract(Vout, Vout, (inds_V, inds_V); cj=(false, true))
+    I_U_array = convert(Array, I_U)
+    I_V_array = convert(Array, I_V)
+    return I_U_array, I_V_array
+end
+
+function test_GSVD_rank6_3(
+    total_size, even_size, Dcut, 
+    indsrow::NTuple{N1, Int}, 
+    indscol::NTuple{N2, Int}) where {N1, N2}
+
+    T = Grassmann(total_size, even_size, (:out, :out, :out, :in, :in, :in), ComplexF64; init=:random, parity=:even)
+    Uout, Sout, Vout, _  = gsvd(T, indsrow, indscol, Dcut)
+    inds_U = ntuple(i->i, N1)
+    inds_V = ntuple(i->i, N2)
+    I_U = contract(Uout, Uout, (inds_U, inds_U); cj=(false, true))
+    I_V = contract(Vout, Vout, (inds_V, inds_V); cj=(false, true))
+    I_U_array = convert(Array, I_U)
+    I_V_array = convert(Array, I_V)
+    return I_U_array, I_V_array
+end
 
 function test_GEVD_rank2_non_trunc1(total_size, even_size, Dcut)
 
-    T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
+    T = Grassmann(total_size, even_size, (:out, :in), ComplexF64; init=:random, parity=:even)
     Uout, Λout, _ = gevd(T, Dcut)
     TU = contract(T, Uout, (2, 1))
     UΛ = contract(Uout, Λout, (2, 1))
@@ -205,7 +245,7 @@ function test_GEVD_rank2_non_trunc2(total_size, even_size, Dcut)
 
     T_coef = rand(ComplexF64, total_size)
     T_coef = (T_coef + T_coef')/2
-    T = Grassmann(T_coef, total_size, even_size)
+    T = Grassmann(T_coef, total_size, even_size, (:out, :in))
     Uout, Λout, _ = gevd(T, Dcut)
     T1 = contract(Uout, Λout, (2, 1))
     T2 = contract(T1, Uout, (2, 2); cj=(false, true))
@@ -215,13 +255,13 @@ end
 function test_GEVD_rank2_non_trunc3(total_size, even_size, Dcut)
 
     T_coef1 = rand(ComplexF64, total_size)
-    T1 = Grassmann(T_coef1, total_size, even_size)
+    T1 = Grassmann(T_coef1, total_size, even_size, (:out, :in))
     Uout1, Λout1, _ = gevd(T1, Dcut; symflag=true)
     Ta1 = contract(Uout1, Λout1, (2, 1))
     Tb1 = contract(Ta1, Uout1, (2, 2); cj=(false, true))
 
     T_coef2 = (T_coef1 + T_coef1')/2
-    T2 = Grassmann(T_coef2, total_size, even_size)
+    T2 = Grassmann(T_coef2, total_size, even_size, (:out, :in))
     Uout2, Λout2, _ = gevd(T2, Dcut)
     Ta2 = contract(Uout2, Λout2, (2, 1))
     Tb2 = contract(Ta2, Uout2, (2, 2); cj=(false, true))
@@ -235,7 +275,7 @@ function test_GEVD_rank4_non_trunc1(
     indscol::NTuple{N2, Int}
     ) where {N1, N2}
 
-    T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
+    T = Grassmann(total_size, even_size, (:out, :out, :in, :in), ComplexF64; init=:random, parity=:even)
     U, Λ, _  =  gevd(T, indsrow, indscol, 10000)
     TU = contract(T, U, (indscol, indsrow))
     UΛ = contract(U, Λ, (N1+1, 1))
@@ -247,7 +287,7 @@ function test_HOSVD_1(
     even_size::NTuple{4, Int})
 
     # T1[l1, r1, u1, d1]
-    T1 = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
+    T1 = Grassmann(total_size, even_size, (:out, :out, :in, :in), ComplexF64; init=:random, parity=:even)
     # T2[l2, r2, u2, d2]
     T2 = copy(T1)
     # Ml[(l1, l2), r1, u1, r2, d2] <-- Ml[l1, r1, u1, l2, r2, d2] = T1[l1, r1, u1, dum] * T2[l2, r2, dum, d2]
@@ -268,7 +308,7 @@ end
 
 function test_GQR_rank2_1(total_size, even_size)
 
-    T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
+    T = Grassmann(total_size, even_size, (:out, :in), ComplexF64; init=:random, parity=:even)
     Q, R = gortho(T; alg=LinearAlgebra.qr)
     T_test = contract(Q, R, (2, 1))
     T ≈ T_test
@@ -276,7 +316,7 @@ end
 
 function test_GQR_rank2_2(total_size, even_size)
 
-    T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
+    T = Grassmann(total_size, even_size, (:out, :in), ComplexF64; init=:random, parity=:even)
     Q, R = gortho(T; alg=LinearAlgebra.qr)
     I_test = contract(Q, Q, (1, 1); cj=(true, false))
     I_test_array = convert(Array, I_test)
@@ -286,7 +326,7 @@ end
 
 function test_GLQ_rank2_1(total_size, even_size)
 
-    T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
+    T = Grassmann(total_size, even_size, (:out, :in), ComplexF64; init=:random, parity=:even)
     L, Q = gortho(T; alg=LinearAlgebra.lq)
     T_test = contract(L, Q, (2, 1))
     T ≈ T_test
@@ -294,7 +334,7 @@ end
 
 function test_GLQ_rank2_2(total_size, even_size)
 
-    T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
+    T = Grassmann(total_size, even_size, (:out, :in), ComplexF64; init=:random, parity=:even)
     L, Q = gortho(T; alg=LinearAlgebra.lq)
     I_test = contract(Q, Q, (1, 1); cj=(true, false))
     I_test_array = convert(Array, I_test)
@@ -304,7 +344,7 @@ end
 
 function test_GQR_rank4_1(total_size, even_size, indsrow::NTuple{N1, Int64}, indscol::NTuple{N2, Int64}) where {N1, N2}
 
-    T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
+    T = Grassmann(total_size, even_size, (:out, :out, :in, :in), ComplexF64; init=:random, parity=:even)
     Q, R = gortho(T, indsrow, indscol; alg=LinearAlgebra.qr)
     T_test = contract(Q, R, (N1+1, 1))
     T ≈ T_test
@@ -312,7 +352,7 @@ end
 
 function test_GLQ_rank4_1(total_size, even_size, indsrow::NTuple{N1, Int64}, indscol::NTuple{N2, Int64}) where {N1, N2}
 
-    T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
+    T = Grassmann(total_size, even_size, (:out, :out, :in, :in), ComplexF64; init=:random, parity=:even)
     L, Q = gortho(T, indsrow, indscol; alg=LinearAlgebra.lq)
     T_test = contract(L, Q, (N1+1, 1))
     T ≈ T_test
