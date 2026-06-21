@@ -403,12 +403,20 @@ function gevd(
 
     total_size, even_size, index_types = size(tensor), even(tensor), index_type(tensor)
     total_size_row, even_size_row, index_type_row = getindices(total_size, rowinds), getindices(even_size, rowinds), getindices(index_types, rowinds)
-    total_size_col, even_size_col, index_type_col = getindices(total_size, colinds), getindices(even_size, colinds), getindices(index_types, colinds)
 
-    N1 > 1 ? tensor_fused1 = fuse(tensor, rowinds) : tensor_fused1 = tensor
-    N2 > 1 ? tensor_fused2 = fuse(tensor_fused1, colinds .- (N1-1)) : tensor_fused2 = tensor_fused1
+    tensor_fused1 = if N1 > 1
+        fuse(tensor, rowinds)
+    else
+        tensor
+    end
 
-    U, Λ_out, trunc_err = gevd(tensor_fused2, Dcut; symflag=symflag, trunc=trunc, average_trunc=average_trunc)
+    tensor_fused2 = if N2 > 1
+        fuse(tensor_fused1, colinds .- (N1 - 1))
+    else
+        tensor_fused1
+    end
+
+    U, eigvals_out, trunc_err = gevd(tensor_fused2, Dcut; symflag=symflag, trunc=trunc, average_trunc=average_trunc)
 
     _, dim_U_col = size(U)
     _, edim_U_col = even(U)
@@ -418,9 +426,13 @@ function gevd(
     even_size_U = insertafter(even_size_row, N1, (edim_U_col, ))
     index_type_U = insertafter(index_type_row, N1, (:in, ))
 
-    N1 > 1 ? U_out = split(U, 1, total_size_U, even_size_U, index_type_U) : U_out = U
+    U_out = if N1 > 1
+        split(U, 1, total_size_U, even_size_U, index_type_U)
+    else
+        U
+    end
 
-    return U_out, Λ_out, trunc_err
+    return U_out, eigvals_out, trunc_err
 end
 
 ############################### GQR/GLQ for Grassmann Matrix ###############################

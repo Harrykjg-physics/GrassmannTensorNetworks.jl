@@ -1196,4 +1196,86 @@ end
 
 # -------------------------------------------------------------------
 
+function gevd_objective(
+    A::Grassmann{T, N},
+    rowinds::NTuple{N1, Int},
+    colinds::NTuple{N2, Int},
+    which::Symbol;
+    symflag::Bool=true) where {T, N, N1, N2}
 
+    u, λ, _ = gevd(A, rowinds, colinds, 100000; symflag=symflag, trunc=false)
+
+    if which === :U
+        return sum(abs2, u)
+    elseif which === :Λ
+        return sum(λ)
+    else
+        throw(ArgumentError("which must be :U or :Λ"))
+    end
+end
+
+function finite_difference_full_grad_gevd(
+    A::Grassmann{T, N},
+    rowinds::NTuple{N1, Int},
+    colinds::NTuple{N2, Int};
+    which::Symbol,
+    symflag::Bool=true) where {T, N, N1, N2}
+
+    fdm = central_fdm(5, 1)
+    f = x -> gevd_objective(x, rowinds, colinds, which; symflag=symflag)
+
+    grad_data = Dict{NTuple{N, Int}, Array{T, N}}()
+
+    for (sec, block) in nonzero_pairs(A)
+
+        G = zeros(T, size(block)...)
+        for I in CartesianIndices(block)
+            E = grassmann_basis_like(A, sec, I)
+            G[I] = fdm(t -> f(A + t * E), 0.0)
+        end
+
+        grad_data[sec] = G
+    end
+
+    return Grassmann(size(A), even(A), index_type(A), grad_data)
+end
+
+function test_gevd_ad_full_fd(
+    total_size::NTuple{N, Int},
+    even_size::NTuple{N, Int},
+    rowinds::NTuple{N1, Int},
+    colinds::NTuple{N2, Int},
+    which::Symbol;
+    symflag::Bool=true,
+    atol::Float64=1e-5,
+    rtol::Float64=1e-5) where {N, N1, N2}
+
+    index_types = ntuple(i -> i in rowinds ? :out : :in, N)
+
+    A = Grassmann(total_size, even_size, index_types, Float64; init=:random, parity=:even)
+
+    f = x -> gevd_objective(x, rowinds, colinds, which; symflag=symflag)
+
+    g_ad = gradient(f, A)[1]
+    g_fd = finite_difference_full_grad_gevd(A, rowinds, colinds; which=which, symflag=symflag)
+
+    return isapprox(g_ad, g_fd; atol=atol, rtol=rtol)
+end
+
+@timedtestset "Test ad of gevd for rank-4 tensor (no truncation)" begin
+
+    rowinds = (1, 2)
+    colinds = (3, 4)
+
+    @test test_gevd_ad_full_fd((2, 2, 2, 2), (1, 1, 1, 1), rowinds, colinds, :U; symflag=true)
+    @test test_gevd_ad_full_fd((2, 2, 2, 2), (1, 1, 1, 1), rowinds, colinds, :Λ; symflag=true)
+end
+
+@timedtestset "Test ad of gevd for rank-6 tensor (no truncation)" begin
+
+    rowinds = (1, 2, 3)
+    colinds = (4, 5, 6)
+
+    @test test_gevd_ad_full_fd((2, 2, 2, 2, 2, 2), (1, 1, 1, 1, 1, 1), rowinds, colinds, :U; symflag=true)
+    @test test_gevd_ad_full_fd((2, 2, 2, 2, 2, 2), (1, 1, 1, 1, 1, 1), rowinds, colinds, :Λ; symflag=true)
+end
