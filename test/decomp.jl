@@ -48,11 +48,11 @@ function test_GSVD_rank2_1(total_size, even_size, Dcut)
 
     Uout, Sout, Vout, _  = gsvd(T, Dcut)
 
-    Uout_array = convert2array(Uout)
-    Vout_array = convert2array(Vout)
-    Sout_array = convert2array(Sout)
+    Uout_array = convert(Array, Uout)
+    Vout_array = convert(Array, Vout)
+    Sout_array = convert(Array, Sout)
 
-    T_array = convert2array(T)
+    T_array = convert(Array, T)
     U_array, S_vec, V_array = svd(T_array)
     U_array_out = U_array[:, 1:Dcut]
     V_array_out = V_array[:, 1:Dcut]
@@ -78,8 +78,8 @@ function test_GSVD_rank2_3(total_size, even_size, Dcut)
     Uout, Sout, Vout, _ = gsvd(T, Dcut)
     T1 = contract(Uout, Sout, (2, 1))
     T2 = contract(T1, Vout, (2, 2); cj=(false, true))
-    T2_array = convert2array(T2)
-    T_array = convert2array(T)
+    T2_array = convert(Array, T2)
+    T_array = convert(Array, T)
     T_array ≈ T2_array
 end
 
@@ -89,8 +89,8 @@ function test_GSVD_rank2_4(total_size, even_size, Dcut)
     Uout, Sout, Vout, _ = gsvd(T, Dcut)
     T1 = contract(Uout, Sout, (2, 1))
     T2 = contract(T1, Vout, (2, 2); cj=(false, true))
-    T2_array = convert2array(T2)
-    T_array = convert2array(T)
+    T2_array = convert(Array, T2)
+    T_array = convert(Array, T)
     Uout_array, Sout_vec, Vout_array = svd(T_array)
     Uout_array_trunc = Uout_array[:, 1:Dcut]
     Vout_array_trunc = Vout_array[:, 1:Dcut]
@@ -105,8 +105,8 @@ function test_GSVD_rank2_5(total_size, even_size, Dcut)
     Uout, Sout, Vout, _ = gsvd(T, Dcut)
     I_U = contract(Uout, Uout, (1, 1); cj=(false, true))
     I_V = contract(Vout, Vout, (1, 1); cj=(false, true))
-    I_U_array = convert2array(I_U)
-    I_V_array = convert2array(I_V)
+    I_U_array = convert(Array, I_U)
+    I_V_array = convert(Array, I_V)
     return I_U_array, I_V_array
 end
 
@@ -117,13 +117,13 @@ function test_GSVD_rank2_6(total_size, even_size, Dcut)
 
     I_U1 = contract(Uout, Uout, (1, 1); cj=(false, true))
     I_V1 = contract(Vout, Vout, (1, 1); cj=(false, true))
-    I_U1_array = convert2array(I_U1)
-    I_V1_array = convert2array(I_V1)
+    I_U1_array = convert(Array, I_U1)
+    I_V1_array = convert(Array, I_V1)
 
     I_U2 = contract(Uout, Uout, (2, 2); cj=(false, true))
     I_V2 = contract(Vout, Vout, (2, 2); cj=(false, true))
-    I_U2_array = convert2array(I_U2)
-    I_V2_array = convert2array(I_V2)
+    I_U2_array = convert(Array, I_U2)
+    I_V2_array = convert(Array, I_V2)
     return I_U1_array, I_V1_array, I_U2_array, I_V2_array
 end
 
@@ -165,8 +165,8 @@ function test_GSVD_rank4_2(
     inds_V = ntuple(i->i, N2)
     I_U = contract(Uout, Uout, (inds_U, inds_U); cj=(false, true))
     I_V = contract(Vout, Vout, (inds_V, inds_V); cj=(false, true))
-    I_U_array = convert2array(I_U)
-    I_V_array = convert2array(I_V)
+    I_U_array = convert(Array, I_U)
+    I_V_array = convert(Array, I_V)
     return I_U_array, I_V_array
 end
 
@@ -181,8 +181,8 @@ function test_GSVD_rank4_3(
     inds_V = ntuple(i->i, N2)
     I_U = contract(Uout, Uout, (inds_U, inds_U); cj=(false, true))
     I_V = contract(Vout, Vout, (inds_V, inds_V); cj=(false, true))
-    I_U_array = convert2array(I_U)
-    I_V_array = convert2array(I_V)
+    I_U_array = convert(Array, I_U)
+    I_V_array = convert(Array, I_V)
     return I_U_array, I_V_array
 end
 
@@ -279,7 +279,7 @@ function test_GQR_rank2_2(total_size, even_size)
     T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
     Q, R = gortho(T; alg=LinearAlgebra.qr)
     I_test = contract(Q, Q, (1, 1); cj=(true, false))
-    I_test_array = convert2array(I_test)
+    I_test_array = convert(Array, I_test)
     I_array = diagm(ones(size(I_test_array)[1]))
     I_test_array ≈ I_array
 end
@@ -297,7 +297,7 @@ function test_GLQ_rank2_2(total_size, even_size)
     T = Grassmann(total_size, even_size, ComplexF64; init=:random, parity=:even)
     L, Q = gortho(T; alg=LinearAlgebra.lq)
     I_test = contract(Q, Q, (1, 1); cj=(true, false))
-    I_test_array = convert2array(I_test)
+    I_test_array = convert(Array, I_test)
     I_array = diagm(ones(size(I_test_array)[1]))
     I_test_array ≈ I_array
 end
@@ -547,14 +547,14 @@ end
 
 @timedtestset "Test GHOSVD using GSVD and GEVD" begin
     Ul, Sl, Vr, Sr, Ult, Λlt, Vrt, Λrt = test_HOSVD_1((4, 4, 4, 4), (2, 2, 2, 2))
-    Ul_array = convert2array(Ul)
-    Sl_array = convert2array(Sl)
-    Vr_array = convert2array(Vr)
-    Sr_array = convert2array(Sr)
-    Ult_array = convert2array(Ult)
-    Λlt_array = convert2array(Λlt)
-    Vrt_array = convert2array(Vrt)
-    Λrt_array = convert2array(Λrt)
+    Ul_array = convert(Array, Ul)
+    Sl_array = convert(Array, Sl)
+    Vr_array = convert(Array, Vr)
+    Sr_array = convert(Array, Sr)
+    Ult_array = convert(Array, Ult)
+    Λlt_array = convert(Array, Λlt)
+    Vrt_array = convert(Array, Vrt)
+    Λrt_array = convert(Array, Λrt)
     errl1 = (diag(Sl_array).^2 - diag(abs.(Λlt_array))) ./ diag(Sl_array).^2
     errr1 = (diag(Sr_array).^2 - diag(abs.(Λrt_array))) ./ diag(Sr_array).^2
     errl2 = (abs.(Ul_array) - abs.(Ult_array)) 
@@ -1279,3 +1279,148 @@ end
     @test test_gevd_ad_full_fd((2, 2, 2, 2, 2, 2), (1, 1, 1, 1, 1, 1), rowinds, colinds, :U; symflag=true)
     @test test_gevd_ad_full_fd((2, 2, 2, 2, 2, 2), (1, 1, 1, 1, 1, 1), rowinds, colinds, :Λ; symflag=true)
 end
+
+# -------------------------------------------------------------------
+
+function gortho_objective(A, which::Symbol; alg=LinearAlgebra.qr)
+    
+    m1, m2 = gortho(A; alg=alg)
+    which === :M1 && return sum(m1)
+    which === :M2 && return sum(m2)
+    throw(ArgumentError("which must be :M1 or :M2"))
+end
+
+function finite_difference_full_grad_gortho(
+    A::GrassmannMatrix{T},
+    which::Symbol;
+    alg::Function=LinearAlgebra.qr) where {T}
+
+    fdm = central_fdm(5, 1)
+    f = x -> gortho_objective(x, which; alg=alg)
+
+    grad_data = Dict{NTuple{2, Int}, Array{T, 2}}()
+
+    for (sec, block) in nonzero_pairs(A)
+
+        G = zeros(T, size(block)...)
+        for I in CartesianIndices(block)
+            E = grassmann_basis_like(A, sec, I)
+            G[I] = fdm(t -> f(A + t * E), 0.0)
+        end
+
+        grad_data[sec] = G
+    end
+
+    return Grassmann(size(A), even(A), index_type(A), grad_data)
+end
+
+function test_gortho_ad_full_fd(
+    total_size::NTuple{2, Int},
+    even_size::NTuple{2, Int},
+    which::Symbol;
+    alg::Function=LinearAlgebra.qr,
+    atol::Float64=1e-5,
+    rtol::Float64=1e-5)
+
+    A = Grassmann(total_size, even_size, (:out, :in), Float64; init=:random, parity=:even)
+    f = x -> gortho_objective(x, which; alg=alg)
+
+    g_ad = gradient(f, A)[1]
+    g_fd = finite_difference_full_grad_gortho(A, which; alg=alg)
+
+    return isapprox(g_ad, g_fd; atol=atol, rtol=rtol)
+end
+
+function gortho_objective(
+    A::Grassmann{T, N},
+    rowinds::NTuple{N1, Int},
+    colinds::NTuple{N2, Int},
+    which::Symbol;
+    alg::Function=LinearAlgebra.qr) where {T, N, N1, N2}
+
+    m1, m2 = gortho(A, rowinds, colinds; alg=alg)
+
+    if which === :M1
+        return sum(m1)
+    elseif which === :M2
+        return sum(m2)
+    else
+        throw(ArgumentError("which must be :M1 or :M2"))
+    end
+end
+
+function finite_difference_full_grad_gortho(
+    A::Grassmann{T, N},
+    rowinds::NTuple{N1, Int},
+    colinds::NTuple{N2, Int};
+    which::Symbol,
+    alg::Function=LinearAlgebra.qr) where {T, N, N1, N2}
+
+    fdm = central_fdm(5, 1)
+    f = x -> gortho_objective(x, rowinds, colinds, which; alg=alg)
+
+    grad_data = Dict{NTuple{N, Int}, Array{T, N}}()
+
+    for (sec, block) in nonzero_pairs(A)
+
+        G = zeros(T, size(block)...)
+        for I in CartesianIndices(block)
+            E = grassmann_basis_like(A, sec, I)
+            G[I] = fdm(t -> f(A + t * E), 0.0)
+        end
+
+        grad_data[sec] = G
+    end
+
+    return Grassmann(size(A), even(A), index_type(A), grad_data)
+end
+
+function test_gortho_ad_full_fd(
+    total_size::NTuple{N, Int},
+    even_size::NTuple{N, Int},
+    rowinds::NTuple{N1, Int},
+    colinds::NTuple{N2, Int},
+    which::Symbol;
+    alg::Function=LinearAlgebra.qr,
+    atol::Float64=1e-5,
+    rtol::Float64=1e-5) where {N, N1, N2}
+
+    index_types = ntuple(i -> i in rowinds ? :out : :in, N)
+
+    A = Grassmann(total_size, even_size, index_types, Float64; init=:random, parity=:even)
+    f = x -> gortho_objective(x, rowinds, colinds, which; alg=alg)
+
+    g_ad = gradient(f, A)[1]
+    g_fd = finite_difference_full_grad_gortho(A, rowinds, colinds; which=which, alg=alg)
+
+    return isapprox(g_ad, g_fd; atol=atol, rtol=rtol)
+end
+
+@timedtestset "Test ad of gortho lQ/QR for matrix" begin
+
+    @timedtestset "Test with M1" begin
+        @test test_gortho_ad_full_fd((4, 4), (2, 2), :M1; alg=LinearAlgebra.lq)
+        @test test_gortho_ad_full_fd((4, 4), (2, 2), :M1; alg=LinearAlgebra.qr)
+    end
+    @timedtestset "Test with M2" begin
+        @test test_gortho_ad_full_fd((4, 4), (2, 2), :M2; alg=LinearAlgebra.lq)
+        @test test_gortho_ad_full_fd((4, 4), (2, 2), :M2; alg=LinearAlgebra.qr)
+    end
+end
+
+@timedtestset "Test ad of gortho LQ/QR for rank-4 tensor" begin
+
+    rowinds = (1, 2)
+    colinds = (3, 4)
+
+    @timedtestset "Test with M1" begin
+        @test test_gortho_ad_full_fd((2, 2, 2, 2), (1, 1, 1, 1), rowinds, colinds, :M1; alg=LinearAlgebra.qr)
+        @test test_gortho_ad_full_fd((2, 2, 2, 2), (1, 1, 1, 1), rowinds, colinds, :M1; alg=LinearAlgebra.lq)
+    end
+    @timedtestset "Test with M2" begin
+        @test test_gortho_ad_full_fd((2, 2, 2, 2), (1, 1, 1, 1), rowinds, colinds, :M2; alg=LinearAlgebra.qr)
+        @test test_gortho_ad_full_fd((2, 2, 2, 2), (1, 1, 1, 1), rowinds, colinds, :M2; alg=LinearAlgebra.lq)
+        end
+    end
+end
+

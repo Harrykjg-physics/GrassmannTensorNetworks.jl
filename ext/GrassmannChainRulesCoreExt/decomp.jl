@@ -204,21 +204,23 @@ end
 # We project arbitrary cotangents onto the valid tangent space before applying
 # the product rule  dA = dQ_proj * R + Q * dR_proj.
 
+function _copyltu(M::AbstractMatrix{S}) where {S}
+    N = Matrix(M)
+    n = min(size(N)...)
+    @inbounds for j in 1:n, i in (j + 1):n
+        N[j, i] = N[i, j]
+    end
+    return N
+end
+
 function _qr_block_rev(
     Q::Matrix{S},
     R::Matrix{S},
     dQ::Matrix{S},
     dR::Matrix{S}) where {S<:Number}
 
-    # project dQ onto tangent space of orthogonal group at Q
-    K = Q' * dQ
-    K_skew = (K - K') / 2
-    dQ_proj = Q * K_skew
-
-    # project dR onto upper triangular tangent space
-    dR_proj = UpperTriangular(dR)
-
-    return dQ_proj * R + Q * Matrix(dR_proj)
+    M = R * dR' - dQ' * Q
+    return (dQ + Q * _copyltu(M)) / R'
 end
 
 
@@ -234,16 +236,9 @@ function _lq_block_rev(
     dL::Matrix{S},
     dQ::Matrix{S}) where {S<:Number}
 
-    # project dQ onto tangent space of orthogonal group at Q
-    K = dQ * Q'
-    K_skew = (K - K') / 2
-    dQ_proj = K_skew * Q
-
-    # project dL onto lower triangular tangent space
-    dL_proj = LowerTriangular(dL)
-
-    return Matrix(dL_proj) * Q + L * dQ_proj
+    return _qr_block_rev(Matrix(Q'), Matrix(L'), Matrix(dQ'), Matrix(dL'))'
 end
+
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -680,8 +675,6 @@ function ChainRulesCore.rrule(
         data_M2_dict[sector] = M2
     end
 
-    is_qr = (alg === LinearAlgebra.qr)
-
     total_size_M1_out = (tot_dim_row, tot_dim_min)
     even_size_M1_out = (even_dim_row, even_dim_min)
     index_type_M1_out = (index_types[1], :in)
@@ -710,10 +703,12 @@ function ChainRulesCore.rrule(
             dM1_blk = _block_cotangent_or_zeros(ΔM1, sec, S, size(M1)...)
             dM2_blk = _block_cotangent_or_zeros(ΔM2, sec, S, size(M2)...)
 
-            dA_block = if is_qr
+            dA_block = if alg === LinearAlgebra.qr
                 _qr_block_rev(M1, M2, dM1_blk, dM2_blk)
-            else
+            elseif alg === LinearAlgebra.lq
                 _lq_block_rev(M1, M2, dM1_blk, dM2_blk)
+            else
+                throw(ArgumentError("gortho AD currently supports LinearAlgebra.qr and LinearAlgebra.lq"))
             end
             data_dict[sec] = dA_block
         end

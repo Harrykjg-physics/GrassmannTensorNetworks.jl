@@ -530,8 +530,17 @@ function gortho(
     total_size_row, even_size_row, index_type_row = getindices(total_size, rowinds), getindices(even_size, rowinds), getindices(index_types, rowinds)
     total_size_col, even_size_col, index_type_col = getindices(total_size, colinds), getindices(even_size, colinds), getindices(index_types, colinds)
 
-    N1 > 1 ? tensor_fused1 = fuse(tensor, rowinds) : tensor_fused1 = tensor
-    N2 > 1 ? tensor_fused2 = fuse(tensor_fused1, colinds .- (N1-1)) : tensor_fused2 = tensor_fused1
+    tensor_fused1 = if N1 > 1
+        fuse(tensor, rowinds)
+    else
+        tensor
+    end
+
+    tensor_fused2 = if N2 > 1
+        fuse(tensor_fused1, colinds .- (N1 - 1))
+    else
+        tensor_fused1
+    end
 
     M1, M2 = gortho(tensor_fused2; alg=alg)
 
@@ -549,8 +558,17 @@ function gortho(
     even_size_M2 = insertafter(even_size_col, 0, (edim_M2_row, ))
     index_type_M2 = insertafter(index_type_col, 0, (:out, ))
 
-    N1 > 1 ? M1_out = split(M1, 1, total_size_M1, even_size_M1, index_type_M1) : M1_out = M1
-    N2 > 1 ? M2_out = split(M2, 2, total_size_M2, even_size_M2, index_type_M2) : M2_out = M2
+    M1_out = if N1 > 1
+        split(M1, 1, total_size_M1, even_size_M1, index_type_M1)
+    else
+        M1
+    end
+
+    M2_out = if N2 > 1
+        split(M2, 2, total_size_M2, even_size_M2, index_type_M2)
+    else
+        M2
+    end
 
     return M1_out, M2_out
 end
