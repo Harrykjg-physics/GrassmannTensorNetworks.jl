@@ -1059,3 +1059,141 @@ end
         @test test_gsvd_sum_V_rect_b((4, 4), (2, 2))
     end
 end
+
+# -------------------------------------------------------------------
+
+using FiniteDifferences
+
+function gsvd_objective(
+    A::Grassmann{T, N},
+    rowinds::NTuple{N1, Int},
+    colinds::NTuple{N2, Int},
+    which::Symbol,
+    sign_function::Function=trivial_sign) where {T, N, N1, N2}
+
+    u, s, v, _ = gsvd(A, rowinds, colinds, 100000;
+                      sign_function=sign_function, trunc=false)
+
+    if which === :U
+        return sum(u)
+    elseif which === :S
+        return sum(s)
+    elseif which === :V
+        return sum(v)
+    else
+        throw(ArgumentError("which must be :U, :S, or :V"))
+    end
+end
+
+function grassmann_basis_like(
+    A::Grassmann{T, N},
+    sec::NTuple{N, Int},
+    I::CartesianIndex{N}) where {T, N}
+
+    data_E = Dict{NTuple{N, Int}, Array{T, N}}()
+
+    for (sec2, block2) in nonzero_pairs(A)
+        data_E[sec2] = zeros(T, size(block2)...)
+    end
+
+    data_E[sec][I] = one(T)
+
+    return Grassmann(size(A), even(A), index_type(A), data_E)
+end
+
+function finite_difference_full_grad(
+    A::Grassmann{T, N},
+    rowinds::NTuple{N1, Int},
+    colinds::NTuple{N2, Int};
+    which::Symbol,
+    sign_function::Function=trivial_sign) where {T, N, N1, N2}
+
+    fdm = central_fdm(5, 1)
+    f = x -> gsvd_objective(x, rowinds, colinds, which, sign_function)
+
+    grad_data = Dict{NTuple{N, Int}, Array{T, N}}()
+
+    for (sec, block) in nonzero_pairs(A)
+        G = zeros(T, size(block)...)
+
+        for I in CartesianIndices(block)
+            E = grassmann_basis_like(A, sec, I)
+            G[I] = fdm(t -> f(A + t * E), 0.0)
+        end
+
+        grad_data[sec] = G
+    end
+
+    return Grassmann(size(A), even(A), index_type(A), grad_data)
+end
+
+function test_gsvd_ad_full_fd(
+    total_size::NTuple{N, Int},
+    even_size::NTuple{N, Int},
+    rowinds::NTuple{N1, Int},
+    colinds::NTuple{N2, Int},
+    which::Symbol;
+    sign_function::Function=trivial_sign,
+    atol::Float64=1e-5,
+    rtol::Float64=1e-5) where {N, N1, N2}
+
+    index_types = ntuple(i -> i in rowinds ? :out : :in, N)
+
+    A = Grassmann(total_size, even_size, index_types, Float64;
+                  init=:random, parity=:even)
+
+    f = x -> gsvd_objective(x, rowinds, colinds, which, sign_function)
+
+    g_ad = gradient(f, A)[1]
+    g_fd = finite_difference_full_grad(A, rowinds, colinds;
+                                       which=which,
+                                       sign_function=sign_function)
+
+    return isapprox(g_ad, g_fd; atol=atol, rtol=rtol)
+end
+
+@timedtestset "Test ad of gsvd for rank-4 tensor (no truncation)" begin
+    
+    rowinds = (1, 2)
+    colinds = (3, 4)
+
+    @timedtestset "Test with U" begin
+        @test test_gsvd_ad_full_fd((2, 2, 2, 2), (1, 1, 1, 1), rowinds, colinds, :U; sign_function=trivial_sign)
+        @test test_gsvd_ad_full_fd((2, 2, 2, 2), (1, 1, 1, 1), rowinds, colinds, :U; sign_function=auto_sign)
+    end
+
+    @timedtestset "Test with S" begin
+        @test test_gsvd_ad_full_fd((2, 2, 2, 2), (1, 1, 1, 1), rowinds, colinds, :S; sign_function=trivial_sign)
+        @test test_gsvd_ad_full_fd((2, 2, 2, 2), (1, 1, 1, 1), rowinds, colinds, :S; sign_function=auto_sign)
+    end
+
+    @timedtestset "Test with V" begin
+        @test test_gsvd_ad_full_fd((2, 2, 2, 2), (1, 1, 1, 1), rowinds, colinds, :V; sign_function=trivial_sign)
+        @test test_gsvd_ad_full_fd((2, 2, 2, 2), (1, 1, 1, 1), rowinds, colinds, :V; sign_function=auto_sign)
+    end
+end
+
+@timedtestset "Test ad of gsvd for rank-5 tensor (no truncation)" begin
+
+    rowinds = (1, 2, 3)
+    colinds = (4, 5)
+
+    @timedtestset "Test with U" begin
+        @test test_gsvd_ad_full_fd((2, 2, 2, 2, 2), (1, 1, 1, 1, 1), rowinds, colinds, :U; sign_function=trivial_sign)
+        @test test_gsvd_ad_full_fd((2, 2, 2, 2, 2), (1, 1, 1, 1, 1), rowinds, colinds, :U; sign_function=auto_sign)
+    end
+
+    @timedtestset "Test with S" begin
+        @test test_gsvd_ad_full_fd((2, 2, 2, 2, 2), (1, 1, 1, 1, 1), rowinds, colinds, :S; sign_function=trivial_sign)
+        @test test_gsvd_ad_full_fd((2, 2, 2, 2, 2), (1, 1, 1, 1, 1), rowinds, colinds, :S; sign_function=auto_sign)
+    end
+
+    @timedtestset "Test with V" begin
+        @test test_gsvd_ad_full_fd((2, 2, 2, 2, 2), (1, 1, 1, 1, 1), rowinds, colinds, :V; sign_function=trivial_sign)
+        @test test_gsvd_ad_full_fd((2, 2, 2, 2, 2), (1, 1, 1, 1, 1), rowinds, colinds, :V; sign_function=auto_sign)
+    end
+end
+
+# -------------------------------------------------------------------
+
+
