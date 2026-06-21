@@ -603,6 +603,8 @@ end
 
 ############################## tests AD ##############################
 
+# -------------------------------------------------------------------
+
 # analytic gradient for sum(U) where U is the left singular vector of A with no truncation
 function dense_svd_sum_U_grad_full(B)
 
@@ -856,5 +858,204 @@ end
         @test test_gsvd_sum_V_a((4, 4), (4, 4))
         @test test_gsvd_sum_V_a((4, 4), (0, 0))
         @test test_gsvd_sum_V_b((4, 4), (2, 2))
+    end
+end
+
+# -------------------------------------------------------------------
+
+function dense_svd_pullback_full(B; dU=nothing, dS=nothing, dV=nothing)
+
+    F = svd(B)
+    U = F.U
+    σ = F.S
+    V = F.V
+
+    T = eltype(B)
+    m, k = size(U)
+    n, kV = size(V)
+    @assert k == kV == length(σ)
+
+    dU === nothing && (dU = zeros(T, m, k))
+    dS === nothing && (dS = zeros(T, k))
+    dV === nothing && (dV = zeros(T, n, k))
+
+    σ2 = σ .^ 2
+    Fmat = zeros(T, k, k)
+
+    for j in 1:k, i in 1:k
+        if i != j
+            denom = σ2[j] - σ2[i]
+            if abs(denom) > 1e-10
+                Fmat[i, j] = inv(denom)
+            end
+        end
+    end
+
+    S = Diagonal(σ)
+    Sinv = Diagonal(inv.(σ))
+
+    Ut_dU = U' * dU
+    Vt_dV = V' * dV
+
+    term = Diagonal(dS)
+    term += (Fmat .* (Ut_dU - Ut_dU')) * S
+    term += S * (Fmat .* (Vt_dV - Vt_dV'))
+
+    return U * term * V' +
+           (I - U * U') * dU * Sinv * V' +
+           U * Sinv * dV' * (I - V * V')
+end
+
+function dense_svd_sum_U_grad_rect(B)
+
+    F = svd(B)
+    dU = ones(eltype(B), size(F.U))
+
+    return dense_svd_pullback_full(B; dU=dU)
+end
+
+function analytic_gsvd_sum_U_grad_rect(A)
+
+    grad_data = Dict{NTuple{2, Int}, Matrix{eltype(A)}}()
+
+    for (sec, block) in nonzero_pairs(A)
+        grad_data[sec] = dense_svd_sum_U_grad_rect(block)
+    end
+
+    return Grassmann(size(A), even(A), index_type(A), grad_data)
+end
+
+
+function test_gsvd_sum_U_rect_a(total_size::NTuple{2, Int}, even_size::NTuple{2, Int})
+
+    A = Grassmann(total_size, even_size, (:out, :in), Float64;
+                  init=:random, parity=:even)
+
+    g_an = analytic_gsvd_sum_U_grad_rect(A)
+    g_ad = gradient(x -> sum(gsvd(x, 100000; trunc=false)[1]), A)[1]
+
+    return g_an ≈ g_ad
+end
+
+function test_gsvd_sum_U_rect_b(total_size::NTuple{2, Int}, even_size::NTuple{2, Int})
+
+    A = Grassmann(total_size, even_size, (:out, :in), Float64;
+                  init=:random, parity=:even)
+
+    A_grad_dense = svd_sum_U_grad_dense(A)
+    A_grad_numeric = gradient(x -> sum(gsvd(x, 100000; trunc=false)[1]), A)[1]
+
+    flag1 = (A_grad_dense[1:even_size[1], 1:even_size[2]] ≈ A_grad_numeric[(0, 0)])
+    flag2 = (A_grad_dense[even_size[1]+1:end, even_size[2]+1:end] ≈ A_grad_numeric[(1, 1)])
+
+    return flag1 && flag2
+end
+
+function dense_svd_sum_S_grad_rect(B)
+
+    F = svd(B)
+    dS = ones(eltype(B), length(F.S))
+
+    return dense_svd_pullback_full(B; dS=dS)
+end
+
+function analytic_gsvd_sum_S_grad_rect(A)
+
+    grad_data = Dict{NTuple{2, Int}, Matrix{eltype(A)}}()
+
+    for (sec, block) in nonzero_pairs(A)
+        grad_data[sec] = dense_svd_sum_S_grad_rect(block)
+    end
+
+    return Grassmann(size(A), even(A), index_type(A), grad_data)
+end
+
+function test_gsvd_sum_S_rect_a(total_size::NTuple{2, Int}, even_size::NTuple{2, Int})
+
+    A = Grassmann(total_size, even_size, (:out, :in), Float64; 
+    init=:random, parity=:even)
+
+    g_an = analytic_gsvd_sum_S_grad_rect(A)
+    g_ad = gradient(x -> sum(gsvd(x, 100000; trunc=false)[2]), A)[1]
+
+    return g_an ≈ g_ad
+end
+
+function test_gsvd_sum_S_rect_b(total_size::NTuple{2, Int}, even_size::NTuple{2, Int})
+
+    A = Grassmann(total_size, even_size, (:out, :in), Float64;
+                  init=:random, parity=:even)
+
+    A_grad_dense = svd_sum_S_grad_dense(A)
+    A_grad_numeric = gradient(x -> sum(gsvd(x, 100000; trunc=false)[2]), A)[1]
+
+    flag1 = (A_grad_dense[1:even_size[1], 1:even_size[2]] ≈ A_grad_numeric[(0, 0)])
+    flag2 = (A_grad_dense[even_size[1]+1:end, even_size[2]+1:end] ≈ A_grad_numeric[(1, 1)])
+
+    return flag1 && flag2
+end
+
+function dense_svd_sum_V_grad_rect(B)
+
+    F = svd(B)
+    dV = ones(eltype(B), size(F.V))
+
+    return dense_svd_pullback_full(B; dV=dV)
+end
+
+function analytic_gsvd_sum_V_grad_rect(A)
+
+    grad_data = Dict{NTuple{2, Int}, Matrix{eltype(A)}}()
+
+    for (sec, block) in nonzero_pairs(A)
+        grad_data[sec] = dense_svd_sum_V_grad_rect(block)
+    end
+
+    return Grassmann(size(A), even(A), index_type(A), grad_data)
+end
+
+function test_gsvd_sum_V_rect_a(total_size::NTuple{2, Int}, even_size::NTuple{2, Int})
+
+    A = Grassmann(total_size, even_size, (:out, :in), Float64; 
+    init=:random, parity=:even)
+
+    g_an = analytic_gsvd_sum_V_grad_rect(A)
+    g_ad = gradient(x -> sum(gsvd(x, 100000; trunc=false)[3]), A)[1]
+
+    return g_an ≈ g_ad
+end
+
+function test_gsvd_sum_V_rect_b(total_size::NTuple{2, Int}, even_size::NTuple{2, Int})
+
+    A = Grassmann(total_size, even_size, (:out, :in), Float64;
+                  init=:random, parity=:even)
+
+    A_grad_dense = svd_sum_V_grad_dense(A)
+    A_grad_numeric = gradient(x -> sum(gsvd(x, 100000; trunc=false)[3]), A)[1]
+
+    flag1 = (A_grad_dense[1:even_size[1], 1:even_size[2]] ≈ A_grad_numeric[(0, 0)])
+    flag2 = (A_grad_dense[even_size[1]+1:end, even_size[2]+1:end] ≈ A_grad_numeric[(1, 1)])
+
+    return flag1 && flag2
+end
+
+@timedtestset "Test ad of gsvd (retangular matrix, no truncation)" begin
+    @timedtestset "Test with U" begin
+        @test test_gsvd_sum_U_rect_a((4, 4), (2, 2))
+        @test test_gsvd_sum_U_rect_a((4, 4), (4, 4))
+        @test test_gsvd_sum_U_rect_a((4, 4), (0, 0))
+        @test test_gsvd_sum_U_rect_b((4, 4), (2, 2))
+    end
+    @timedtestset "Test with S" begin
+        @test test_gsvd_sum_S_rect_a((4, 4), (2, 2))
+        @test test_gsvd_sum_S_rect_a((4, 4), (4, 4))
+        @test test_gsvd_sum_S_rect_a((4, 4), (0, 0))
+        @test test_gsvd_sum_S_rect_b((4, 4), (2, 2))
+    end
+    @timedtestset "Test with V" begin
+        @test test_gsvd_sum_V_rect_a((4, 4), (2, 2))
+        @test test_gsvd_sum_V_rect_a((4, 4), (4, 4))
+        @test test_gsvd_sum_V_rect_a((4, 4), (0, 0))
+        @test test_gsvd_sum_V_rect_b((4, 4), (2, 2))
     end
 end
