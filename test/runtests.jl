@@ -1,24 +1,31 @@
-# Add testets
-using Test, TestExtras
-using TensorOperations
-using Shuffle
+using Test
+using TestExtras
+using Grassmanntn
+using ChainRulesCore
+using FiniteDifferences
 using LinearAlgebra
+using Random
+using Shuffle
+using TensorOperations
 using TupleTools
 using TupleTools: flatten, permute, insertat, insertafter, deleteat, getindices
-using Random
+using Zygote
+using Zygote: bufferfrom
+
+import Grassmanntn: truncation
 
 Random.seed!(1234567)
 
-Ti = time()
+start_time = time()
 
-include("grassmann.jl")
-include("fermionsign.jl")
-include("base.jl")
-include("fusion.jl")
-include("fusion.jl")
+@testset "Grassmanntn" begin
+    include("grassmann.jl")
+    include("fermionsign.jl")
+    include("base.jl")
+    include("fusion.jl")
+    include("contract.jl")
+    include("decomp.jl")
+end
 
-Tf = time()
-
-printstyled("Finished all tests in ", string(round((Tf - Ti) / 60; sigdigits=3)),
-        " minutes."; bold=true, color=Base.info_color())
-        
+elapsed_minutes = round((time() - start_time) / 60; sigdigits=3)
+printstyled("Finished all tests in ", string(elapsed_minutes), " minutes."; bold=true, color=Base.info_color())

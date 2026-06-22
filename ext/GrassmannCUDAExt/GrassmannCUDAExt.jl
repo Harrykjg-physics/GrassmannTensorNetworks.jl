@@ -1,9 +1,8 @@
 module GrassmannCUDAExt
 
-using GrassmannTN
 using CUDA
+using Grassmanntn
 
-# Include CUDA-specific implementations
 include("cuda_grassmann.jl")
 
-end  # module GrassmannCUDAExt
+end

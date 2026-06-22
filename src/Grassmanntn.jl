@@ -1,13 +1,13 @@
 module Grassmanntn
 
+using HDF5: create_group, h5open
+using LinearAlgebra
+using Random
+using Shuffle
 using TensorOperations
 using TupleTools
-using TupleTools:flatten, permute, insertat, insertafter, deleteat, getindices
+using TupleTools: flatten, permute, insertat, insertafter, deleteat, getindices
 using VectorInterface
-using Shuffle
-using ChainRulesCore, Zygote
-using Zygote:bufferfrom
-using LinearAlgebra
 
 include("grassmann.jl")
 include("fermionsign.jl")
@@ -15,18 +15,12 @@ include("base.jl")
 include("contract.jl")
 include("fusion.jl")
 include("decomp.jl")
+include("tupletools.jl")
 
-include("../ext/tupletools.jl")
-
-include("../ext/GrassmannChainRulesCoreExt/grassmann.jl")
-include("../ext/GrassmannChainRulesCoreExt/fermionsign.jl")
-include("../ext/GrassmannChainRulesCoreExt/base.jl")
-include("../ext/GrassmannChainRulesCoreExt/contract.jl")
-include("../ext/GrassmannChainRulesCoreExt/fusion.jl")
-include("../ext/GrassmannChainRulesCoreExt/decomp.jl")
-
-export Grassmann, _fixed_parity_blocks
-export even, data, index_type, tensor_parity, tensor_rank, scalar, index_conjugation, nonzero_pairs, nonzero_keys, nonzero_vals
+export Grassmann, AbstractGrassmann, GrassmannScalar, GrassmannVector, GrassmannMatrix
+export _fixed_parity_blocks
+export even, odd, data, index_type, tensor_parity, tensor_rank, scalar
+export index_conjugation, nonzero_pairs, nonzero_keys, nonzero_vals
 
 export auto_sign, trivial_sign, add_parity_sign, add_perm_sign
 
@@ -35,5 +29,3 @@ export fuse
 export gsvd, gevd, gortho
 
 end
-
-
