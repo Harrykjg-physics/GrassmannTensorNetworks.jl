@@ -6,7 +6,7 @@ Grassmanntn provides Grassmann tensor data structures and operations in Julia, i
 
 The repository includes a repository-hosted documentation site in [docs/](docs/index.md).
 It covers the core Grassmann type, tensor operations, decomposition routines, and automatic differentiation support.
-After enabling Read the Docs for this repository, the online version can be served at [grassmanntn.readthedocs.io/en/latest/](https://grassmanntn.readthedocs.io/en/latest/).
+After enabling Read the Docs for this repository, the online version can be served at [Grassmanntn.readthedocs.io/en/latest/](https://Grassmanntn.readthedocs.io/en/latest/).
 
 ## Development
 
