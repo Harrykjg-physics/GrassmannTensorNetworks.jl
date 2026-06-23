@@ -1,7 +1,7 @@
 module GrassmannCUDAExt
 
 using CUDA
-using Grassmanntn
+using GrassmannTensorNetworks
 
 include("cuda_grassmann.jl")
 

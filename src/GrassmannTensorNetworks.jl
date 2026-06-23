@@ -1,4 +1,4 @@
-module Grassmanntn
+module GrassmannTensorNetworks
 
 using HDF5: create_group, h5open
 using LinearAlgebra

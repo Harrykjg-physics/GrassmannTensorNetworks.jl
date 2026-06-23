@@ -42,7 +42,7 @@ gevd(tensor::GrassmannMatrix, Dcut; symflag=false, trunc=true, average_trunc=fal
 Returns:
 
 ```julia
-U, Λ, trunc_err
+U, Lambda, trunc_err
 ```
 
 `gevd` diagonalizes the parity blocks of a square Grassmann matrix. If `symflag=true`, each block is symmetrized before eigendecomposition.
@@ -106,7 +106,7 @@ When `ChainRulesCore` and `Zygote` are available, rules are loaded for core tens
 This means workflows such as the following are intended to work:
 
 ```julia
-using Grassmanntn
+using GrassmannTensorNetworks
 using Zygote
 
 loss(A) = begin

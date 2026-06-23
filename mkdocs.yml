@@ -1,8 +1,8 @@
-site_name: Grassmanntn
+site_name: GrassmannTensorNetworks
 site_description: Grassmann tensor operations in Julia
 site_url: https://grassmanntn.readthedocs.io/en/latest/
-repo_url: https://github.com/Harrykjg-physics/Grassmanntn
-repo_name: Harrykjg-physics/Grassmanntn
+repo_url: https://github.com/Harrykjg-physics/Grassmanntn.jl
+repo_name: Harrykjg-physics/Grassmanntn.jl
 
 theme:
   name: readthedocs

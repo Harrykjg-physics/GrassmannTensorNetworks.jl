@@ -1,6 +1,6 @@
-# Grassmanntn
+# GrassmannTensorNetworks
 
-Grassmanntn is a Julia package for working with Grassmann tensors with Z2 parity structure.
+GrassmannTensorNetworks is a Julia package for working with Grassmann tensors with Z2 parity structure.
 It provides:
 
 - A block-structured `Grassmann` tensor type.
@@ -30,7 +30,7 @@ This layout is useful when fermionic parity is part of the tensor algebra and sh
 ## Quick start
 
 ```julia
-using Grassmanntn
+using GrassmannTensorNetworks
 
 T = Grassmann(
     (4, 4, 4),

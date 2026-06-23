@@ -1,4 +1,4 @@
-name = "Grassmanntn"
+name = "GrassmannTensorNetworks"
 uuid = "d83068a9-b689-45fe-9bec-2d0e83279509"
 authors = ["Harry"]
 version = "0.1.0"
@@ -43,4 +43,3 @@ Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [targets]
 test = ["ChainRulesCore", "FiniteDifferences", "Test", "TestExtras", "Zygote"]
-

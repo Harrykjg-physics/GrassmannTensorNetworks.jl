@@ -60,7 +60,7 @@ This toggles selected index types between `:in` and `:out`. It is useful when pr
 
 ## Sign helpers
 
-Grassmanntn separates tensor algebra from sign bookkeeping:
+GrassmannTensorNetworks separates tensor algebra from sign bookkeeping:
 
 - `trivial_sign(args...)`: always returns `1`.
 - `auto_sign(...)`: computes fermionic signs from sectors, contraction pattern, boundary condition, or permutation.

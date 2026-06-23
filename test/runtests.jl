@@ -1,6 +1,6 @@
 using Test
 using TestExtras
-using Grassmanntn
+using GrassmannTensorNetworks
 using ChainRulesCore
 using FiniteDifferences
 using LinearAlgebra
@@ -12,13 +12,13 @@ using TupleTools: flatten, permute, insertat, insertafter, deleteat, getindices
 using Zygote
 using Zygote: bufferfrom
 
-import Grassmanntn: truncation
+import GrassmannTensorNetworks: truncation
 
 Random.seed!(1234567)
 
 start_time = time()
 
-@testset "Grassmanntn" begin
+@testset "GrassmannTensorNetworks" begin
     include("grassmann.jl")
     include("fermionsign.jl")
     include("base.jl")
