@@ -1,11 +1,12 @@
-﻿# Grassmanntn
+# Grassmanntn
 
 Grassmanntn provides Grassmann tensor data structures and operations in Julia, including contraction, fusion, decomposition, and ChainRules/Zygote automatic differentiation support through package extensions.
 
 ## Documentation
 
-The repository includes a GitHub Pages friendly documentation site in [docs/](docs/index.md).
+The repository includes a repository-hosted documentation site in [docs/](docs/index.md).
 It covers the core Grassmann type, tensor operations, decomposition routines, and automatic differentiation support.
+After enabling Read the Docs for this repository, the online version can be served at [grassmanntn.readthedocs.io/en/latest/](https://grassmanntn.readthedocs.io/en/latest/).
 
 ## Development
 

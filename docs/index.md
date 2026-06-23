@@ -1,7 +1,3 @@
-﻿---
-title: Grassmanntn
----
-
 # Grassmanntn
 
 Grassmanntn is a Julia package for working with Grassmann tensors with Z2 parity structure.
@@ -57,7 +53,6 @@ Pkg.instantiate()
 Pkg.test()
 ```
 
-## Notes on GitHub Pages
+## Publishing
 
-This site is intentionally static and lives in the repository `docs/` directory.
-To publish it as a GitHub Pages site, set the Pages source to the repository branch and the `/docs` folder in the repository settings.
+This site lives in the repository `docs/` directory and can be published with either GitHub Pages or Read the Docs.

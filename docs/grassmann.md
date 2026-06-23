@@ -1,7 +1,3 @@
-﻿---
-title: Core Type and Helpers
----
-
 # Core Type and Helpers
 
 ## `Grassmann`

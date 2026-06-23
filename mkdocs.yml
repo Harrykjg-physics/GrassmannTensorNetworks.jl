@@ -1,0 +1,16 @@
+site_name: Grassmanntn
+site_description: Grassmann tensor operations in Julia
+site_url: https://grassmanntn.readthedocs.io/en/latest/
+repo_url: https://github.com/Harrykjg-physics/Grassmanntn
+repo_name: Harrykjg-physics/Grassmanntn
+
+theme:
+  name: readthedocs
+
+nav:
+  - Home: index.md
+  - Core Type and Helpers: grassmann.md
+  - Tensor Operations: operations.md
+  - Decompositions and AD: decompositions.md
+
+docs_dir: docs

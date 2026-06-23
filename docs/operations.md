@@ -1,7 +1,3 @@
-﻿---
-title: Tensor Operations
----
-
 # Tensor Operations
 
 ## `trace`

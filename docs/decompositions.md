@@ -1,7 +1,3 @@
-﻿---
-title: Decompositions and AD
----
-
 # Decompositions and AD
 
 ## `gsvd`
