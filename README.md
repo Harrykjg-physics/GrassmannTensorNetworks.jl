@@ -21,7 +21,7 @@ If you want to call it from a normal Julia session with `using Grassmanntn`, add
 
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/Harrykjg-physics/Grassmanntn.git")
+Pkg.add(url="https://github.com/Harrykjg-physics/Grassmanntn.jl.git")
 using Grassmanntn
 ```
 
@@ -29,7 +29,7 @@ If you want a live editable checkout instead of a fixed installed copy, use:
 
 ```julia
 using Pkg
-Pkg.develop(path="/path/to/Grassmanntn")
+Pkg.develop(path="/path/to/Grassmanntn.jl")
 using Grassmanntn
 ```
 
