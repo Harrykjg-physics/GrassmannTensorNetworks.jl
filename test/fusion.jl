@@ -9,8 +9,8 @@ function test_Z2fusion_norm(
     inds::NTuple{N2, Int}) where {N1, N2}
 
     t = Grassmann(total_size, even_size, index_type, ComplexF64; init=:random, parity=p_flag)
-    norm1 = norm(t)
-    norm2 = norm(fuse(t, inds))
+    norm1 = sqrt(sum(abs2, t))
+    norm2 = sqrt(sum(abs2, fuse(t, inds)))
 
     return (norm1 ≈ norm2)
 end
@@ -69,28 +69,28 @@ end
 
 ############################## testing fusion.jl ##############################
 
-@timedtestset "Test Z2 fusion / splitting" begin verbose=true
-    @timedtestset "test norm invariance(even-parity)" begin verbose=true
+@timedtestset "Test Z2 fusion / splitting" begin
+    @timedtestset "test norm invariance(even-parity)" begin
         @test test_Z2fusion_norm((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :even, (2, 3))
         @test test_Z2fusion_norm((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :even, (2, 3, 4))
         @test test_Z2fusion_norm((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :even, (1, 2, 3, 4))
     end
-    @timedtestset "test norm invariance(odd-parity)" begin verbose=true
+    @timedtestset "test norm invariance(odd-parity)" begin
         @test test_Z2fusion_norm((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :odd, (2, 3))
         @test test_Z2fusion_norm((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :odd, (2, 3, 4))
         @test test_Z2fusion_norm((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :odd, (1, 2, 3, 4))
     end
-    @timedtestset "test maximum invariance(even-parity)" begin verbose=true
+    @timedtestset "test maximum invariance(even-parity)" begin
         @test test_Z2fusion_maximum((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :even, (2, 3))
         @test test_Z2fusion_maximum((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :even, (2, 3, 4))
         @test test_Z2fusion_maximum((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :even, (1, 2, 3, 4))
     end
-    @timedtestset "test maximum invariance(odd-parity)" begin verbose=true
+    @timedtestset "test maximum invariance(odd-parity)" begin
         @test test_Z2fusion_maximum((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :odd, (2, 3))
         @test test_Z2fusion_maximum((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :odd, (2, 3, 4))
         @test test_Z2fusion_maximum((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :odd, (1, 2, 3, 4))
     end
-    @timedtestset "test contraction invariance (even-even)" begin verbose=true
+    @timedtestset "test contraction invariance (even-even)" begin
         @test test_Z2fusion_contract(
             (4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :even, 
             (5, 4, 3, 4, 6), (3, 2, 2, 2, 3), (:in, :in, :in, :out, :out), :even,
@@ -107,7 +107,7 @@ end
             ((1, 2, 3, 4), (2, 3, 4, 5))
         )
     end
-    @timedtestset "test contraction invariance (even-odd)" begin verbose=true
+    @timedtestset "test contraction invariance (even-odd)" begin
         @test test_Z2fusion_contract(
             (4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :even, 
             (5, 4, 3, 4, 6), (3, 2, 2, 2, 3), (:in, :in, :in, :out, :out), :odd,
@@ -124,7 +124,7 @@ end
             ((1, 2, 3, 4), (2, 3, 4, 5))
         )
     end
-    @timedtestset "test contraction invariance (odd-even)" begin verbose=true
+    @timedtestset "test contraction invariance (odd-even)" begin
         @test test_Z2fusion_contract(
             (4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :odd, 
             (5, 4, 3, 4, 6), (3, 2, 2, 2, 3), (:in, :in, :in, :out, :out), :even,
@@ -141,7 +141,7 @@ end
             ((1, 2, 3, 4), (2, 3, 4, 5))
         )
     end
-    @timedtestset "test contraction invariance (odd-odd)" begin verbose=true
+    @timedtestset "test contraction invariance (odd-odd)" begin
         @test test_Z2fusion_contract(
             (4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :odd, 
             (5, 4, 3, 4, 6), (3, 2, 2, 2, 3), (:in, :in, :in, :out, :out), :odd,
@@ -158,12 +158,12 @@ end
             ((1, 2, 3, 4), (2, 3, 4, 5))
         )
     end
-    @timedtestset "test fusion and splitting (even-parity)" begin verbose=true
+    @timedtestset "test fusion and splitting (even-parity)" begin
         @test test_Z2fusion_Z2split((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :even, (2, 3))
         @test test_Z2fusion_Z2split((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :even, (2, 3, 4))
         @test test_Z2fusion_Z2split((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :even, (1, 2, 3, 4))
     end
-    @timedtestset "test fusion and splitting (odd-parity)" begin verbose=true
+    @timedtestset "test fusion and splitting (odd-parity)" begin
         @test test_Z2fusion_Z2split((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :odd, (2, 3))
         @test test_Z2fusion_Z2split((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :odd, (2, 3, 4))
         @test test_Z2fusion_Z2split((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :odd, (1, 2, 3, 4))
@@ -264,7 +264,7 @@ end
 
 ############################## tests AD ##############################
 
-@timedtestset "AD test: Z2fusion, sum invariance" begin verbose=true
+@timedtestset "AD test: Z2fusion, sum invariance" begin
     @test test_Z2fusion_ad1((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :even, (2, 3))
     @test test_Z2fusion_ad1((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :odd, (2, 3))
     @test test_Z2fusion_ad1((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :even, (2, 3, 4))
@@ -273,7 +273,7 @@ end
     @test test_Z2fusion_ad1((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :odd, (1, 2, 3, 4))
 end
 
-@timedtestset "AD test: Z2fusion, contraction invariance (even-even)" begin verbose=true
+@timedtestset "AD test: Z2fusion, contraction invariance (even-even)" begin
         @test test_Z2fusion_ad2(
             (4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :even, 
             (5, 4, 3, 4, 6), (3, 2, 2, 2, 3), (:in, :in, :in, :out, :out), :even,
@@ -291,7 +291,7 @@ end
         )
 end
 
-@timedtestset "AD test: Z2fusion, contraction invariance (even-odd)" begin verbose=true
+@timedtestset "AD test: Z2fusion, contraction invariance (even-odd)" begin
         @test test_Z2fusion_ad2(
             (4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :even, 
             (5, 4, 3, 4, 6), (3, 2, 2, 2, 3), (:in, :in, :in, :out, :out), :odd,
@@ -309,7 +309,7 @@ end
         )
 end
 
-@timedtestset "AD test: Z2fusion, contraction invariance (odd-odd)" begin verbose=true
+@timedtestset "AD test: Z2fusion, contraction invariance (odd-odd)" begin
         @test test_Z2fusion_ad2(
             (4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :odd, 
             (5, 4, 3, 4, 6), (3, 2, 2, 2, 3), (:in, :in, :in, :out, :out), :odd,
@@ -327,7 +327,7 @@ end
         )
 end
 
-@timedtestset "AD test: Z2split, sum invariance" begin verbose=true
+@timedtestset "AD test: Z2split, sum invariance" begin
     @test test_Z2split_ad1((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :even, (2, 3))
     @test test_Z2split_ad1((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :odd, (2, 3))
     @test test_Z2split_ad1((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :even, (2, 3, 4))
@@ -336,7 +336,7 @@ end
     @test test_Z2split_ad1((4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :odd, (1, 2, 3, 4))
 end
 
-@timedtestset "AD test: Z2split, contraction invariance (even-even)" begin verbose=true
+@timedtestset "AD test: Z2split, contraction invariance (even-even)" begin
         @test test_Z2split_ad2(
             (4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :even, 
             (5, 4, 3, 4, 6), (3, 2, 2, 2, 3), (:in, :in, :in, :out, :out), :even,
@@ -354,7 +354,7 @@ end
         )
 end
 
-@timedtestset "AD test: Z2split, contraction invariance (even-odd)" begin verbose=true
+@timedtestset "AD test: Z2split, contraction invariance (even-odd)" begin
         @test test_Z2split_ad2(
             (4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :even, 
             (5, 4, 3, 4, 6), (3, 2, 2, 2, 3), (:in, :in, :in, :out, :out), :odd,
@@ -372,7 +372,7 @@ end
         )
 end
 
-@timedtestset "AD test: Z2split, contraction invariance (odd-odd)" begin verbose=true
+@timedtestset "AD test: Z2split, contraction invariance (odd-odd)" begin
         @test test_Z2split_ad2(
             (4, 3, 4, 6, 5), (2, 2, 2, 3, 3), (:out, :out, :in, :in, :in), :odd, 
             (5, 4, 3, 4, 6), (3, 2, 2, 2, 3), (:in, :in, :in, :out, :out), :odd,

@@ -360,7 +360,7 @@ end
 
 ########################### testing ###########################
 
-@timedtestset "Test Z2 truncation" verbose=true begin
+@timedtestset "Test Z2 truncation" begin
     @timedtestset "Test Dcut > D, no truncation" begin
         De = 10; Do = 10; Dcut = 30
         S, Se = generator(De, Do)
@@ -1462,5 +1462,3 @@ end
         @test test_gortho_ad_full_fd((2, 2, 2, 2), (1, 1, 1, 1), rowinds, colinds, :M2; alg=LinearAlgebra.lq)
         end
     end
-end
-

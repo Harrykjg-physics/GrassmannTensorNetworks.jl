@@ -32,19 +32,6 @@ struct Grassmann{T, N, AT<:AbstractArray{T, N}} <: AbstractGrassmann{T, N}
 end
 
 """
-Outer constructor of the Grassmann object
-"""
-
-function Grassmann(
-    total_size::NTuple{N, Int},
-    even_parity_size::NTuple{N, Int},
-    index_type::NTuple{N, Symbol},
-    data::Dict{NTuple{N, Int}, AT}
-) where {T, N, AT<:AbstractArray{T, N}}
-    return Grassmann{T, N, AT}(total_size, even_parity_size, index_type, data)
-end
-
-"""
 Outer constructor of the Grassmann object, with dense array and specified initialization schemes.
 
 Arguments:

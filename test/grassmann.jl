@@ -1,7 +1,7 @@
 
 ####################### testing #######################
 
-@timedtestset "test the grassmann.jl" verbose=true begin
+@timedtestset "test the grassmann.jl" begin
     @timedtestset "test basic methods for the Grassman tensor" begin
         total_size = (4, 8, 6, 4)
         even_size = (2, 4, 3, 2)

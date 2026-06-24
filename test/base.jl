@@ -69,7 +69,7 @@ end
 
 ####################### testing #######################
 
-@timedtestset "test the base.jl" verbose=true begin
+@timedtestset "test the base.jl" begin
 
     @timedtestset "test the similar and copy function" begin
         total_size = (4, 8, 6, 4); even_size = (2, 4, 3, 2)
@@ -270,7 +270,7 @@ end
 
 using Zygote
 
-@timedtestset "AD tests for base.jl operations" verbose=true begin
+@timedtestset "AD tests for base.jl operations" begin
 
     @timedtestset "AD: maximum" begin
         total_size = (4, 4, 4, 4); even_size = (2, 2, 2, 2)

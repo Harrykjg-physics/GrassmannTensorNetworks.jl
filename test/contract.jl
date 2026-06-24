@@ -818,8 +818,8 @@ end
 
 # ------------------------- trace a single index -------------------------
 
-@timedtestset "test trace operations on one index for even-parity tensor" verbose=true begin
-    @timedtestset "test ordinary trace operations" verbose=true begin
+@timedtestset "test trace operations on one index for even-parity tensor" begin
+    @timedtestset "test ordinary trace operations" begin
         # Float64
         @test test_tr1((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :even, Float64)
         @test test_tr1((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :even, Float64; perm=(4, 2, 3, 1))
@@ -831,7 +831,7 @@ end
         @test test_tr1((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :even, ComplexF64; cj=true)
         @test test_tr1((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :even, ComplexF64; perm=(4, 2, 3, 1), cj=true)
     end
-    @timedtestset "test Fermionic trace operations" verbose=true begin
+    @timedtestset "test Fermionic trace operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_tr1((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :even, Float64; sign_tr=true, sign_function=auto_sign)
@@ -858,8 +858,8 @@ end
     end
 end
 
-@timedtestset "test trace operations on one index for odd-parity tensor" verbose=true begin
-    @timedtestset "test ordinary trace operations" verbose=true begin
+@timedtestset "test trace operations on one index for odd-parity tensor" begin
+    @timedtestset "test ordinary trace operations" begin
         # Float64
         @test test_tr1((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, Float64)
         @test test_tr1((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, Float64; perm=(4, 2, 3, 1))
@@ -871,7 +871,7 @@ end
         @test test_tr1((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, ComplexF64; cj=true)
         @test test_tr1((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, ComplexF64; perm=(4, 2, 3, 1), cj=true)
     end
-    @timedtestset "test Fermionic trace operations" verbose=true begin
+    @timedtestset "test Fermionic trace operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_tr1((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, Float64; sign_tr=true, sign_function=auto_sign)
@@ -902,8 +902,8 @@ end
 
 # ------------------------- trace two indices -------------------------
 
-@timedtestset "test trace operations on two indices for even-parity tensor" verbose=true begin
-    @timedtestset "test ordinary trace operations" verbose=true begin
+@timedtestset "test trace operations on two indices for even-parity tensor" begin
+    @timedtestset "test ordinary trace operations" begin
         # Float64
         @test test_tr2((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64)
         @test test_tr2((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; perm=(2, 1))
@@ -915,7 +915,7 @@ end
         @test test_tr2((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; cj=true)
         @test test_tr2((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; perm=(2, 1), cj=true)
     end
-    @timedtestset "test Fermionic trace operations" verbose=true begin
+    @timedtestset "test Fermionic trace operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_tr2((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; sign_tr=true, sign_function=auto_sign)
@@ -944,8 +944,8 @@ end
     end
 end
 
-@timedtestset "test trace operations on two indices for odd-parity tensor" verbose=true begin
-    @timedtestset "test ordinary trace operations" verbose=true begin
+@timedtestset "test trace operations on two indices for odd-parity tensor" begin
+    @timedtestset "test ordinary trace operations" begin
         # Float64
         @test test_tr2((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, Float64)
         @test test_tr2((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, Float64; perm=(2, 1))
@@ -957,7 +957,7 @@ end
         @test test_tr2((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, ComplexF64; cj=true)
         @test test_tr2((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, ComplexF64; perm=(2, 1), cj=true)
     end
-    @timedtestset "test Fermionic trace operations" verbose=true begin
+    @timedtestset "test Fermionic trace operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_tr2((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, Float64; sign_tr=true, sign_function=auto_sign)
@@ -982,8 +982,8 @@ end
 
 # ------------------------- trace all the indices -------------------------
 
-@timedtestset "test trace operations on all indices for even-parity tensor" verbose=true begin
-    @timedtestset "test ordinary trace operations" verbose=true begin
+@timedtestset "test trace operations on all indices for even-parity tensor" begin
+    @timedtestset "test ordinary trace operations" begin
         # Float64
         @test test_tr3((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64)
         @test test_tr3((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; cj=true)
@@ -991,7 +991,7 @@ end
         @test test_tr3((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64)
         @test test_tr3((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; cj=true)
     end
-    @timedtestset "test Fermionic trace operations" verbose=true begin
+    @timedtestset "test Fermionic trace operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_tr3((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; sign_tr=true, sign_function=auto_sign)
@@ -1016,8 +1016,8 @@ end
 
 # ------------------------- contract 0 index(a.k.a direct product) -------------------------
 
-@timedtestset "test contract operations on 0 index (even-even)" verbose=true begin
-    @timedtestset "test ordinary contract operations" verbose=true begin
+@timedtestset "test contract operations on 0 index (even-even)" begin
+    @timedtestset "test ordinary contract operations" begin
         # Float64
         @test test_contr0((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64)
         @test test_contr0((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; cj=(true, false))
@@ -1033,7 +1033,7 @@ end
         @test test_contr0((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; perm=(3, 1, 2, 4, 7, 5, 6, 8))
         @test test_contr0((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; cj=(true, true), perm=(3, 1, 2, 4, 7, 5, 6, 8))
     end
-    @timedtestset "test Fermionic contract operations" verbose=true begin
+    @timedtestset "test Fermionic contract operations" begin
         # Float64
         @test test_contr0((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; sign_function=auto_sign)
         @test test_contr0((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; sign_conj1=true, sign_conj2=true, 
@@ -1053,8 +1053,8 @@ end
     end
 end
 
-@timedtestset "test contract operations on 0 index (even-odd)" verbose=true begin
-    @timedtestset "test ordinary contract operations" verbose=true begin
+@timedtestset "test contract operations on 0 index (even-odd)" begin
+    @timedtestset "test ordinary contract operations" begin
         # Float64
         @test test_contr0((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64)
         @test test_contr0((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; cj=(true, false))
@@ -1070,7 +1070,7 @@ end
         @test test_contr0((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; perm=(3, 1, 2, 4, 7, 5, 6, 8))
         @test test_contr0((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; cj=(true, true), perm=(3, 1, 2, 4, 7, 5, 6, 8))
     end
-    @timedtestset "test Fermionic contract operations" verbose=true begin
+    @timedtestset "test Fermionic contract operations" begin
         # Float64
         @test test_contr0((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; sign_function=auto_sign)
         @test test_contr0((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; sign_conj1=true, sign_conj2=true, 
@@ -1090,8 +1090,8 @@ end
     end
 end
 
-@timedtestset "test contract operations on 0 index (odd-odd)" verbose=true begin
-    @timedtestset "test ordinary contract operations" verbose=true begin
+@timedtestset "test contract operations on 0 index (odd-odd)" begin
+    @timedtestset "test ordinary contract operations" begin
         # Float64
         @test test_contr0((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64)
         @test test_contr0((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; cj=(true, false))
@@ -1107,7 +1107,7 @@ end
         @test test_contr0((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; perm=(3, 1, 2, 4, 7, 5, 6, 8))
         @test test_contr0((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; cj=(true, true), perm=(3, 1, 2, 4, 7, 5, 6, 8))
     end
-    @timedtestset "test Fermionic contract operations" verbose=true begin
+    @timedtestset "test Fermionic contract operations" begin
         # Float64
         @test test_contr0((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; sign_function=auto_sign)
         @test test_contr0((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; sign_conj1=true, sign_conj2=true, 
@@ -1129,8 +1129,8 @@ end
 
 # ------------------------- contract a single index -------------------------
 
-@timedtestset "test contract operations on a single index (even-even)" verbose=true begin
-    @timedtestset "test ordinary contract operations" verbose=true begin
+@timedtestset "test contract operations on a single index (even-even)" begin
+    @timedtestset "test ordinary contract operations" begin
         # Float64
         @test test_contr1((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64)
         @test test_contr1((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; cj=(true, false))
@@ -1146,7 +1146,7 @@ end
         @test test_contr1((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; perm = (5, 1, 3, 2, 4, 6))
         @test test_contr1((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; cj=(true, true), perm = (5, 1, 3, 2, 4, 6))
     end
-    @timedtestset "test Fermionic contract operations" verbose=true begin
+    @timedtestset "test Fermionic contract operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_contr1((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; sign_contr=true, sign_function=auto_sign)
@@ -1167,8 +1167,8 @@ end
     end
 end
 
-@timedtestset "test contract operations on a single index (even-odd)" verbose=true begin
-    @timedtestset "test ordinary contract operations" verbose=true begin
+@timedtestset "test contract operations on a single index (even-odd)" begin
+    @timedtestset "test ordinary contract operations" begin
         # Float64
         @test test_contr1((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64)
         @test test_contr1((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; cj=(true, false))
@@ -1184,7 +1184,7 @@ end
         @test test_contr1((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; perm = (5, 1, 3, 2, 4, 6))
         @test test_contr1((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; cj=(true, true), perm = (5, 1, 3, 2, 4, 6))
     end
-    @timedtestset "test Fermionic contract operations" verbose=true begin
+    @timedtestset "test Fermionic contract operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_contr1((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; sign_contr=true, sign_function=auto_sign)
@@ -1205,8 +1205,8 @@ end
     end
 end
 
-@timedtestset "test contract operations on a single index (odd-odd)" verbose=true begin
-    @timedtestset "test ordinary contract operations" verbose=true begin
+@timedtestset "test contract operations on a single index (odd-odd)" begin
+    @timedtestset "test ordinary contract operations" begin
         # Float64
         @test test_contr1((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64)
         @test test_contr1((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; cj=(true, false))
@@ -1222,7 +1222,7 @@ end
         @test test_contr1((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; perm = (5, 1, 3, 2, 4, 6))
         @test test_contr1((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; cj=(true, true), perm = (5, 1, 3, 2, 4, 6))
     end
-    @timedtestset "test Fermionic contract operations" verbose=true begin
+    @timedtestset "test Fermionic contract operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_contr1((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; sign_contr=true, sign_function=auto_sign)
@@ -1245,8 +1245,8 @@ end
 
 # ------------------------- contract two indices -------------------------
 
-@timedtestset "test contract operations on two indices (even-even)" verbose=true begin
-    @timedtestset "test ordinary contract operations" verbose=true begin
+@timedtestset "test contract operations on two indices (even-even)" begin
+    @timedtestset "test ordinary contract operations" begin
         # Float64
         @test test_contr2((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64)
         @test test_contr2((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; cj=(true, false))
@@ -1262,7 +1262,7 @@ end
         @test test_contr2((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; perm=(3, 1, 4, 2))
         @test test_contr2((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; cj=(true, true), perm=(3, 1, 4, 2))
     end
-    @timedtestset "test Fermionic contract operations" verbose=true begin
+    @timedtestset "test Fermionic contract operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_contr2((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; sign_contr=true, sign_function=auto_sign)
@@ -1283,8 +1283,8 @@ end
     end
 end
 
-@timedtestset "test contract operations on two indices (even-odd)" verbose=true begin
-    @timedtestset "test ordinary contract operations" verbose=true begin
+@timedtestset "test contract operations on two indices (even-odd)" begin
+    @timedtestset "test ordinary contract operations" begin
         # Float64
         @test test_contr2((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64)
         @test test_contr2((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; cj=(true, false))
@@ -1300,7 +1300,7 @@ end
         @test test_contr2((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; perm=(3, 1, 4, 2))
         @test test_contr2((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; cj=(true, true), perm=(3, 1, 4, 2))
     end
-    @timedtestset "test Fermionic contract operations" verbose=true begin
+    @timedtestset "test Fermionic contract operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_contr2((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; sign_contr=true, sign_function=auto_sign)
@@ -1321,8 +1321,8 @@ end
     end
 end
 
-@timedtestset "test contract operations on two indices (odd-odd)" verbose=true begin
-    @timedtestset "test ordinary contract operations" verbose=true begin
+@timedtestset "test contract operations on two indices (odd-odd)" begin
+    @timedtestset "test ordinary contract operations" begin
         # Float64
         @test test_contr2((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64)
         @test test_contr2((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; cj=(true, false))
@@ -1338,7 +1338,7 @@ end
         @test test_contr2((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; perm=(3, 1, 4, 2))
         @test test_contr2((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; cj=(true, true), perm=(3, 1, 4, 2))
     end
-    @timedtestset "test Fermionic contract operations" verbose=true begin
+    @timedtestset "test Fermionic contract operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_contr2((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; sign_contr=true, sign_function=auto_sign)
@@ -1361,8 +1361,8 @@ end
 
 # ------------------------- contract all the indices -------------------------
 
-@timedtestset "test contract operations on all the indices (even-even)" verbose=true begin
-    @timedtestset "test ordinary contract operations" verbose=true begin
+@timedtestset "test contract operations on all the indices (even-even)" begin
+    @timedtestset "test ordinary contract operations" begin
         # Float64
         @test test_contr3((3, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64)
         @test test_contr3((3, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; cj=(true, false))
@@ -1374,7 +1374,7 @@ end
         @test test_contr3((3, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; cj=(false, true))
         @test test_contr3((3, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; cj=(true, true))
     end
-    @timedtestset "test Fermionic contract operations" verbose=true begin
+    @timedtestset "test Fermionic contract operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_contr3((3, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; sign_contr=true, sign_function=auto_sign)
@@ -1391,8 +1391,8 @@ end
     end
 end
 
-@timedtestset "test contract operations on all the indices (odd-odd)" verbose=true begin
-    @timedtestset "test ordinary contract operations" verbose=true begin
+@timedtestset "test contract operations on all the indices (odd-odd)" begin
+    @timedtestset "test ordinary contract operations" begin
         # Float64
         @test test_contr3((3, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64)
         @test test_contr3((3, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; cj=(true, false))
@@ -1404,7 +1404,7 @@ end
         @test test_contr3((3, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; cj=(false, true))
         @test test_contr3((3, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; cj=(true, true))
     end
-    @timedtestset "test Fermionic contract operations" verbose=true begin
+    @timedtestset "test Fermionic contract operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_contr3((3, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; sign_contr=true, sign_function=auto_sign)
@@ -1672,8 +1672,8 @@ end
 
 # ------------------------- trace a single index -------------------------
 
-@timedtestset "AD test: test trace operations on one index for even-parity tensor" verbose=true begin
-    @timedtestset "AD test: test ordinary trace operations" verbose=true begin
+@timedtestset "AD test: test trace operations on one index for even-parity tensor" begin
+    @timedtestset "AD test: test ordinary trace operations" begin
         # Float64
         @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :even, Float64)
         @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :even, Float64; perm=(4, 2, 3, 1))
@@ -1685,7 +1685,7 @@ end
         @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :even, ComplexF64; cj=true)
         @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :even, ComplexF64; perm=(4, 2, 3, 1), cj=true)
     end
-    @timedtestset "AD test: test Fermionic trace operations" verbose=true begin
+    @timedtestset "AD test: test Fermionic trace operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :even, Float64; sign_tr=true, sign_function=auto_sign)
@@ -1712,8 +1712,8 @@ end
     end
 end
 
-@timedtestset "AD test: test trace operations on one index for odd-parity tensor" verbose=true begin
-    @timedtestset "AD test: test ordinary trace operations" verbose=true begin
+@timedtestset "AD test: test trace operations on one index for odd-parity tensor" begin
+    @timedtestset "AD test: test ordinary trace operations" begin
         # Float64
         @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, Float64)
         @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, Float64; perm=(4, 2, 3, 1))
@@ -1725,7 +1725,7 @@ end
         @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, ComplexF64; cj=true)
         @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, ComplexF64; perm=(4, 2, 3, 1), cj=true)
     end
-    @timedtestset "AD test: test Fermionic trace operations" verbose=true begin
+    @timedtestset "AD test: test Fermionic trace operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_tr1_ad((4, 5, 6, 3, 5, 4), (2, 2, 3, 2, 2, 2), :odd, Float64; sign_tr=true, sign_function=auto_sign)
@@ -1754,8 +1754,8 @@ end
 
 # ------------------------- trace two indices -------------------------
 
-@timedtestset "AD test: test trace operations on two indices for even-parity tensor" verbose=true begin
-    @timedtestset "AD test: test ordinary trace operations" verbose=true begin
+@timedtestset "AD test: test trace operations on two indices for even-parity tensor" begin
+    @timedtestset "AD test: test ordinary trace operations" begin
         # Float64
         @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64)
         @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; perm=(2, 1))
@@ -1767,7 +1767,7 @@ end
         @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; cj=true)
         @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; perm=(2, 1), cj=true)
     end
-    @timedtestset "AD test: test Fermionic trace operations" verbose=true begin
+    @timedtestset "AD test: test Fermionic trace operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; sign_tr=true, sign_function=auto_sign)
@@ -1802,8 +1802,8 @@ end
     end
 end
 
-@timedtestset "AD test: test trace operations on two indices for odd-parity tensor" verbose=true begin
-    @timedtestset "AD test: test ordinary trace operations" verbose=true begin
+@timedtestset "AD test: test trace operations on two indices for odd-parity tensor" begin
+    @timedtestset "AD test: test ordinary trace operations" begin
         # Float64
         @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, Float64)
         @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, Float64; perm=(2, 1))
@@ -1815,7 +1815,7 @@ end
         @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, ComplexF64; cj=true)
         @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, ComplexF64; perm=(2, 1), cj=true)
     end
-    @timedtestset "AD test: test Fermionic trace operations" verbose=true begin
+    @timedtestset "AD test: test Fermionic trace operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_tr2_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :odd, Float64; sign_tr=true, sign_function=auto_sign)
@@ -1852,8 +1852,8 @@ end
 
 # ------------------------- trace all the indices -------------------------
 
-@timedtestset "AD test: est trace operations on all indices for even-parity tensor" verbose=true begin
-    @timedtestset "AD test: test ordinary trace operations" verbose=true begin
+@timedtestset "AD test: est trace operations on all indices for even-parity tensor" begin
+    @timedtestset "AD test: test ordinary trace operations" begin
         # Float64
         @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64)
         @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; cj=true)
@@ -1861,7 +1861,7 @@ end
         @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64)
         @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, ComplexF64; cj=true)
     end
-    @timedtestset "AD test: test Fermionic trace operations" verbose=true begin
+    @timedtestset "AD test: test Fermionic trace operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_tr3_ad((4, 5, 3, 3, 5, 4), (2, 2, 2, 2, 2, 2), :even, Float64; sign_tr=true, sign_function=auto_sign)
@@ -1886,8 +1886,8 @@ end
 
 # ------------------------- contract 0 index(a.k.a direct product) -------------------------
 
-@timedtestset "AD test: test contract operations on 0 index (even-even)" verbose=true begin
-    @timedtestset "AD test: test ordinary contract operations" verbose=true begin
+@timedtestset "AD test: test contract operations on 0 index (even-even)" begin
+    @timedtestset "AD test: test ordinary contract operations" begin
         # Float64
         @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64)
         @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; cj=(true, false))
@@ -1903,7 +1903,7 @@ end
         @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; perm=(3, 1, 2, 4, 7, 5, 6, 8))
         @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; cj=(true, true), perm=(3, 1, 2, 4, 7, 5, 6, 8))
     end
-    @timedtestset "AD test: test Fermionic contract operations" verbose=true begin
+    @timedtestset "AD test: test Fermionic contract operations" begin
         # Float64
         @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; sign_function=auto_sign)
         @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; sign_conj1=true, sign_conj2=true, 
@@ -1923,8 +1923,8 @@ end
     end
 end
 
-@timedtestset "AD test: test contract operations on 0 index (even-odd)" verbose=true begin
-    @timedtestset "AD test: test ordinary contract operations" verbose=true begin
+@timedtestset "AD test: test contract operations on 0 index (even-odd)" begin
+    @timedtestset "AD test: test ordinary contract operations" begin
         # Float64
         @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64)
         @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; cj=(true, false))
@@ -1940,7 +1940,7 @@ end
         @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; perm=(3, 1, 2, 4, 7, 5, 6, 8))
         @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; cj=(true, true), perm=(3, 1, 2, 4, 7, 5, 6, 8))
     end
-    @timedtestset "AD test: test Fermionic contract operations" verbose=true begin
+    @timedtestset "AD test: test Fermionic contract operations" begin
         # Float64
         @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; sign_function=auto_sign)
         @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; sign_conj1=true, sign_conj2=true, 
@@ -1960,8 +1960,8 @@ end
     end
 end
 
-@timedtestset "AD test: test contract operations on 0 index (odd-odd)" verbose=true begin
-    @timedtestset "AD test: test ordinary contract operations" verbose=true begin
+@timedtestset "AD test: test contract operations on 0 index (odd-odd)" begin
+    @timedtestset "AD test: test ordinary contract operations" begin
         # Float64
         @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64)
         @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; cj=(true, false))
@@ -1977,7 +1977,7 @@ end
         @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; perm=(3, 1, 2, 4, 7, 5, 6, 8))
         @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; cj=(true, true), perm=(3, 1, 2, 4, 7, 5, 6, 8))
     end
-    @timedtestset "AD test: test Fermionic contract operations" verbose=true begin
+    @timedtestset "AD test: test Fermionic contract operations" begin
         # Float64
         @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; sign_function=auto_sign)
         @test test_contr0_ad((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; sign_conj1=true, sign_conj2=true, 
@@ -1999,8 +1999,8 @@ end
 
 # ------------------------- contract a single index -------------------------
 
-@timedtestset "AD test: test contract operations on a single index (even-even)" verbose=true begin
-    @timedtestset "AD test: test ordinary contract operations" verbose=true begin
+@timedtestset "AD test: test contract operations on a single index (even-even)" begin
+    @timedtestset "AD test: test ordinary contract operations" begin
         # Float64
         @test test_contr1_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64)
         @test test_contr1_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; cj=(true, false))
@@ -2016,7 +2016,7 @@ end
         @test test_contr1_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; perm = (5, 1, 3, 2, 4, 6))
         @test test_contr1_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; cj=(true, true), perm = (5, 1, 3, 2, 4, 6))
     end
-    @timedtestset "AD test: test Fermionic contract operations" verbose=true begin
+    @timedtestset "AD test: test Fermionic contract operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_contr1_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; sign_contr=true, sign_function=auto_sign)
@@ -2037,8 +2037,8 @@ end
     end
 end
 
-@timedtestset "AD test: test contract operations on a single index (even-odd)" verbose=true begin
-    @timedtestset "AD test: test ordinary contract operations" verbose=true begin
+@timedtestset "AD test: test contract operations on a single index (even-odd)" begin
+    @timedtestset "AD test: test ordinary contract operations" begin
         # Float64
         @test test_contr1_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64)
         @test test_contr1_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; cj=(true, false))
@@ -2054,7 +2054,7 @@ end
         @test test_contr1_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; perm = (5, 1, 3, 2, 4, 6))
         @test test_contr1_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; cj=(true, true), perm = (5, 1, 3, 2, 4, 6))
     end
-    @timedtestset "AD test: test Fermionic contract operations" verbose=true begin
+    @timedtestset "AD test: test Fermionic contract operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_contr1_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; sign_contr=true, sign_function=auto_sign)
@@ -2075,8 +2075,8 @@ end
     end
 end
 
-@timedtestset "AD test: test contract operations on a single index (odd-odd)" verbose=true begin
-    @timedtestset "AD test: test ordinary contract operations" verbose=true begin
+@timedtestset "AD test: test contract operations on a single index (odd-odd)" begin
+    @timedtestset "AD test: test ordinary contract operations" begin
         # Float64
         @test test_contr1_ad((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64)
         @test test_contr1_ad((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; cj=(true, false))
@@ -2092,7 +2092,7 @@ end
         @test test_contr1_ad((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; perm = (5, 1, 3, 2, 4, 6))
         @test test_contr1_ad((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; cj=(true, true), perm = (5, 1, 3, 2, 4, 6))
     end
-    @timedtestset "AD test: test Fermionic contract operations" verbose=true begin
+    @timedtestset "AD test: test Fermionic contract operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_contr1_ad((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; sign_contr=true, sign_function=auto_sign)
@@ -2115,8 +2115,8 @@ end
 
 # ------------------------- contract two indices -------------------------
 
-@timedtestset "AD test: test contract operations on two indices (even-even)" verbose=true begin
-    @timedtestset "AD test: test ordinary contract operations" verbose=true begin
+@timedtestset "AD test: test contract operations on two indices (even-even)" begin
+    @timedtestset "AD test: test ordinary contract operations" begin
         # Float64
         @test test_contr2_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64)
         @test test_contr2_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; cj=(true, false))
@@ -2132,7 +2132,7 @@ end
         @test test_contr2_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; perm=(3, 1, 4, 2))
         @test test_contr2_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; cj=(true, true), perm=(3, 1, 4, 2))
     end
-    @timedtestset "AD test: test Fermionic contract operations" verbose=true begin
+    @timedtestset "AD test: test Fermionic contract operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_contr2_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; sign_contr=true, sign_function=auto_sign)
@@ -2153,8 +2153,8 @@ end
     end
 end
 
-@timedtestset "AD test: test contract operations on two indices (even-odd)" verbose=true begin
-    @timedtestset "AD test: test ordinary contract operations" verbose=true begin
+@timedtestset "AD test: test contract operations on two indices (even-odd)" begin
+    @timedtestset "AD test: test ordinary contract operations" begin
         # Float64
         @test test_contr2_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64)
         @test test_contr2_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; cj=(true, false))
@@ -2170,7 +2170,7 @@ end
         @test test_contr2_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; perm=(3, 1, 4, 2))
         @test test_contr2_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; cj=(true, true), perm=(3, 1, 4, 2))
     end
-    @timedtestset "AD test: test Fermionic contract operations" verbose=true begin
+    @timedtestset "AD test: test Fermionic contract operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_contr2_ad((4, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; sign_contr=true, sign_function=auto_sign)
@@ -2191,8 +2191,8 @@ end
     end
 end
 
-@timedtestset "AD test: test contract operations on two indices (odd-odd)" verbose=true begin
-    @timedtestset "AD test: test ordinary contract operations" verbose=true begin
+@timedtestset "AD test: test contract operations on two indices (odd-odd)" begin
+    @timedtestset "AD test: test ordinary contract operations" begin
         # Float64
         @test test_contr2_ad((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64)
         @test test_contr2_ad((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; cj=(true, false))
@@ -2208,7 +2208,7 @@ end
         @test test_contr2_ad((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; perm=(3, 1, 4, 2))
         @test test_contr2_ad((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; cj=(true, true), perm=(3, 1, 4, 2))
     end
-    @timedtestset "AD test: test Fermionic contract operations" verbose=true begin
+    @timedtestset "AD test: test Fermionic contract operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_contr2_ad((4, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; sign_contr=true, sign_function=auto_sign)
@@ -2231,8 +2231,8 @@ end
 
 # ------------------------- contract all the indices -------------------------
 
-@timedtestset "AD test: test contract operations on all the indices (even-even)" verbose=true begin
-    @timedtestset "AD test: test ordinary contract operations" verbose=true begin
+@timedtestset "AD test: test contract operations on all the indices (even-even)" begin
+    @timedtestset "AD test: test ordinary contract operations" begin
         # Float64
         @test test_contr3_ad((3, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64)
         @test test_contr3_ad((3, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; cj=(true, false))
@@ -2244,7 +2244,7 @@ end
         @test test_contr3_ad((3, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; cj=(false, true))
         @test test_contr3_ad((3, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, ComplexF64; cj=(true, true))
     end
-    @timedtestset "AD test: test Fermionic contract operations" verbose=true begin
+    @timedtestset "AD test: test Fermionic contract operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_contr3_ad((3, 3, 4, 2), (2, 2, 2, 2), :even, (3, 4, 2, 3), (2, 2, 2, 2), :even, Float64; sign_contr=true, sign_function=auto_sign)
@@ -2261,8 +2261,8 @@ end
     end
 end
 
-@timedtestset "AD test: test contract operations on all the indices (odd-odd)" verbose=true begin
-    @timedtestset "AD test: test ordinary contract operations" verbose=true begin
+@timedtestset "AD test: test contract operations on all the indices (odd-odd)" begin
+    @timedtestset "AD test: test ordinary contract operations" begin
         # Float64
         @test test_contr3_ad((3, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64)
         @test test_contr3_ad((3, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; cj=(true, false))
@@ -2274,7 +2274,7 @@ end
         @test test_contr3_ad((3, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; cj=(false, true))
         @test test_contr3_ad((3, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, ComplexF64; cj=(true, true))
     end
-    @timedtestset "AD test: test Fermionic contract operations" verbose=true begin
+    @timedtestset "AD test: test Fermionic contract operations" begin
         # at least sign_tr=true should be enabled if sign_function=auto_sign is enabled
         # Float64
         @test test_contr3_ad((3, 3, 4, 2), (2, 2, 2, 2), :odd, (3, 4, 2, 3), (2, 2, 2, 2), :odd, Float64; sign_contr=true, sign_function=auto_sign)

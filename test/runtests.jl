@@ -5,7 +5,7 @@ using ChainRulesCore
 using FiniteDifferences
 using LinearAlgebra
 using Random
-using Shuffle
+using Shuffle: shuffle
 using TensorOperations
 using TupleTools
 using TupleTools: flatten, permute, insertat, insertafter, deleteat, getindices

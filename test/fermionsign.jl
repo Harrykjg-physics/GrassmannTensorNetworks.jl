@@ -183,7 +183,7 @@ end
 
 ####################### testing #######################
 
-@timedtestset "test the fermionsign.jl" verbose=true begin
+@timedtestset "test the fermionsign.jl" begin
     @timedtestset "test sign factor from boundary conditions" begin
         @test 1 == auto_sign((0, 1, 0, 1, 0, 1), (true, true, true, true, true, true))
         @test -1 == auto_sign((1, 1, 0, 1, 1, 1), (false, true, true, true, true, true))
