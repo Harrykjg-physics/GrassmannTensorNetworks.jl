@@ -338,7 +338,7 @@ function save(
     fid[param_str]["total_size"] = collect(size(t))
     fid[param_str]["even_size"] = collect(even(t))
     fid[param_str]["index_type"] = map(indextype2num, collect(index_type(t)))
-    Tg_array = convert2array(t)
+    Tg_array = convert(Array, t)
     fid[param_str]["data"] = Tg_array
     fid[param_str]["parity"] = tensor_parity(t)
     close(fid)

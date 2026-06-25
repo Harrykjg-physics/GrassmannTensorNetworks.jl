@@ -10,7 +10,7 @@ import GrassmannTensorNetworks: Grassmann, AbstractGrassmann, GrassmannScalar, G
     even, odd, index_type, tensor_parity, tensor_rank,
     trivial_sign, auto_sign,
     add_parity_sign, add_perm_sign,
-    index_conjugation, convert2array, prepare_range_dict,
+    index_conjugation, prepare_range_dict,
     _parity_mask, _fixed_parity_blocks, _similar_arraytype,
     conjugate, fuse, calculate_sectors, calculate_fused_size, prepare_fused_info,
     trace, contract, gsvd, gevd, gortho, truncation, check_parity
@@ -21,7 +21,7 @@ include("grassmann.jl")
 # AD rules for fermionsign.jl (auto_sign, trivial_sign, add_parity_sign, add_perm_sign)
 include("fermionsign.jl")
 
-# AD rules for base.jl (copy, +, -, *, /, real, conj, permutedims, sqrt, convert2array)
+# AD rules for base.jl (copy, +, -, *, /, real, conj, permutedims, sqrt, convert(Array, ...))
 include("base.jl")
 
 # AD rules for contract.jl (trace and contract)
