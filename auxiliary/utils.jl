@@ -2,6 +2,7 @@ function Nmod(n::Int64, N::Int64)
     return mod(n-1, N) + 1
 end
 
+# Compare two Schimidt weights and return the difference matrix
 function compare_weights(
     Λ1::Matrix{GrassmannMatrix{Float64}}, 
     Λ2::Matrix{GrassmannMatrix{Float64}})
@@ -19,4 +20,21 @@ function compare_weights(
     end
 
     return conv_err_mat
+end
+
+# Save arbitary number of results given the parameter string
+function save(filename::String, param_str::String, args...)
+
+    num = length(args)
+    num > 0 && iseven(num) || throw(ArgumentError("args should be string-value pairs !"))
+    
+    fid = h5open("$filename.h5", "cw")
+    param_str in keys(fid) ? delete_object(fid, "$param_str") : nothing
+    create_group(fid, param_str)
+
+    for i in 1:2:num
+        fid[param_str][args[i]] = args[i+1]
+    end
+
+    close(fid)
 end

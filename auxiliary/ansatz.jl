@@ -5,15 +5,18 @@ Grassmann iPEPS tensors on the square lattice
 
 The bond weights {Λ} are stored in the Λx and Λy matrices, which may be absent (i.e. set to Missing)
 
+Index reading order: Phys, Left, Right, Up, Down
+Corresponding arrow: :out, :out, :in, :in, :out
+
                       ↑     
                       ↑           ↙
-                      ↑    Λy[x-1, y]
+                      ↑    Λx[x-1, y]
                       ↑     ↙
                       ↑  ↙
-⟵⟵ Λx[x, y] ⟵⟵ A[x, y] ⟵⟵ Λx[x, y+1] ⟵⟵
+⟵⟵ Λy[x, y] ⟵⟵ A[x, y] ⟵⟵ Λy[x, y+1] ⟵⟵
                    ↙   
                  ↙    
-           Λy[x, y]   
+           Λx[x, y]   
             ↙ 
 """
 
