@@ -12,5 +12,6 @@ nav:
   - Core Type and Helpers: grassmann.md
   - Tensor Operations: operations.md
   - Decompositions and AD: decompositions.md
+  - Algorithms and Helpers: algorithms.md
 
 docs_dir: docs

@@ -1,12 +1,17 @@
 # GrassmannTensorNetworks
 
-GrassmannTensorNetworks provides Grassmann tensor data structures and operations in Julia, including contraction, fusion, decomposition, and ChainRules/Zygote automatic differentiation support through package extensions.
+GrassmannTensorNetworks is a Julia package for Grassmann tensor networks with Z2 parity structure.
+It includes core tensor algebra, decomposition routines with AD support, and higher-level PEPS / CTMRG utilities.
 
 ## Installation
 
-### Use from the local checkout
+```julia
+using Pkg
+Pkg.add("GrassmannTensorNetworks")
+using GrassmannTensorNetworks
+```
 
-If you are developing inside this repository, you can use the package directly with:
+For local development:
 
 ```julia
 using Pkg
@@ -15,38 +20,25 @@ Pkg.instantiate()
 using GrassmannTensorNetworks
 ```
 
-### Install into your default Julia environment
+## Package layout
 
-If you want to call it from a normal Julia session with `using GrassmannTensorNetworks`, add the repository once:
+The package currently has three layers:
 
-```julia
-using Pkg
-Pkg.add(url="https://github.com/Harrykjg-physics/Grassmanntn.jl.git")
-using GrassmannTensorNetworks
-```
-
-If you want a live editable checkout instead of a fixed installed copy, use:
-
-```julia
-using Pkg
-Pkg.develop(path="/path/to/GrassmannTensorNetworks")
-using GrassmannTensorNetworks
-```
-
-## Registration status
-
-This repository is already structured as a standard Julia package with `Project.toml` and `src/GrassmannTensorNetworks.jl`.
-Registering it into the public Julia General registry still requires the JuliaRegistrator workflow on GitHub.
+- `src/`: core Grassmann tensor types and tensor algebra.
+- `auxiliary/`: PEPS ansatz, model helpers, and utility functions.
+- `algorithms/`: simple update and CTMRG routines built on top of the core package API.
 
 ## Documentation
 
-The repository includes a repository-hosted documentation site in [docs/](docs/index.md).
-It covers the core Grassmann type, tensor operations, decomposition routines, and automatic differentiation support.
-After enabling Read the Docs for this repository, the online version can be served from the project's Read the Docs URL.
+The repository docs live in [docs/](docs/index.md).
+They cover:
+
+- the `Grassmann` type and structural helpers,
+- tensor operations and decompositions,
+- AD support,
+- higher-level PEPS / CTMRG utilities.
 
 ## Development
-
-From the package root:
 
 ```julia
 using Pkg
@@ -55,4 +47,5 @@ Pkg.instantiate()
 Pkg.test()
 ```
 
-The ChainRules/Zygote rules are loaded from `ext/GrassmannChainRulesCoreExt` when `ChainRulesCore` and `Zygote` are available. CUDA support is loaded from `ext/GrassmannCUDAExt` when `CUDA` is available.
+The ChainRules/Zygote rules are loaded from `ext/GrassmannChainRulesCoreExt` when `ChainRulesCore` and `Zygote` are available.
+CUDA support is loaded from `ext/GrassmannCUDAExt` when `CUDA` is available.

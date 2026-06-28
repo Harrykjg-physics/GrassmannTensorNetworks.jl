@@ -64,22 +64,4 @@ Example:
 Tf = fuse(T, (1, 2))
 ```
 
-## `split`
-
-```julia
-split(tensor, ind, total_size_split, even_size_split, index_type_split)
-```
-
-`split` is the inverse companion to `fuse`. It reconstructs multiple indices from one fused index using the target tensor metadata.
-
-Although `split` is defined as `Base.split`, in practice you will mostly encounter it indirectly inside higher-rank `gsvd`, `gevd`, and `gortho`.
-
-## When to use `fuse` and `split`
-
-Use them when:
-
-- You want to turn a high-rank tensor into a matrix-like object.
-- You need to apply SVD, EVD, QR, or LQ by grouping rows and columns.
-- You want to preserve parity-aware block structure during reshaping.
-
-Avoid manual dense reshapes when you want Grassmann sector bookkeeping to stay correct.
+`Base.split` is the inverse companion to `fuse`. You will usually meet it indirectly through higher-rank `gsvd`, `gevd`, and `gortho`.

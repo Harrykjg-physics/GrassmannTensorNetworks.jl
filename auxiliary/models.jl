@@ -1,5 +1,5 @@
 
-struct AbstractModel end
+abstract type AbstractModel end
 
 """
 2D Fermi-Hubbard model on the square lattice

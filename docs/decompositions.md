@@ -123,3 +123,4 @@ grad = gradient(loss, A)
 - Use `sign_function=trivial_sign` first when debugging tensor shapes.
 - Switch to `auto_sign` when the fermionic ordering is part of the actual problem.
 - For higher-rank decompositions, think of `rowinds` and `colinds` as the matrix row and column partition of the tensor.
+- The same matrix routines are reused by the higher-level CTMRG and simple-update code shipped with the package.
