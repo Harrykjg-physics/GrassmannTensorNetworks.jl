@@ -13,6 +13,7 @@ using VectorInterface
 include("grassmann.jl")
 include("fermionsign.jl")
 include("base.jl")
+include("linalg.jl")
 include("contract.jl")
 include("fusion.jl")
 include("decomp.jl")
@@ -36,7 +37,7 @@ export fuse
 export gsvd, gevd, gortho
 export save, load
 
-export Nmod, compare_weights
+export Nmod, compare_weights, prepare_bond_weight
 export Square_GPEPS
 export HubbardModel, nn_bond, gate
 export CTMRGEnv, run_GCTMRG!, find_maxiter, read_CTMRG_env

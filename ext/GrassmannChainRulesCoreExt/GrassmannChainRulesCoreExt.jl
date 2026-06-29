@@ -24,6 +24,9 @@ include("fermionsign.jl")
 # AD rules for base.jl (copy, +, -, *, /, real, conj, permutedims, sqrt, convert(Array, ...))
 include("base.jl")
 
+# AD rules for linalg.jl (log, norm, diag, transpose, inv, dot)
+include("linalg.jl")
+
 # AD rules for contract.jl (trace and contract)
 include("contract.jl")
 
