@@ -19,10 +19,6 @@ include("fusion.jl")
 include("decomp.jl")
 include("tupletools.jl")
 include("auxiliary.jl")
-
-# High-level algorithms currently default to structural sign handling.
-const global_sign = trivial_sign
-
 include("algorithms.jl")
 
 export Grassmann, AbstractGrassmann, GrassmannScalar, GrassmannVector, GrassmannMatrix

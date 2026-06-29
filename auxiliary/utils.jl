@@ -2,6 +2,16 @@ function Nmod(n::Int64, N::Int64)
     return mod(n-1, N) + 1
 end
 
+function prepare_bond_weight(Dvir::Int64, Dvir_even::Int64)
+
+    vec_even = sort(rand(Float64, Dvir_even); rev=true)
+    vec_even /= maximum(vec_even)
+    vec_odd= sort(rand(Float64, Dvir-Dvir_even); rev=true)
+    vec_odd /= maximum(vec_odd)
+    vec_bond_weight= diagm(cat(vec_even, vec_odd; dims=1))
+    
+end
+
 # Compare two Schimidt weights and return the difference matrix
 function compare_weights(
     Λ1::Matrix{GrassmannMatrix{Float64}}, 

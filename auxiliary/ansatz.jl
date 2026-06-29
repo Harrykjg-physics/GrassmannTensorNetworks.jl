@@ -26,6 +26,36 @@ struct Square_GPEPS{T<:Number}
     Λy::Union{Missing, Matrix{GrassmannMatrix{Float64}}}
 end
 
+function Square_GPEPS(
+    Dphys::Int, Dphys_even::Int, Dvir::Int, 
+    Lx::Int, Ly::Int, Q::Type, has_bond_weights::Bool)
+
+    A = Matrix{Grassmann{Q, 5}}(undef, Lx, Ly)
+
+    Dvir_even = Int(Dvir/2)
+
+    for row in 1:Lx, col in 1:Ly
+        A[row, col] = Grassmann(
+            (Dphys, Dvir, Dvir, Dvir, Dvir), 
+            (Dphys_even, Dvir_even, Dvir_even, Dvir_even, Dvir_even), 
+            (:out, :out, :in, :in, :out), Q; init=:random)
+    end
+
+    if has_bond_weights
+        Λx = Matrix{GrassmannMatrix{Float64}}(undef, Lx, Ly)
+        Λy = Matrix{GrassmannMatrix{Float64}}(undef, Lx, Ly)
+        for row in 1:Lx, col in 1:Ly
+            Λx[row, col] = Grassmann(prepare_bond_weight(Dvir, Dvir_even), (Dvir, Dvir), (Dvir_even, Dvir_even), (:out, :in))
+            Λy[row, col] = Grassmann(prepare_bond_weight(Dvir, Dvir_even), (Dvir, Dvir), (Dvir_even, Dvir_even), (:out, :in))
+        end
+    else
+        Λx = missing
+        Λy = missing
+    end
+
+    return Square_GPEPS{Q}(A, Λx, Λy)
+end
+
 Base.size(peps::Square_GPEPS) = size(peps.A)
 Base.eltype(peps::Square_GPEPS{Q}) where {Q} = Q
 

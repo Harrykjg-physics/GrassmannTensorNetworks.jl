@@ -27,7 +27,7 @@ function Grassmann_SU(
         tf = time()
 
         coef = prod(coefx) * prod(coefy)
-        Eavg_tmp = -(1/δτ) * (1/(Lx * Ly)) * (1/3) * log(coef) 
+        Eavg_tmp = -(1/δτ) * (1/(Lx * Ly)) * log(coef) 
         conv_err_energy = (abs(Eavg_tmp) - abs(Eavg))/abs(Eavg)   
 
         # The convergence in the Schimidt spectrum
@@ -63,7 +63,6 @@ end
 ################################# Core functions for Nearest Neighbour GSU  #################################
 
 """
-
                                                          ↙
                                           ↑           ↙
                                           ↑    Λx[x-1, y]
@@ -100,8 +99,7 @@ function update_x_bond(
         peps.A[r, c], peps.A[r_p1, c], peps.Λx[r, c], coef_mat[r, c] = update_x_bond(
           Gate, peps.A[r, c], peps.A[r_p1, c], 
           peps.Λx[r, c], peps.Λx[r_m1, c], peps.Λy[r, c], peps.Λy[r, c_p1], 
-          peps.Λx[r_p1, c], peps.Λx[r, c], peps.Λy[r_p1, c], peps.Λy[r_p1, c_p1], 
-          Dcut; 
+          peps.Λx[r_p1, c], peps.Λy[r_p1, c], peps.Λy[r_p1, c_p1], Dcut; 
           average_trunc=average_trunc)
     end
 
@@ -122,8 +120,29 @@ end
            ↙                              ↙
          ↙                             ↙
 
-Rotate the above configuration by 90 degrees anti-clockwisely around the physical bond 
-to update the y bond using update_x_bond() function.
+To update the y bond using update_x_bond() function :
+    a. Rotate the above configuration by 90 degrees anti-clockwisely around the physical bond.
+    b. Switch the two virtual indices along the x direction.
+    
+
+                                                         ↙
+                                          ↑           ↙
+                                          ↑    Λy[x, y+2]
+                                          ↑     ↙
+                                          ↑  ↙
+                 ⟵⟵ Λy[x, y+1] ⟵⟵ A[x, y+1] ⟵⟵ Λx[x-1, y+1] ⟵⟵
+                                       ↙   
+                         ↑           ↙    
+                         ↑     Λy[x, y+1]   
+                         ↑     ↙ 
+                         ↑  ↙
+  ⟵⟵ Λx[x, y] ⟵⟵ A[x, y] ⟵⟵ Λx[x-1, y] ⟵⟵
+                      ↙
+                   ↙
+             Λy[x, y]
+             ↙
+          ↙
+
 """
 
 function update_y_bond(
@@ -139,11 +158,10 @@ function update_y_bond(
         r_m1 = Nmod(r-1, Lx)
         c_p1 = Nmod(c+1, Ly)
         c_p2 = Nmod(c+2, Ly)
-        A_new_r_c, A_new_r_c_p1, peps.Λy[r, c], coef_mat[r, c_p1] = update_x_bond(
+        A_new_r_c_p1, A_new_r_c, peps.Λy[r, c_p1], coef_mat[r, c_p1] = update_x_bond(
           Gate, dirx2y(peps.A[r, c_p1]), dirx2y(peps.A[r, c]), 
           peps.Λy[r, c_p1], peps.Λy[r, c_p2], peps.Λx[r, c_p1], peps.Λx[r_m1, c_p1], 
-          peps.Λy[r, c], peps.Λy[r, c_p1], peps.Λx[r, c], peps.Λx[r_m1, c], 
-          Dcut; 
+          peps.Λy[r, c], peps.Λx[r, c], peps.Λx[r_m1, c], Dcut; 
           average_trunc=average_trunc)
         peps.A[r, c] = diry2x(A_new_r_c)
         peps.A[r, c_p1] = diry2x(A_new_r_c_p1)
@@ -280,9 +298,9 @@ function update_x_bond(
     # A1_tmp2[n1p, x1, x1p, y1p, y1] = A1_tmp1[n1p, dum, x1, x1p, y1p] * Λy1b[dum, y1]
     A1_tmp2 = contract(A1_tmp1, Λy1b, (2, 1); sign_function=global_sign)
     # A1_tmp3[n1p, x1p, y1p, y1, x1] = A1_tmp2[n1p, dum, x1p, y1p, y1] * Λx1b[dum, x1]
-    A1_tmp3 = contract(A1_tmp2, sqrt(Λx), (2, 1); sign_function=global_sign)
-    # B1[n1p, y1p, y1, x1, x1p] = A1_tmp3[n1p, dum, y1p, y1, x1] * √Λx[dum, x1p]
-    B1 = contract(A1_tmp3, sqrt(Λx), (2, 1); sign_function=global_sign)
+    A1_tmp3 = contract(A1_tmp2, Λx1b, (2, 1); sign_function=global_sign)
+    # B1[n1p, y1p, y1, x1, x1p] = A1_tmp3[n1p, dum, y1p, y1, x1] * √Λx[x1p, dum]
+    B1 = contract(A1_tmp3, sqrt(Λx), (2, 2); sign_function=global_sign)
 
     # A2_tmp1[n2p, y2, x2, x2p, y2p] = A2[n2p, dum, y2, x2, x2p] * Λy2a[y2p, dum]
     A2_tmp1 = contract(A2, Λy2a, (2, 2); sign_function=global_sign)
@@ -315,7 +333,7 @@ function update_x_bond(
 
     # Split the Schmidt weights from the local tensors Ao1 and Bo1
     # A2o[n2p, x2, y2p, y2, x2p] = Ux[(n2p, dum), x2] * L2[(y2p, y2, x2p), dum]
-    A2o = contract(Ux, L2, (2, 4); perm=(1, 3, 4, 2, 5), sign_function=global_sign)
+    A2o = contract(Ux, L2, (2, 4); sign_function=global_sign)
     # A2o1[n2p, x2, y2, x2p, y2p] = A2o[n2p, x2, dum, y2, x2p] * inv(Λy2a)[y2p, dum]
     A2o1 = contract(A2o, inv(Λy2a), (3, 2); sign_function=global_sign)
     # A2o2[n2p, x2, x2p, y2p, y2] = A2o1[n2p, x2, dum, x2p, y2p] * inv(Λy2b)[dum, y2]
@@ -324,7 +342,7 @@ function update_x_bond(
     A2o3 = contract(A2o2, inv(Λx2a), (3, 2); perm=(1, 3, 4, 2, 5), sign_function=global_sign)
 
     # A1o[n1p, x1p, y1p, y1, x1] = conj(Vx)[(n1p, dum), x1p] * R1[dum, (y1p, y1, x1)]
-    A1o = contract(Vx, R1, (2, 1); conj=(true, false), sign_function=global_sign)
+    A1o = contract(Vx, R1, (2, 1); cj=(true, false), sign_function=global_sign)
     # A1o1[n1p, x1p, y1, x1, y1p] = A1o[n1p, x1p, dum, y1, x1] * inv(Λy1a)[y1p, dum]
     A1o1 = contract(A1o, inv(Λy1a), (3, 2); sign_function=global_sign)
     # A1o2[n1p, x1p, x1, y1p, y1] = A1o1[n1p, x1p, dum, x1, y1p] * inv(Λy1b)[dum, y1]
@@ -344,10 +362,14 @@ function dirx2y(A::Grassmann{T, 5}) where {T}
 
   # A_perm[np, b, bp, a, ap] <-- A[np, ap, a, b, bp] 
   A_perm = permutedims(A, (1, 4, 5, 3, 2); sign_function=global_sign)
+  # A_out[np, bp, b, a, ap] <-- A_perm[np, b, bp, a, ap]
+  A_out = permutedims(A_perm, (1, 3, 2, 4, 5); sign_function=global_sign)
 end
 
-function diry2x(A_perm::Grassmann{T, 5}) where {T}
+function diry2x(A_out::Grassmann{T, 5}) where {T}
 
+  # A_perm[np, b, bp, a, ap] <-- A_out[np, bp, b, a, ap]
+  A_perm = permutedims(A_out, (1, 3, 2, 4, 5); sign_function=global_sign)
   # A[np, ap, a, b, bp] <-- A_perm[np, b, bp, a, ap]
   A = permutedims(A_perm, (1, 5, 4, 2, 3); sign_function=global_sign)
 end
