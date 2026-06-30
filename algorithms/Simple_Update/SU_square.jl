@@ -202,7 +202,7 @@ Step 2: QR or LQ decompositions :
                                                   ↙
               ↑      ↙                         ↙                           
               ↑    ↙                         ↙ 
-              ↑  ↙                ⟵⟵⟵ R1 ⟵⟵⟵
+              ↑  ↙                ⟵⟵⟵ Q1 ⟵⟵⟵
       ⟵⟵⟵ B1 ⟵⟵⟵  ===>        ↑    ↙
             ↙                       ↑  ↙
           ↙                         X1 
@@ -215,7 +215,7 @@ Step 2: QR or LQ decompositions :
               ↑    ↙                         X2
               ↑  ↙                          ↙
       ⟵⟵⟵ B2 ⟵⟵⟵  ===>              ↙
-            ↙                  ⟵⟵⟵ L2 ⟵⟵⟵
+            ↙                  ⟵⟵⟵ Q2 ⟵⟵⟵
           ↙                           ↙    
         ↙                           ↙ 
 
@@ -314,12 +314,12 @@ function update_x_bond(
     # Bond projection technique
     # B1_perm[n1p, x1p, y1p, y1, x1] <-- B1[n1p, y1p, y1, x1, x1p]
     B1_perm = permutedims(B1, (1, 5, 2, 3, 4); sign_function=global_sign)
-    # B1_perm[(n1p, x1p), (y1p, y1, x1)] --> X1[(n1p, x1p), x1], R1[x1p, (y1p, y1, x1)]
-    X1, R1 = gortho(B1_perm, (1, 2), (3, 4, 5); alg=LinearAlgebra.qr)
+    # B1_perm[(n1p, x1p), (y1p, y1, x1)] --> X1[(n1p, x1p), x1], Q1[x1p, (y1p, y1, x1)]
+    X1, Q1 = gortho(B1_perm, (1, 2), (3, 4, 5); alg=LinearAlgebra.lq)
     # B2_perm[y2p, y2, x2p, n2p, x2] <-- B2[n2p, y2p, y2, x2, x2p]
     B2_perm = permutedims(B2, (2, 3, 5, 1, 4); sign_function=global_sign)
-    # B2_perm[(y2p, y2, x2p), (n2p, x2)] --> L2[(y2p, y2, x2p), x2], X2[x2p, (n2p, x2)]
-    L2, X2 = gortho(B2_perm, (1, 2, 3), (4, 5); alg=LinearAlgebra.lq)
+    # B2_perm[(y2p, y2, x2p), (n2p, x2)] --> Q2[(y2p, y2, x2p), x2], X2[x2p, (n2p, x2)]
+    Q2, X2 = gortho(B2_perm, (1, 2, 3), (4, 5); alg=LinearAlgebra.qr)
 
     # Apply the evolution gate G
     # C1[n1p, n2p, n1, x2p, x2] = G[n1p, n2p, n1, dum] * X2[x2p, (dum, x2)]
@@ -332,8 +332,8 @@ function update_x_bond(
     Ux, Λx_new, Vx, trunc_err = gsvd(C2, (1, 2), (3, 4), Dcut; trunc=true, average_trunc=average_trunc, sign_function=global_sign)
 
     # Split the Schmidt weights from the local tensors Ao1 and Bo1
-    # A2o[n2p, x2, y2p, y2, x2p] = Ux[(n2p, dum), x2] * L2[(y2p, y2, x2p), dum]
-    A2o = contract(Ux, L2, (2, 4); sign_function=global_sign)
+    # A2o[n2p, x2, y2p, y2, x2p] = Ux[(n2p, dum), x2] * Q2[(y2p, y2, x2p), dum]
+    A2o = contract(Ux, Q2, (2, 4); sign_function=global_sign)
     # A2o1[n2p, x2, y2, x2p, y2p] = A2o[n2p, x2, dum, y2, x2p] * inv(Λy2a)[y2p, dum]
     A2o1 = contract(A2o, inv(Λy2a), (3, 2); sign_function=global_sign)
     # A2o2[n2p, x2, x2p, y2p, y2] = A2o1[n2p, x2, dum, x2p, y2p] * inv(Λy2b)[dum, y2]
@@ -341,8 +341,8 @@ function update_x_bond(
     # A2o3[n2p, y2p, y2, x2, x2p] <-- A2o3[n2p, x2, y2p, y2, x2p] = A2o2[n2p, x2, dum, y2p, y2] * inv(Λx2a)[x2p, dum]
     A2o3 = contract(A2o2, inv(Λx2a), (3, 2); perm=(1, 3, 4, 2, 5), sign_function=global_sign)
 
-    # A1o[n1p, x1p, y1p, y1, x1] = conj(Vx)[(n1p, dum), x1p] * R1[dum, (y1p, y1, x1)]
-    A1o = contract(Vx, R1, (2, 1); cj=(true, false), sign_function=global_sign)
+    # A1o[n1p, x1p, y1p, y1, x1] = conj(Vx)[(n1p, dum), x1p] * Q1[dum, (y1p, y1, x1)]
+    A1o = contract(Vx, Q1, (2, 1); cj=(true, false), sign_function=global_sign)
     # A1o1[n1p, x1p, y1, x1, y1p] = A1o[n1p, x1p, dum, y1, x1] * inv(Λy1a)[y1p, dum]
     A1o1 = contract(A1o, inv(Λy1a), (3, 2); sign_function=global_sign)
     # A1o2[n1p, x1p, x1, y1p, y1] = A1o1[n1p, x1p, dum, x1, y1p] * inv(Λy1b)[dum, y1]
