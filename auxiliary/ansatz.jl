@@ -59,6 +59,26 @@ end
 Base.size(peps::Square_GPEPS) = size(peps.A)
 Base.eltype(peps::Square_GPEPS{Q}) where {Q} = Q
 
+function absorb_Schmidt_weights(peps::Square_GPEPS{T}) where {T}
+
+    Lx, Ly = size(peps)
+
+    for r in 1:Lx, c in 1:Ly
+        r_m1 = Nmod(r-1, Lx)
+        c_p1 = Nmod(c+1, Ly)
+        # Ao1[phy, r, u, d, l] = peps.A[r, c][phy, dum, r, u, d] * sqrt(peps.Λy[r, c])[l, dum]
+        Ao1 = contract(peps.A[r, c], sqrt(peps.Λy[r, c]), (2, 2); sign_function=global_sign)
+        # Ao2[phy, u, d, l, r] = Ao1[phy, dum, u, d, l] * sqrt(peps.Λy[r, c_p1])[dum, r]
+        Ao2 = contract(Ao1, sqrt(peps.Λy[r, c_p1]), (2, 1); sign_function=global_sign)
+        # Ao3[phy, d, l, r, u] = Ao2[phy, dum, d, l, r] * sqrt(peps.Λx[r_m1, c])[dum, u]
+        Ao3 = contract(Ao2, sqrt(peps.Λx[r_m1, c]), (2, 1); sign_function=global_sign)
+        # peps.A[r, c][phy, l, r, u, d] = Ao3[phy, dum, l, r, u] * sqrt(peps.Λx[r, c])[d, dum]
+        peps.A[r, c] = contract(Ao3, sqrt(peps.Λx[r, c]), (2, 2); sign_function=global_sign)
+    end
+
+    return Square_GPEPS{T}(peps.A, missing, missing)
+end
+
 function _save_square_gpeps_tensor_grid!(parent, tensor_name::AbstractString, tensor_grid)
 
     tensor_group = create_group(parent, tensor_name)

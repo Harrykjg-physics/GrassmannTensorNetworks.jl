@@ -34,8 +34,9 @@ export gsvd, gevd, gortho
 export save, load
 
 export Nmod, compare_weights, prepare_bond_weight
-export Square_GPEPS
+export Square_GPEPS, absorb_Schmidt_weights
 export HubbardModel, nn_bond, gate
+export reduced_tensor
 export CTMRGEnv, run_GCTMRG!, find_maxiter, read_CTMRG_env
 export compute_exp_site, compute_exp_hbond, compute_exp_vbond
 export correlation_function_horizontal, correlation_function_vertical

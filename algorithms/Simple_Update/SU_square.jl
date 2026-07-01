@@ -36,7 +36,7 @@ function Grassmann_SU(
         Λ_diff_max = maximum([maximum(Λx_diff), maximum(Λy_diff)])
 
         @info @sprintf "Simple update iteration : %i,   δτ : %f,   Δt : %.5f" i  δτ  (tf-ti)
-        @info @sprintf "---- Estimated ground state energy: %.9f"  Eavg_tmp
+        @info @sprintf "---- Estimated ground state energy per site: %.9f"  Eavg_tmp
         @info @sprintf "---- Energy convergence: %.3e   Schmidt weight convergence: %.3e" conv_err_energy  Λ_diff_max
 
         if save_iter > 0 && mod(i, save_iter) == 0
