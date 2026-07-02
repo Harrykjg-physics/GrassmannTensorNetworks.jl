@@ -396,6 +396,32 @@ Cld2 →→ (h7) →→ Ed2 →→ (h8) →→ Crd2
 """
 
 function compute_exp_vbond(
+    Tbulk::Matrix{Grassmann{Q1, 4}}, 
+    Timp::Matrix{Grassmann{Q2, 6}}, 
+    env::CTMRGEnv) where {Q1, Q2}
+    
+    Lx, Ly = size(Tbulk)
+
+    Q = promote_type(Q1, Q2)
+
+    Z = Matrix{Q}(undef, Lx, Ly)
+    O = Matrix{Q}(undef, Lx, Ly)
+
+    for c in 1:Ly, r in 1:Lx
+
+        r_p1 = Nmod(r + 1, Lx)
+
+        Z[r, c], O[r, c] = compute_exp_vbond(
+            Tbulk[r_p1, c], Tbulk[r, c], Timp[r, c],
+            env.Ed[r_p1, c], env.Eu[r, c], env.Er[r_p1, c], env.Er[r, c], 
+            env.El[r_p1, c], env.El[r, c], 
+            env.Crd[r_p1, c], env.Cru[r, c], env.Cld[r_p1, c], env.Clu[r, c]) 
+    end
+
+    return Z, O
+end
+
+function compute_exp_vbond(
     Tb2::Grassmann{Q1, 4}, Tb1::Grassmann{Q1, 4}, Timp::Grassmann{Q2, 6}, 
     Ed2::Grassmann{Q1, 3}, Eu1::Grassmann{Q1, 3}, 
     Er2::Grassmann{Q1, 3}, Er1::Grassmann{Q1, 3},
@@ -415,9 +441,9 @@ function compute_exp_vbond(
     Er2 = permutedims(Er2, (2, 1, 3); sign_function=global_sign)
     # Er1[v7, v6, h4] <-- Er1[v6, v7, h4]
     Er1 = permutedims(Er1, (2, 1, 3); sign_function=global_sign)
-    # El2[v2, v3, h5] <-- El2[v2, v3, h5]
+    # El2[v3, v2, h5] <-- El2[v2, v3, h5]
     El2 = permutedims(El2, (2, 1, 3); sign_function=global_sign)
-    # El1[v1, v2, h3] <-- El1[v2, v1, h3]
+    # El1[v2, v1, h3] <-- El1[v1, v2, h3]
     El1 = permutedims(El1, (2, 1, 3); sign_function=global_sign)
     # Crd2[v8, h8] <-- Crd2[h8, v8]
     Crd2 = permutedims(Crd2, (2, 1); sign_function=global_sign)
@@ -427,11 +453,46 @@ function compute_exp_vbond(
     Cld2 = permutedims(Cld2, (2, 1); sign_function=global_sign)
     # Clu1[v1, h1] <-- Clu1[h1, v1]
     Clu1 = permutedims(Clu1, (2, 1); sign_function=global_sign)
+    # Timp[v5, v4, h6, h4, h5, h3] <-- Timp[h3, h5, h4, h6, v4, v5]
+    Timp = permutedims(Timp, (6, 5, 4, 3, 2, 1); sign_function=global_sign)
+
+    # Reverse the arrows in the environment tensors to match the horizontal bond case
+    Crd2 = index_conjugation(Crd2, (1, 2))
+    Crd2 = add_parity_sign(Crd2, 2; sign_function=global_sign)
+
+    Ed2 = index_conjugation(Ed2, (1, 2))
+    Ed2 = add_parity_sign(Ed2, 2; sign_function=global_sign)
+
+    Cld2 = index_conjugation(Cld2, (1, 2))
+    Cld2 = add_parity_sign(Cld2, 1; sign_function=global_sign)
+
+    El2 = index_conjugation(El2, (1, 2))
+    El2 = add_parity_sign(El2, 2; sign_function=global_sign)
+
+    El1 = index_conjugation(El1, (1, 2))
+    El1 = add_parity_sign(El1, 2; sign_function=global_sign)
+
+    Clu1 = index_conjugation(Clu1, (1, 2))
+    Clu1 = add_parity_sign(Clu1, 2; sign_function=global_sign)
+
+    Eu1 = index_conjugation(Eu1, (1, 2))
+    Eu1 = add_parity_sign(Eu1, 1; sign_function=global_sign)
+
+    Cru1 = index_conjugation(Cru1, (1, 2))
+    Cru1 = add_parity_sign(Cru1, 1; sign_function=global_sign)
+
+    Er1 = index_conjugation(Er1, (1, 2))
+    Er1 = add_parity_sign(Er1, 1; sign_function=global_sign)
+
+    Er2 = index_conjugation(Er2, (1, 2))
+    Er2 = add_parity_sign(Er2, 1; sign_function=global_sign)
 
     norm, exp = compute_exp_hbond(Tb2, Tb1, Timp, Ed2, Eu1, Er2, Er1, El2, El1, Crd2, Cru1, Cld2, Clu1)
 
     return norm, exp
 end
+
+
 
 """
 Clu[r, c] ←←←←←←←← Eu[r, c] ←←←←←←←← Eu[r, c+1] ←←←←←←←← Eu[r, c+2] ←←←←←←←← ... ←←←←←←←← Eu[r, c+Δc-1] ←←←←←←←← Eu[r, c+Δc] ←←←←←←←← Cru[r, c+Δc]

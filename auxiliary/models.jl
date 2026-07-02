@@ -23,6 +23,37 @@ function HubbardModel(t::Real, U::Real, μ::Real)
     return HubbardModel{typeof(t)}(t, U, μ)
 end
 
+function nu_site_Fock_basis(model::HubbardModel{T}) where {T}
+    
+    Nu_coef = zeros(T, (4, 4))
+    # < ↑ | c†↑ c↑ | ↑ > = 1 
+    Nu_coef[1, 1] = 1
+    # < D | c†↑ c↑ | D > = 1
+    Nu_coef[4, 4] = 1
+
+    return Nu_coef
+end
+
+function nd_site_Fock_basis(model::HubbardModel{T}) where {T}
+    
+    Nd_coef = zeros(T, (4, 4))
+    # < ↓ | c†↓ c↓ | ↓ > = 1 
+    Nd_coef[2, 2] = 1
+    # < D | c†↓ c↓ | D > = 1
+    Nd_coef[4, 4] = 1
+
+    return Nd_coef
+end
+
+function n_site_Fock_basis(model::HubbardModel{T}) where {T}
+    nu_site_Fock_basis(model) + nd_site_Fock_basis(model)
+end
+
+function n_site(model::HubbardModel)
+    n_coef = n_site_Fock_basis(model)
+    n_site_out = Grassmann(n_coef, (4, 4), (2, 2), (:out, :in))
+end
+
 function nn_bond_Fock_basis(model::HubbardModel{T}) where {T}
 
     t = model.t
@@ -71,8 +102,8 @@ end
 function nn_bond(model::HubbardModel)
 
     H_coef = nn_bond_Fock_basis(model)
-    nn_bond = Grassmann(H_coef, (4, 4, 4, 4), (2, 2, 2, 2), (:out, :out, :in, :in))
-    nn_bond_out = add_perm_sign(nn_bond, (1, 2, 4, 3))
+    nn_bond_out1 = Grassmann(H_coef, (4, 4, 4, 4), (2, 2, 2, 2), (:out, :out, :in, :in))
+    nn_bond_out2 = add_perm_sign(nn_bond_out1, (1, 2, 4, 3))
 end
 
 function gate(model::HubbardModel, dτ::Real)

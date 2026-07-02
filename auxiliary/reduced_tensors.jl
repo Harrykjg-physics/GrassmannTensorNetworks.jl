@@ -53,6 +53,61 @@ function reduced_tensor(peps::Square_GPEPS{Q}) where {Q}
     return T_square_mat
 end
 
+"""
+Impurity tensor : 
+                               [u']
+                              ↗ 
+                            ↗ 
+                          ↗  
+            [l] ⟶⟶⟶ Tup ⟶⟶⟶ [r']                                  [U]
+                      ↗ ↑                                              ↙
+                    ↗ [dum1]                                         ↙
+                  ↗     ↑                                          ↙
+               [d]      O       [u]      ===>   [L'] ⟵⟵⟵ O_reduced ⟵⟵⟵ [R]
+                        ↑      ↙                              ↙
+                      [dum2] ↙                              ↙
+                        ↑  ↙                              ↙ 
+           [l'] ⟵⟵⟵ Tdn ⟵⟵⟵ [r]                  [D']
+                      ↙
+                    ↙  
+                  ↙ 
+                [d']  
+"""
+
+function reduced_tensor(Tdn::Grassmann{Q, 5}, O::GrassmannMatrix{Q}) where {Q}
+
+    Tup = conj(Tdn; sign_function=global_sign)
+    # T_dn_O[dum1, l', r, u, d'] = O[dum1, dum2] * Tdn[dum2, l', r, u, d']
+    T_dn_O = contract(O, Tdn, (2, 1); sign_function=global_sign)
+    # O_reduced[l, l', r', r, u', u, d, d'] <-- O_reduced[l, r', u', d, l', r, u, d'] = Tup[dum1, l, r', u', d] * T_dn_O[dum1, l', r, u, d']
+    O_reduced = contract(Tup, T_dn_O, (1, 1); perm=(1, 5, 2, 6, 3, 7, 4, 8), sign_function=global_sign)
+    # O_reduced1[L', r', r, u', u, d, d'] <-- O_reduced[(l, l'), r', r, u', u, d, d']
+    O_reduced = add_parity_sign(O_reduced, 1; sign_function=global_sign)
+    O_reduced1 = fuse(O_reduced, (1, 2); index_type_fused=:out)
+    # O_reduced2[L', R, u', u, d, d'] <-- O_reduced1[L', r', r, u', u, d, d']
+    O_reduced1 = add_perm_sign(O_reduced1, (1, 3, 2, 4, 5, 6, 7); sign_function=global_sign)
+    O_reduced2 = fuse(O_reduced1, (2, 3); index_type_fused=:in)
+    # O_reduced3[L', R, U, d, d'] <-- O_reduced2[L', R, u', u, d, d']
+    O_reduced2 = add_perm_sign(O_reduced2, (1, 2, 4, 3, 5, 6); sign_function=global_sign)
+    O_reduced3 = fuse(O_reduced2, (3, 4); index_type_fused=:in)
+    # O_reduced4[L', R, U, D'] <-- O_reduced3[L', R, U, d, d']
+    O_reduced3 = add_parity_sign(O_reduced3, 4; sign_function=global_sign)
+    O_reduced4 = fuse(O_reduced3, (4, 5); index_type_fused=:out)
+end
+
+function reduced_tensor(peps::Square_GPEPS{Q}, O::GrassmannMatrix{Q}) where {Q}
+
+    Lx, Ly = size(peps)
+  
+    O_imp_mat = Matrix{Grassmann{Q, 4}}(undef, Lx, Ly)
+
+    for r in 1:Lx, c in 1:Ly
+        O_imp_mat[r, c] = reduced_tensor(peps.A[r, c], O)
+    end
+
+    return O_imp_mat
+end
+
 """ 
 
 Impurity bond along the y direction :
@@ -77,7 +132,7 @@ Impurity bond along the y direction :
 
 """  
      
-function reduced_tensor_y_bond(Tdn1::Grassmann{Q, 5}, Tdn2::Grassmann{Q, 5}, H_bond::Grassmann{Q, 4}) where {Q}
+function reduced_tensor_hbond(Tdn1::Grassmann{Q, 5}, Tdn2::Grassmann{Q, 5}, H_bond::Grassmann{Q, 4}) where {Q}
 
     Tup1 = conj(Tdn1; sign_function=global_sign)
     Tup2 = conj(Tdn2; sign_function=global_sign)
@@ -146,7 +201,7 @@ Impurity bond along the x direction :
               [d2'] 
 """  
 
-function reduced_tensor_x_bond(Tdn1::Grassmann{Q, 5}, Tdn2::Grassmann{Q, 5}, H_bond::Grassmann{Q, 4}) where {Q}
+function reduced_tensor_vbond(Tdn1::Grassmann{Q, 5}, Tdn2::Grassmann{Q, 5}, H_bond::Grassmann{Q, 4}) where {Q}
 
     Tup1 = conj(Tdn1; sign_function=global_sign)
     Tup2 = conj(Tdn2; sign_function=global_sign)
@@ -184,17 +239,17 @@ function reduced_tensor(peps::Square_GPEPS{Q}, H_bond::Grassmann{Q, 4}) where {Q
 
     Lx, Ly = size(peps)
   
-    T_x_bond_mat = Matrix{Grassmann{Q, 6}}(undef, Lx, Ly)
-    T_y_bond_mat = Matrix{Grassmann{Q, 6}}(undef, Lx, Ly)
+    T_v_bond_mat = Matrix{Grassmann{Q, 6}}(undef, Lx, Ly)
+    T_h_bond_mat = Matrix{Grassmann{Q, 6}}(undef, Lx, Ly)
 
     for r in 1:Lx, c in 1:Ly
         c_p1 = Nmod(c+1, Ly)
         r_p1 = Nmod(r+1, Lx)
-        T_x_bond_mat[r, c] = reduced_tensor_x_bond(peps.A[r, c], peps.A[r_p1, c], H_bond)
-        T_y_bond_mat[r, c] = reduced_tensor_y_bond(peps.A[r, c], peps.A[r, c_p1], H_bond)
+        T_v_bond_mat[r, c] = reduced_tensor_vbond(peps.A[r, c], peps.A[r_p1, c], H_bond)
+        T_h_bond_mat[r, c] = reduced_tensor_hbond(peps.A[r, c], peps.A[r, c_p1], H_bond)
     end
 
-    return T_x_bond_mat, T_y_bond_mat
+    return T_v_bond_mat, T_h_bond_mat
 end
 
 

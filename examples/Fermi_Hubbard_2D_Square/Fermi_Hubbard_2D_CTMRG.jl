@@ -23,25 +23,28 @@ function run_CTMRG_Square_Hubbard(
 
     model = HubbardModel(t, U, μ)
     H_nn_bond = nn_bond(model)
+    N_site = n_site(model)
 
     ##################### Construct reduced tensors and impurity tensors from Square GPEPS #####################
 
     T_square_mat = reduced_tensor(peps)
-    T_x_bond_imp_mat, T_y_bond_imp_mat = reduced_tensor(peps, H_nn_bond)
+    T_n_imp_mat = reduced_tensor(peps, N_site)
+    T_vbond_imp_mat, T_hbond_imp_mat = reduced_tensor(peps, H_nn_bond)
 
     ##################### Running Grassmann CTMRG to compute environment tensors #####################
 
-    load_env == "random" ? ctmrg_env = CTMRGEnv(T_square_mat, χ, Int(χ/2)) : ctmrg_env = load("ctmrg_env", load_env, CTMRGEnv)
-
-    run_GCTMRG!(T_square_mat, ctmrg_env, χ; 
+    ctmrg_env = (load_env == "random" ? CTMRGEnv(T_square_mat, χ, Int(χ/2)) : load("ctmrg_env", load_env, CTMRGEnv))
+    run_GCTMRG!(T_square_mat, T_n_imp_mat, ctmrg_env, χ; 
     ctmrg_iter=ctmrg_iter, ctmrg_tol=1e-12, average_trunc=true, 
     verbosity=1, save_iter=20, save_filename="ctmrg_env")
 
-    _, Eh = compute_exp_hbond(T_square_mat, T_y_bond_imp_mat, ctmrg_env)
-    _, Ev = compute_exp_vbond(T_square_mat, T_x_bond_imp_mat, ctmrg_env)
-    Es_avg = sum(Eh, Ev)/(size(Eh, 1) * size(Eh, 2))
+    _, ns = compute_exp_site(T_square_mat, T_n_imp_mat, ctmrg_env)
+    ns_avg = sum(ns)/(size(ns, 1) * size(ns, 2))
+    _, Eh = compute_exp_hbond(T_square_mat, T_hbond_imp_mat, ctmrg_env)
+    _, Ev = compute_exp_vbond(T_square_mat, T_vbond_imp_mat, ctmrg_env)
+    Es_avg = (sum(Eh) + sum(Ev))/(size(Eh, 1) * size(Eh, 2))
     println("Average ground energy per site: $Es_avg at U = $U, μ = $μ, χ = $χ")
-    save("exp_ctmrg", χ, "Eh", Eh, "Ev", Ev, "Es_avg", Es_avg)
+    save("exp_ctmrg", "χ$χ", "ns", ns, "ns_avg", ns_avg, "Eh", Eh, "Ev", Ev, "Es_avg", Es_avg)
 end
 
 t = 1.0
