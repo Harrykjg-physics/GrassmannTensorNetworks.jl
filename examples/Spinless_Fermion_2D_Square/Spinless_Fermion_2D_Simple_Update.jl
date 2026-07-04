@@ -27,8 +27,8 @@ function run_SU_Square_SpinlessFermion(
 end
 
 t = -1.0
-γ = 0.0
-λ = 0.0
+γ = 1.0
+λ = 3.0
 Dbond = 2
 Lx = 1
 Ly = 1

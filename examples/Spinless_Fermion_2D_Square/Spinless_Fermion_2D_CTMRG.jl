@@ -43,13 +43,13 @@ function run_CTMRG_Square_SpinlessFermion(
     _, Eh = compute_exp_hbond(T_square_mat, T_hbond_imp_mat, ctmrg_env)
     _, Ev = compute_exp_vbond(T_square_mat, T_vbond_imp_mat, ctmrg_env)
     Es_avg = (sum(Eh) + sum(Ev))/(size(Eh, 1) * size(Eh, 2))
-    println("Average ground energy per site: $Es_avg at t = $t, μ = $μ, χ = $χ")
+    println("Average ground energy per site: $Es_avg at t = $t, γ = $γ, λ = $λ")
     save("exp_ctmrg", "χ$χ", "ns", ns, "ns_avg", ns_avg, "Eh", Eh, "Ev", Ev, "Es_avg", Es_avg)
 end
 
 t = -1.0
-γ = 0.0
-λ = 0.0
+γ = 1.0
+λ = 3.0
 peps_filename = "tensor_file"
 peps_param_str = "iter3000"*"_δτ0.0001"
 ctmrg_iter = 100

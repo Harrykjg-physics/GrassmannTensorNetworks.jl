@@ -9,7 +9,7 @@ H = ∑_(⟨i,j⟩) [ -t (c†_{i} c_{j} + h.c.)  - γ (c†_{i} c_{j}† + h.c.
 
 H_nn_bond = - t ( c†i ⊗ cj + c†j ⊗ ci) 
             - γ ( c†i ⊗ c†j + cj ⊗ ci) 
-            - λ ( c†i ci ⊗ Ij + Ii ⊗ c†j cj) 
+            - λ/2 ( c†i ci ⊗ Ij + Ii ⊗ c†j cj) 
 """
 
 struct SpinlessFermionModel{T<:Real} <: AbstractModel
@@ -43,11 +43,12 @@ function nn_bond_Fock_basis(model::SpinlessFermionModel{T}) where {T}
     # < 1ᵢ0ⱼ | c†i ⊗ cj | 0ᵢ1ⱼ > = 1; < 0ᵢ1ⱼ | c†j ⊗ ci | 1ᵢ0ⱼ > = 1
     H_coef[2, 1, 1, 2] = -t; H_coef[1, 2, 2, 1] = -t
     # < 1ᵢ1ⱼ | c†i ⊗ c†j | 0ᵢ0ⱼ > = 1; < 0ᵢ0ⱼ | cj ⊗ ci | 1ᵢ1ⱼ > = 1
-    H_coef[2, 2, 1, 1] = -γ; H_coef[1, 1, 2, 2] = -γ
+    # TODO: Not sure about the sign here, but it's correct
+    H_coef[2, 2, 1, 1] = γ; H_coef[1, 1, 2, 2] = γ
     # < 1ᵢ0ⱼ | c†i ci ⊗ Ij | 1ᵢ0ⱼ > = 1; < 1ᵢ1ⱼ | c†i ci ⊗ Ij | 1ᵢ1ⱼ > = 1
-    H_coef[2, 1, 2, 1] = -λ; H_coef[2, 2, 2, 2] = -λ
+    H_coef[2, 1, 2, 1] = -λ/2; H_coef[2, 2, 2, 2] = -λ/2
     # < 0ᵢ1ⱼ | Ii ⊗ c†j cj | 0ᵢ1ⱼ > = 1; < 1ᵢ1ⱼ | Ii ⊗ c†j cj | 1ᵢ1ⱼ > = 1
-    H_coef[1, 2, 1, 2] = -λ; H_coef[2, 2, 2, 2] += -λ
+    H_coef[1, 2, 1, 2] = -λ/2; H_coef[2, 2, 2, 2] += -λ/2
 
     return H_coef
 end
@@ -77,8 +78,8 @@ H = -t ∑_(⟨i,j⟩,σ) (c†_{iσ} c_{jσ} + h.c.)
     - μ ∑_i(n_i↑ + n_i↓)
 
 H_nn_bond = - t( c†i↑ ⊗ cj↑ + c†j↑ ⊗ ci↑  + c†i↓ ⊗ cj↓ + c†j↓ ⊗ ci↓) 
-         + U/2 (ni↑ ni↓ ⊗ Ij + Ii ⊗ nj↑ nj↓) 
-         - μ/2 (ni↑ ⊗ Ij + ni↓ ⊗ Ij + Ii ⊗ nj↑ + Ii ⊗ nj↓)
+         + U/4 (ni↑ ni↓ ⊗ Ij + Ii ⊗ nj↑ nj↓) 
+         - μ/4 (ni↑ ⊗ Ij + ni↓ ⊗ Ij + Ii ⊗ nj↑ + Ii ⊗ nj↓)
 """
 
 struct HubbardModel{T<:Real} <: AbstractModel
@@ -146,23 +147,23 @@ function nn_bond_Fock_basis(model::HubbardModel{T}) where {T}
     H_coef[1, 4, 4, 1] = -t; H_coef[3, 4, 2, 1] = -t
     H_coef[1, 2, 4, 3] = t; H_coef[3, 2, 2, 3] = t
     # < Dᵢ~ⱼ | ni↑ ni↓ ⊗ Ij | Dᵢ~ⱼ > = 1
-    H_coef[2, 1, 2, 1] += U/2; H_coef[2, 2, 2, 2] += U/2
-    H_coef[2, 3, 2, 3] += U/2; H_coef[2, 4, 2, 4] += U/2
+    H_coef[2, 1, 2, 1] += U/4; H_coef[2, 2, 2, 2] += U/4
+    H_coef[2, 3, 2, 3] += U/4; H_coef[2, 4, 2, 4] += U/4
     # < ~ᵢDⱼ | Ii ⊗ nj↑ nj↓ | ~ᵢDⱼ > = 1
-    H_coef[1, 2, 1, 2] += U/2; H_coef[2, 2, 2, 2] += U/2
-    H_coef[3, 2, 3, 2] += U/2; H_coef[4, 2, 4, 2] += U/2
+    H_coef[1, 2, 1, 2] += U/4; H_coef[2, 2, 2, 2] += U/4
+    H_coef[3, 2, 3, 2] += U/4; H_coef[4, 2, 4, 2] += U/4
     # < ↑ᵢ~ⱼ | ni↑ ⊗ Ij | ↑ᵢ~ⱼ > = 1
-    H_coef[3, 1, 3, 1] -= μ/2; H_coef[3, 2, 3, 2] -= μ/2 
-    H_coef[3, 3, 3, 3] -= μ/2; H_coef[3, 4, 3, 4] -= μ/2 
+    H_coef[3, 1, 3, 1] -= μ/4; H_coef[3, 2, 3, 2] -= μ/4 
+    H_coef[3, 3, 3, 3] -= μ/4; H_coef[3, 4, 3, 4] -= μ/4 
     # < ↓ᵢ~ⱼ | ni↓ ⊗ Ij | ↓ᵢ~ⱼ > = 1
-    H_coef[4, 1, 4, 1] -= μ/2; H_coef[4, 2, 4, 2] -= μ/2
-    H_coef[4, 3, 4, 3] -= μ/2; H_coef[4, 4, 4, 4] -= μ/2 
+    H_coef[4, 1, 4, 1] -= μ/4; H_coef[4, 2, 4, 2] -= μ/4
+    H_coef[4, 3, 4, 3] -= μ/4; H_coef[4, 4, 4, 4] -= μ/4 
     # < ~ᵢ↑ⱼ | Ii ⊗ nj↑ | ~ᵢ↑ⱼ > = 1
-    H_coef[1, 3, 1, 3] -= μ/2; H_coef[2, 3, 2, 3] -= μ/2 
-    H_coef[3, 3, 3, 3] -= μ/2; H_coef[4, 3, 4, 3] -= μ/2 
+    H_coef[1, 3, 1, 3] -= μ/4; H_coef[2, 3, 2, 3] -= μ/4 
+    H_coef[3, 3, 3, 3] -= μ/4; H_coef[4, 3, 4, 3] -= μ/4 
     # < ~ᵢ↓ⱼ | Ii ⊗ nj↓ | ~ᵢ↓ⱼ > = 1
-    H_coef[1, 4, 1, 4] -= μ/2; H_coef[2, 4, 2, 4] -= μ/2
-    H_coef[3, 4, 3, 4] -= μ/2; H_coef[4, 4, 4, 4] -= μ/2
+    H_coef[1, 4, 1, 4] -= μ/4; H_coef[2, 4, 2, 4] -= μ/4
+    H_coef[3, 4, 3, 4] -= μ/4; H_coef[4, 4, 4, 4] -= μ/4
 
     return H_coef
 end

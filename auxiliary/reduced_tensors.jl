@@ -29,13 +29,13 @@ function reduced_tensor(Tdn::Grassmann{Q, 5}) where {Q}
     # T_reduced1[L', r', r, u', u, d, d'] <-- T_reduced[(l, l'), r', r, u', u, d, d']
     T_reduced = add_parity_sign(T_reduced, 1; sign_function=global_sign)
     T_reduced1 = fuse(T_reduced, (1, 2); index_type_fused=:out)
-    # T_reduced2[L', R, u', u, d, d'] <-- T_reduced1[L', r', r, u', u, d, d']
+    # T_reduced2[L', R, u', u, d, d'] <-- T_reduced1[L', (r', r), u', u, d, d']
     T_reduced1 = add_perm_sign(T_reduced1, (1, 3, 2, 4, 5, 6, 7); sign_function=global_sign)
     T_reduced2 = fuse(T_reduced1, (2, 3); index_type_fused=:in)
-    # T_reduced3[L', R, U, d, d'] <-- T_reduced2[L', R, u', u, d, d']
+    # T_reduced3[L', R, U, d, d'] <-- T_reduced2[L', R, (u', u), d, d']
     T_reduced2 = add_perm_sign(T_reduced2, (1, 2, 4, 3, 5, 6); sign_function=global_sign)
     T_reduced3 = fuse(T_reduced2, (3, 4); index_type_fused=:in)
-    # T_reduced4[L', R, U, D'] <-- T_reduced3[L', R, U, d, d']
+    # T_reduced4[L', R, U, D'] <-- T_reduced3[L', R, U, (d, d')]
     T_reduced3 = add_parity_sign(T_reduced3, 4; sign_function=global_sign)
     T_reduced4 = fuse(T_reduced3, (4, 5); index_type_fused=:out)
 end
