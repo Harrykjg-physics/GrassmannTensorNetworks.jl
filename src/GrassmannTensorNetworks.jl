@@ -35,7 +35,7 @@ export save, load
 
 export Nmod, compare_weights, prepare_bond_weight
 export Square_GPEPS, absorb_Schmidt_weights
-export HubbardModel, n_site, nn_bond, gate
+export SpinlessFermionModel, HubbardModel, n_site, nn_bond, gate
 export reduced_tensor, reduced_tensor_vbond, reduced_tensor_hbond
 export CTMRGEnv, run_GCTMRG!, find_maxiter, read_CTMRG_env
 export compute_exp_site, compute_exp_hbond, compute_exp_vbond

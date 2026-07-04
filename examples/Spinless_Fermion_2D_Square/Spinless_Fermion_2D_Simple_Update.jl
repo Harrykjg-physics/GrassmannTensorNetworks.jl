@@ -4,10 +4,10 @@ Pkg.instantiate()
 
 using GrassmannTensorNetworks
 
-function run_SU_Square_Hubbard(
+function run_SU_Square_SpinlessFermion(
     t::Float64, 
-    U::Float64, 
-    μ::Float64,
+    γ::Float64,
+    λ::Float64,
     Dbond::Int64, 
     Lx::Int, 
     Ly::Int, 
@@ -15,8 +15,8 @@ function run_SU_Square_Hubbard(
     tol_vec::Vector{Float64}, 
     dτ_vec::Vector{Float64})
 
-    peps = Square_GPEPS(4, 2, Dbond, Lx, Ly, Float64, true)
-    model = HubbardModel(t, U, μ)
+    peps = Square_GPEPS(2, 1, Dbond, Lx, Ly, Float64, true)
+    model = SpinlessFermionModel(t, γ, λ)
 
     for (dτ, iter, tol) in zip(dτ_vec, iter_vec, tol_vec)
         G = gate(model, dτ)
@@ -26,13 +26,13 @@ function run_SU_Square_Hubbard(
     return peps
 end
 
-t = 1.0
-U = 4.0
-μ = 0.0
-Dbond = 4
+t = -1.0
+γ = 0.0
+λ = 0.0
+Dbond = 2
 Lx = 1
 Ly = 1
 
 GrassmannTensorNetworks.global_sign = auto_sign
 
-run_SU_Square_Hubbard(t, U, μ, Dbond, Lx, Ly, [100, 100, 100], [1e-6, 1e-10, 1e-12], [1e-2, 1e-3, 1e-4])
+run_SU_Square_SpinlessFermion(t, γ, λ, Dbond, Lx, Ly, [100, 100, 100], [1e-6, 1e-10, 1e-12], [1e-2, 1e-3, 1e-4])

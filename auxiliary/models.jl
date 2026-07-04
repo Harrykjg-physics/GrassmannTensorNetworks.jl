@@ -2,6 +2,74 @@
 abstract type AbstractModel end
 
 """
+2D Spinless Fermion model on the square lattice
+
+H = ∑_(⟨i,j⟩) [ -t (c†_{i} c_{j} + h.c.)  - γ (c†_{i} c_{j}† + h.c.) ]
+    - 2λ ∑_i c†_{i} c_{i}
+
+H_nn_bond = - t ( c†i ⊗ cj + c†j ⊗ ci) 
+            - γ ( c†i ⊗ c†j + cj ⊗ ci) 
+            - λ ( c†i ci ⊗ Ij + Ii ⊗ c†j cj) 
+"""
+
+struct SpinlessFermionModel{T<:Real} <: AbstractModel
+    t::T
+    γ::T
+    λ::T
+end
+
+function SpinlessFermionModel(t::Real, γ::Real, λ::Real)
+    return SpinlessFermionModel{typeof(t)}(t, γ, λ)
+end
+
+function n_site_Fock_basis(model::SpinlessFermionModel{T}) where {T}
+    n_coef = zeros(T, (2, 2))
+    n_coef[2, 2] = 1
+    return n_coef
+end
+
+function n_site(model::SpinlessFermionModel)
+    n_coef = n_site_Fock_basis(model)
+    n_site_out = Grassmann(n_coef, (2, 2), (1, 1), (:out, :in))
+end
+
+function nn_bond_Fock_basis(model::SpinlessFermionModel{T}) where {T}
+
+    t = model.t
+    γ = model.γ
+    λ = model.λ
+    
+    H_coef = zeros(T, (2, 2, 2, 2))
+    # < 1ᵢ0ⱼ | c†i ⊗ cj | 0ᵢ1ⱼ > = 1; < 0ᵢ1ⱼ | c†j ⊗ ci | 1ᵢ0ⱼ > = 1
+    H_coef[2, 1, 1, 2] = -t; H_coef[1, 2, 2, 1] = -t
+    # < 1ᵢ1ⱼ | c†i ⊗ c†j | 0ᵢ0ⱼ > = 1; < 0ᵢ0ⱼ | cj ⊗ ci | 1ᵢ1ⱼ > = 1
+    H_coef[2, 2, 1, 1] = -γ; H_coef[1, 1, 2, 2] = -γ
+    # < 1ᵢ0ⱼ | c†i ci ⊗ Ij | 1ᵢ0ⱼ > = 1; < 1ᵢ1ⱼ | c†i ci ⊗ Ij | 1ᵢ1ⱼ > = 1
+    H_coef[2, 1, 2, 1] = -λ; H_coef[2, 2, 2, 2] = -λ
+    # < 0ᵢ1ⱼ | Ii ⊗ c†j cj | 0ᵢ1ⱼ > = 1; < 1ᵢ1ⱼ | Ii ⊗ c†j cj | 1ᵢ1ⱼ > = 1
+    H_coef[1, 2, 1, 2] = -λ; H_coef[2, 2, 2, 2] += -λ
+
+    return H_coef
+end
+
+function nn_bond(model::SpinlessFermionModel)
+
+    H_coef = nn_bond_Fock_basis(model)
+    nn_bond_out1 = Grassmann(H_coef, (2, 2, 2, 2), (1, 1, 1, 1), (:out, :out, :in, :in))
+    nn_bond_out2 = add_perm_sign(nn_bond_out1, (1, 2, 4, 3))
+end
+
+function gate(model::SpinlessFermionModel, dτ::Real)
+
+    H_coef = nn_bond_Fock_basis(model)
+    H_coef_mat = reshape(H_coef, (4, 4))
+    G_coef_mat = exp(-dτ * H_coef_mat)
+    G_coef = reshape(G_coef_mat, (2, 2, 2, 2))
+    G = Grassmann(G_coef, (2, 2, 2, 2), (1, 1, 1, 1), (:out, :out, :in, :in))
+    G_out = add_perm_sign(G, (1, 2, 4, 3))
+end
+
+"""
 2D Fermi-Hubbard model on the square lattice
 
 H = -t ∑_(⟨i,j⟩,σ) (c†_{iσ} c_{jσ} + h.c.) 

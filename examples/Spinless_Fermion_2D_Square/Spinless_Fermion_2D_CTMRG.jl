@@ -4,10 +4,10 @@ Pkg.instantiate()
 
 using GrassmannTensorNetworks
 
-function run_CTMRG_Square_Hubbard(
+function run_CTMRG_Square_SpinlessFermion(
     t::Float64, 
-    U::Float64, 
-    μ::Float64,
+    γ::Float64,
+    λ::Float64,
     peps_filename::String,
     peps_param_str::String,  
     χ::Int, 
@@ -21,7 +21,7 @@ function run_CTMRG_Square_Hubbard(
 
     ##################### Introduce the bond Hamiltonian  #####################
 
-    model = HubbardModel(t, U, μ)
+    model = SpinlessFermionModel(t, γ, λ)
     H_nn_bond = nn_bond(model)
     N_site = n_site(model)
 
@@ -43,13 +43,13 @@ function run_CTMRG_Square_Hubbard(
     _, Eh = compute_exp_hbond(T_square_mat, T_hbond_imp_mat, ctmrg_env)
     _, Ev = compute_exp_vbond(T_square_mat, T_vbond_imp_mat, ctmrg_env)
     Es_avg = (sum(Eh) + sum(Ev))/(size(Eh, 1) * size(Eh, 2))
-    println("Average ground energy per site: $Es_avg at U = $U, μ = $μ, χ = $χ")
+    println("Average ground energy per site: $Es_avg at t = $t, μ = $μ, χ = $χ")
     save("exp_ctmrg", "χ$χ", "ns", ns, "ns_avg", ns_avg, "Eh", Eh, "Ev", Ev, "Es_avg", Es_avg)
 end
 
-t = 1.0
-U = 4.0
-μ = 0.0
+t = -1.0
+γ = 0.0
+λ = 0.0
 peps_filename = "tensor_file"
 peps_param_str = "iter3000"*"_δτ0.0001"
 ctmrg_iter = 100
@@ -57,6 +57,6 @@ load_env = "random"
 
 GrassmannTensorNetworks.global_sign = auto_sign
 
-run_CTMRG_Square_Hubbard(t, U, μ, peps_filename, peps_param_str, 16, ctmrg_iter; load_env=load_env)
-run_CTMRG_Square_Hubbard(t, U, μ, peps_filename, peps_param_str, 32, ctmrg_iter; load_env=load_env)
-run_CTMRG_Square_Hubbard(t, U, μ, peps_filename, peps_param_str, 48, ctmrg_iter; load_env=load_env)
+run_CTMRG_Square_SpinlessFermion(t, γ, λ, peps_filename, peps_param_str, 16, ctmrg_iter; load_env=load_env)
+run_CTMRG_Square_SpinlessFermion(t, γ, λ, peps_filename, peps_param_str, 32, ctmrg_iter; load_env=load_env)
+run_CTMRG_Square_SpinlessFermion(t, γ, λ, peps_filename, peps_param_str, 48, ctmrg_iter; load_env=load_env)
