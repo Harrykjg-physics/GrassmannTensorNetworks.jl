@@ -51,7 +51,7 @@ t = -1.0
 γ = 1.0
 λ = 3.0
 peps_filename = "tensor_file"
-peps_param_str = "iter3000"*"_δτ0.0001"
+peps_param_str = "iter4000"*"_δτ0.0001"
 ctmrg_iter = 100
 load_env = "random"
 

@@ -43,8 +43,7 @@ function nn_bond_Fock_basis(model::SpinlessFermionModel{T}) where {T}
     # < 1ᵢ0ⱼ | c†i ⊗ cj | 0ᵢ1ⱼ > = 1; < 0ᵢ1ⱼ | c†j ⊗ ci | 1ᵢ0ⱼ > = 1
     H_coef[2, 1, 1, 2] = -t; H_coef[1, 2, 2, 1] = -t
     # < 1ᵢ1ⱼ | c†i ⊗ c†j | 0ᵢ0ⱼ > = 1; < 0ᵢ0ⱼ | cj ⊗ ci | 1ᵢ1ⱼ > = 1
-    # TODO: Not sure about the sign here, but it's correct
-    H_coef[2, 2, 1, 1] = γ; H_coef[1, 1, 2, 2] = γ
+    H_coef[2, 2, 1, 1] = -γ; H_coef[1, 1, 2, 2] = -γ
     # < 1ᵢ0ⱼ | c†i ci ⊗ Ij | 1ᵢ0ⱼ > = 1; < 1ᵢ1ⱼ | c†i ci ⊗ Ij | 1ᵢ1ⱼ > = 1
     H_coef[2, 1, 2, 1] = -λ/2; H_coef[2, 2, 2, 2] = -λ/2
     # < 0ᵢ1ⱼ | Ii ⊗ c†j cj | 0ᵢ1ⱼ > = 1; < 1ᵢ1ⱼ | Ii ⊗ c†j cj | 1ᵢ1ⱼ > = 1

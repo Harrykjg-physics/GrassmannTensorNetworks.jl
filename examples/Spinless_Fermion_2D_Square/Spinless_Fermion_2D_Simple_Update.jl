@@ -30,9 +30,9 @@ t = -1.0
 γ = 1.0
 λ = 3.0
 Dbond = 2
-Lx = 1
-Ly = 1
+Lx = 2
+Ly = 2
 
 GrassmannTensorNetworks.global_sign = auto_sign
 
-run_SU_Square_SpinlessFermion(t, γ, λ, Dbond, Lx, Ly, [100, 100, 100], [1e-6, 1e-10, 1e-12], [1e-2, 1e-3, 1e-4])
+run_SU_Square_SpinlessFermion(t, γ, λ, Dbond, Lx, Ly, [600, 2000, 4000], [1e-6, 1e-10, 1e-12], [1e-2, 1e-3, 1e-4])

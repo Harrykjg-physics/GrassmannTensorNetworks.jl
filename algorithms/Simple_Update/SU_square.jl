@@ -322,10 +322,10 @@ function update_x_bond(
     Q2, X2 = gortho(B2_perm, (1, 2, 3), (4, 5); alg=LinearAlgebra.qr)
 
     # Apply the evolution gate G
-    # C1[n1p, n2p, n1, x2p, x2] = G[n1p, n2p, n1, dum] * X2[x2p, (dum, x2)]
-    C1 = contract(G, X2, (4, 2); sign_function=global_sign)
-    # C2[n2p, x2p, n1p, x1] <-- C2[n1p, n2p, x2p, x1] = C1[n1p, n2p, dum1, x2p, dum2] * X1[(dum1, dum2), x1]
-    C2 = contract(C1, X1, ((3, 5), (1, 2)); perm=(2, 3, 1, 4), sign_function=global_sign)
+    # C1[n2p, n1p, n2, x1p, x1] = G[n2p, n1p, n2, dum] * X1[(dum, x1p), x1]
+    C1 = contract(G, X1, (4, 1); sign_function=global_sign)
+    # C2[n2p, x2p, n1p, x1] <-- C2[n2p, n1p, x1, x2p] = C1[n2p, n1p, dum1, dum2, x1] * X2[x2p, (dum1, dum2)]
+    C2 = contract(C1, X2, ((3, 4), (2, 3)); perm=(1, 4, 2, 3), sign_function=global_sign)
 
     # Grassmann SVD
     # C2[(n2p, x2p), (n1p, x1)] --> Ux[(n2p, x2p), x2], Λx_new[x2p, x1], Vxdag[x1p, (n1p, x1)] --> Vx[(n1, x1p), x1]  
