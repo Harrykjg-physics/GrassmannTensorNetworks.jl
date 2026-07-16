@@ -42,6 +42,8 @@ function save(filename::String, param_str::String, args...)
     param_str in keys(fid) ? nothing : create_group(fid, param_str)
 
     for i in 1:2:num
+        args[i] isa String || throw(ArgumentError("args should be string-value pairs !"))
+        args[i] in keys(fid[param_str]) ? delete_object(fid[param_str], args[i]) : nothing
         fid[param_str][args[i]] = args[i+1]
     end
 
