@@ -342,8 +342,10 @@ The comparison must use the documented external order
 function contract_nested_tile(K, Y, X, B)
     ky = contract(K, Y, (2, 1); sign_function=global_sign)
     kx = contract(ky, X, (3, 3); sign_function=global_sign)
-    tile = contract(kx, B, ((3, 6), (3, 1)); sign_function=global_sign)
-    ordered = permutedims(tile, (1, 4, 2, 5, 3, 6, 7, 8); sign_function=global_sign)
+    tile = contract(kx, B, ((5, 7), (3, 1)); sign_function=global_sign)
+    ordered = permutedims(
+        tile, (1, 5, 3, 7, 2, 4, 6, 8); sign_function=global_sign
+    )
     left = fuse(ordered, (1, 2); index_type_fused=:out)
     right = fuse(left, (2, 3); index_type_fused=:in)
     up = fuse(right, (3, 4); index_type_fused=:in)
