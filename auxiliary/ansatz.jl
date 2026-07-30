@@ -56,6 +56,87 @@ function Square_GPEPS(
     return Square_GPEPS{Q}(A, Λx, Λy)
 end
 
+function square_gpeps_parameter_count(
+    Dphys::Int,
+    Dphys_even::Int,
+    Dvir::Int,
+    Lx::Int,
+    Ly::Int;
+    parity::Symbol=:even)
+
+    iseven(Dvir) || throw(ArgumentError("Dvir must be even for the default even/odd split"))
+
+    Dvir_even = div(Dvir, 2)
+    total_size = (Dphys, Dvir, Dvir, Dvir, Dvir)
+    even_size = (Dphys_even, Dvir_even, Dvir_even, Dvir_even, Dvir_even)
+    block_dict = _fixed_parity_blocks(total_size, even_size; parity=parity)
+    tensor_count = sum(prod(length, inds_range) for inds_range in values(block_dict))
+
+    return Lx * Ly * tensor_count
+end
+
+function _grassmann_tensor_from_params(
+    params::AbstractVector{T},
+    offset::Int,
+    total_size::NTuple{N, Int},
+    even_size::NTuple{N, Int},
+    index_types::NTuple{N, Symbol};
+    parity::Symbol=:even) where {T, N}
+
+    block_dict = _fixed_parity_blocks(total_size, even_size; parity=parity)
+    sectors = sort(collect(keys(block_dict)))
+    next_offset = offset
+
+    data_dict = Dict(
+        sector => begin
+            block_size = map(length, block_dict[sector])
+            block_length = prod(block_size)
+            block_range = next_offset:(next_offset + block_length - 1)
+            next_offset += block_length
+            copy(reshape(view(params, block_range), block_size...))
+        end for sector in sectors
+    )
+
+    return Grassmann(total_size, even_size, index_types, data_dict), next_offset
+end
+
+function Square_GPEPS(
+    Dphys::Int,
+    Dphys_even::Int,
+    Dvir::Int,
+    Lx::Int,
+    Ly::Int,
+    params::AbstractVector{T},
+    has_bond_weights::Bool=false;
+    parity::Symbol=:even) where {T<:Number}
+
+    has_bond_weights && throw(ArgumentError("The parameter-vector constructor builds a PEPS without Schmidt weights"))
+    iseven(Dvir) || throw(ArgumentError("Dvir must be even for the default even/odd split"))
+
+    expected = square_gpeps_parameter_count(Dphys, Dphys_even, Dvir, Lx, Ly; parity=parity)
+    length(params) == expected || throw(DimensionMismatch("Expected $expected variational parameters, got $(length(params))"))
+
+    Dvir_even = div(Dvir, 2)
+    total_size = (Dphys, Dvir, Dvir, Dvir, Dvir)
+    even_size = (Dphys_even, Dvir_even, Dvir_even, Dvir_even, Dvir_even)
+    index_types = (:out, :out, :in, :in, :out)
+
+    params_per_tensor = div(expected, Lx * Ly)
+    first_param = firstindex(params)
+    tensors = [
+        begin
+            offset = first_param + (site - 1) * params_per_tensor
+            tensor, offset = _grassmann_tensor_from_params(
+                params, offset, total_size, even_size, index_types; parity=parity)
+            tensor
+        end for site in 1:(Lx * Ly)
+    ]
+
+    A = Matrix{Grassmann{T, 5}}(reshape(tensors, Lx, Ly))
+
+    return Square_GPEPS{T}(A, missing, missing)
+end
+
 Base.size(peps::Square_GPEPS) = size(peps.A)
 Base.eltype(peps::Square_GPEPS{Q}) where {Q} = Q
 

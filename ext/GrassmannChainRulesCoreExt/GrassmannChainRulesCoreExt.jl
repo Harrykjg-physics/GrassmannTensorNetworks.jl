@@ -6,6 +6,7 @@ using Zygote
 using GrassmannTensorNetworks
 
 import GrassmannTensorNetworks: Grassmann, AbstractGrassmann, GrassmannScalar, GrassmannVector, GrassmannMatrix,
+    Square_GPEPS,
     nonzero_pairs, nonzero_keys, nonzero_vals, data,
     even, odd, index_type, tensor_parity, tensor_rank,
     trivial_sign, auto_sign,

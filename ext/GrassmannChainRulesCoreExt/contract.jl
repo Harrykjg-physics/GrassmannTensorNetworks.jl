@@ -28,9 +28,42 @@ function _conj_data!(t::Grassmann)
     return t
 end
 
+function _materialize_grassmann_tangent(reference::Grassmann{T, N}, Δ) where {T, N}
+    Δ_unthunk = unthunk(Δ)
+    Δ_unthunk isa Grassmann && return Δ_unthunk
+    Δ_unthunk isa AbstractZero && return Grassmann(
+        size(reference), even(reference), index_type(reference),
+        Dict(key => zeros(T, size(block)...) for (key, block) in nonzero_pairs(reference)))
+    Δ_unthunk isa Tangent || throw(ArgumentError("Expected a Grassmann cotangent, got $(typeof(Δ_unthunk))"))
+
+    tangent_data = getproperty(Δ_unthunk, :data)
+    data_dict = Dict{NTuple{N, Int}, Array{T, N}}()
+    sizehint!(data_dict, length(nonzero_keys(reference)))
+
+    @inbounds for (key, block) in nonzero_pairs(reference)
+        raw_block = tangent_data isa AbstractZero ? ZeroTangent() : get(tangent_data, key, ZeroTangent())
+        raw_block = unthunk(raw_block)
+        data_dict[key] = raw_block isa AbstractZero ? zeros(T, size(block)...) : Array{T, N}(raw_block)
+    end
+
+    return Grassmann(size(reference), even(reference), index_type(reference), data_dict)
+end
+
 """
 Given a linear map `op`, build the reverse-mode pullback by explicit basis projection.
 """
+
+function _adjoint_linear_map(
+    input::Grassmann{T, N, AT},
+    Δy,
+    op::F) where {T, N, AT, F}
+
+    Δy_unthunk = unthunk(Δy)
+    Δy_unthunk isa AbstractZero && return ZeroTangent()
+    Δy_grassmann = _materialize_grassmann_tangent(op(input), Δy_unthunk)
+
+    return _adjoint_linear_map(input, Δy_grassmann, op)
+end
 
 function _adjoint_linear_map(
     input::Grassmann{T, N, AT}, 

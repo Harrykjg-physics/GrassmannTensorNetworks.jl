@@ -113,6 +113,20 @@ end
 
 # ─── sqrt: element-wise 1/(2√x) derivative ───────────────────────────────────
 
+Zygote.@adjoint function Base.permutedims(
+    t::Grassmann{T, N, AT},
+    dst::NTuple{N, Int};
+    sign_function=trivial_sign
+) where {T, N, AT}
+    y = permutedims(t, dst; sign_function=sign_function)
+    function permutedims_zpullback(Δy)
+        inv_dst = ntuple(i -> findfirst(==(i), dst), Val(N))
+        Δt = permutedims(Δy, inv_dst; sign_function=sign_function)
+        return (Δt, nothing)
+    end
+    return y, permutedims_zpullback
+end
+
 function ChainRulesCore.rrule(::typeof(Base.sqrt), t::Grassmann{T, N, AT}) where {T, N, AT}
     y = sqrt(t)
     function sqrt_pullback(Δy)
