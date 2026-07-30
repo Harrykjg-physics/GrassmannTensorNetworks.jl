@@ -39,6 +39,7 @@ export SpinlessFermionModel, HubbardModel, n_site, nn_bond, gate
 export reduced_tensor, reduced_tensor_vbond, reduced_tensor_hbond
 export CTMRGEnv, run_GCTMRG!, find_maxiter, read_CTMRG_env
 export compute_exp_site, compute_exp_hbond, compute_exp_vbond
+export NestedLayout, NestedNetwork
 export Grassmann_SU
 
 end

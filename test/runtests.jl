@@ -23,6 +23,8 @@ start_time = time()
     @test isdefined(GrassmannTensorNetworks, :CTMRGEnv)
     @test isdefined(GrassmannTensorNetworks, :Grassmann_SU)
     @test isdefined(GrassmannTensorNetworks, :HubbardModel)
+    @test isdefined(GrassmannTensorNetworks, :NestedLayout)
+    @test isdefined(GrassmannTensorNetworks, :NestedNetwork)
 
     include("grassmann.jl")
     include("fermionsign.jl")
@@ -31,6 +33,7 @@ start_time = time()
     include("fusion.jl")
     include("contract.jl")
     include("decomp.jl")
+    include("nested_network.jl")
 end
 
 elapsed_minutes = round((time() - start_time) / 60; sigdigits=3)
