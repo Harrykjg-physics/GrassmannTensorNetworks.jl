@@ -1,0 +1,2106 @@
+# Grassmann Nested CTMRG Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Build a native Grassmann doubled-cell nested tensor network with one-site and nearest-neighbor measurements, reverse-mode AD, a spinless-fermion optimization example, and the requested `chi=4,8,12` server acceptance runs.
+
+**Architecture:** Each `Square_GPEPS` tensor becomes a `2 x 2` K/Y/X/B checkerboard of four-leg `Grassmann` tensors. The doubled matrix is passed unchanged to the existing `CTMRGEnv` and `run_GCTMRG!`; measurements replace the physical identity in Y tensors and contract one-site or three-node nearest-neighbor patches. ChainRules rules propagate cotangents through the numerical K/B paths while treating layout and crossing geometry as static.
+
+**Tech Stack:** Julia 1.9+, GrassmannTensorNetworks, TensorOperations, ChainRulesCore, Zygote, FiniteDifferences, Optim, HDF5, existing GCTMRG.
+
+## Global Constraints
+
+- Keep `ChainRulesCore` and `Zygote` as weak dependencies loaded through `GrassmannChainRulesCoreExt`.
+- Do not add PEPSKit or TensorKit dependencies.
+- Do not copy or fork the existing CTMRG move/projector implementation.
+- Every axis reorder uses Grassmann-aware operations with `sign_function=global_sign`.
+- X odd-odd exchange is exactly `-1`; all other parity combinations are `+1`.
+- Support only one-site and horizontal/vertical nearest-neighbor source operators.
+- Preserve existing APIs and avoid unrelated refactoring.
+- Test Julia code only on `jkkong@172.23.26.248` through the `julia-server-test` workflow, using `julia_grassmann`, at most five concurrent tasks, and a 20 GB per-task memory guard.
+- Acceptance parameters are `D=2`, `chi=4,8,12`, `ctmrg_iter=20`, and `ad_iter=20`.
+- Numerical acceptance requires finite, error-free runs whose three-energy table shows an overall trend toward `-6.170521774015...`; no fixed relative-error threshold is imposed.
+
+## Reference Inputs
+
+- Compare geometry and notation against
+  `D:\C 盘备份\Back up\Work_Save\coding\VS files\AI optimized Project\PEPSKit_nesting\src\network.jl`,
+  `observables.jl`, and `chainrules.jl`; translate their TensorKit braiding
+  into this repository's `Grassmann` sign operations rather than adding those
+  packages.
+- The derivation source is
+  `D:\C 盘备份\Back up\Work_Save\latex file\2026\0730_Nested fTN\main.pdf`.
+- The approved K/Y/X/B diagrams are the three attached files under
+  `C:\Users\Harry\.codex\attachments\33ad0ec5-f7ee-426a-8cc9-10fae725a17d\`.
+
+---
+
+## File Map
+
+**Create**
+
+- `algorithms/Nested_CTMRG/nested_network.jl` - layout, graded crossing primitives, K/Y/X/B construction, network wrapper, and CTMRG adapters.
+- `algorithms/Nested_CTMRG/measurements.jl` - operator-dressed Y tensors and normalized one-site/three-node two-site contractions.
+- `algorithms/Nested_CTMRG/nested_chainrules.jl` - reverse rules for pair signs, nested nodes, network assembly, and operator-dressed Y tensors.
+- `test/nested_network.jl` - layout, sign, link, factorization, and CTMRG smoke tests.
+- `test/nested_measurements.jl` - one-site/two-site normalization and reduced-layer comparisons.
+- `test/nested_chainrules.jl` - centered finite-difference checks.
+- `examples/Spinless_Fermion_2D_Square_AD_nested/Project.toml` - example-only Optim and Zygote dependencies.
+- `examples/Spinless_Fermion_2D_Square_AD_nested/Spinless_Fermion_2D_Square_AD_nested.jl` - optimization and acceptance driver.
+
+**Modify**
+
+- `src/algorithms.jl` - include the network and measurement source files.
+- `src/GrassmannTensorNetworks.jl` - export the public nested API.
+- `ext/GrassmannChainRulesCoreExt/GrassmannChainRulesCoreExt.jl` - import nested internals and include nested reverse rules.
+- `test/runtests.jl` - include the nested tests.
+- `test/server_runtests.jl` - include the same nested tests in the isolated server harness.
+- `docs/algorithms.md` - document the nested API and supported geometries.
+
+---
+
+### Task 1: Nested Layout, Wrapper, and Package Wiring
+
+**Files:**
+
+- Create: `algorithms/Nested_CTMRG/nested_network.jl`
+- Create: `test/nested_network.jl`
+- Modify: `src/algorithms.jl`
+- Modify: `src/GrassmannTensorNetworks.jl`
+- Modify: `test/runtests.jl`
+- Modify: `test/server_runtests.jl`
+
+**Interfaces:**
+
+- Consumes: `Square_GPEPS`, `Grassmann`, `CTMRGEnv`, `run_GCTMRG!`.
+- Produces:
+  - `NestedLayout(source_size::Tuple{Int,Int})`
+  - `NestedLayout(peps::Square_GPEPS)`
+  - `NestedNetwork(network, layout, x_crossings)`
+  - `nested_network(peps, layout=NestedLayout(peps))`
+  - `initialize_nested_environment(nested, chi, chi_even=div(chi,2))`
+  - `run_nested_GCTMRG!(nested, env, chi; kwargs...)`
+
+- [ ] **Step 1: Write the failing layout and export tests**
+
+Add to `test/nested_network.jl`:
+
+```julia
+using Test
+using GrassmannTensorNetworks
+
+@testset "Nested layout" begin
+    layout = NestedLayout((2, 3))
+    @test size(layout) == (4, 6)
+    @test layout.source_size == (2, 3)
+    @test layout.ket_sites[2, 3] == CartesianIndex(3, 5)
+    @test layout.y_sites[2, 3] == CartesianIndex(3, 6)
+    @test layout.x_sites[2, 3] == CartesianIndex(4, 5)
+    @test layout.bra_sites[2, 3] == CartesianIndex(4, 6)
+end
+```
+
+Add `include("nested_network.jl")` inside the top-level testset in both test
+entry points. Add assertions to the existing package-symbol smoke test:
+
+```julia
+@test isdefined(GrassmannTensorNetworks, :NestedLayout)
+@test isdefined(GrassmannTensorNetworks, :NestedNetwork)
+@test isdefined(GrassmannTensorNetworks, :nested_network)
+```
+
+- [ ] **Step 2: Run the focused test to verify failure**
+
+Run on the Julia server:
+
+```bash
+julia_grassmann --project=. test/server_runtests.jl
+```
+
+Expected: FAIL with `UndefVarError: NestedLayout not defined`.
+
+- [ ] **Step 3: Implement layout and wrapper types**
+
+Add to `algorithms/Nested_CTMRG/nested_network.jl`:
+
+```julia
+struct NestedLayout
+    source_size::Tuple{Int, Int}
+    nested_size::Tuple{Int, Int}
+    ket_sites::Matrix{CartesianIndex{2}}
+    y_sites::Matrix{CartesianIndex{2}}
+    x_sites::Matrix{CartesianIndex{2}}
+    bra_sites::Matrix{CartesianIndex{2}}
+end
+
+function NestedLayout(source_size::Tuple{Int, Int})
+    rows, cols = source_size
+    rows > 0 && cols > 0 ||
+        throw(ArgumentError("source unit-cell dimensions must be positive"))
+    ket = [CartesianIndex(2r - 1, 2c - 1) for r in 1:rows, c in 1:cols]
+    y = [CartesianIndex(2r - 1, 2c) for r in 1:rows, c in 1:cols]
+    x = [CartesianIndex(2r, 2c - 1) for r in 1:rows, c in 1:cols]
+    bra = [CartesianIndex(2r, 2c) for r in 1:rows, c in 1:cols]
+    return NestedLayout(source_size, (2rows, 2cols), ket, y, x, bra)
+end
+
+NestedLayout(peps::Square_GPEPS) = NestedLayout(size(peps))
+Base.size(layout::NestedLayout) = layout.nested_size
+Base.size(layout::NestedLayout, dim::Integer) = layout.nested_size[dim]
+
+struct NestedNetwork{T<:Number, X<:AbstractMatrix}
+    network::Matrix{Grassmann{T, 4}}
+    layout::NestedLayout
+    x_crossings::X
+end
+
+Base.size(nested::NestedNetwork, args...) = size(nested.network, args...)
+Base.axes(nested::NestedNetwork, args...) = axes(nested.network, args...)
+Base.getindex(nested::NestedNetwork, inds...) = getindex(nested.network, inds...)
+```
+
+Wire the new network source into `src/algorithms.jl` after the existing CTMRG
+core includes:
+
+```julia
+include(joinpath(@__DIR__, "..", "algorithms", "Nested_CTMRG", "nested_network.jl"))
+```
+
+Export the types and entry points from `src/GrassmannTensorNetworks.jl`:
+
+```julia
+export NestedLayout, NestedNetwork, nested_network
+export initialize_nested_environment, run_nested_GCTMRG!
+```
+
+- [ ] **Step 4: Run the focused tests**
+
+Run the same server command. Expected: layout tests PASS; symbol tests for
+measurement functions still fail only if they were asserted before Task 4,
+so do not add those symbol assertions until Task 4.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add algorithms/Nested_CTMRG/nested_network.jl \
+        src/algorithms.jl src/GrassmannTensorNetworks.jl \
+        test/nested_network.jl test/runtests.jl test/server_runtests.jl
+git commit -m "feat: add nested CTMRG layout"
+```
+
+---
+
+### Task 2: Graded Crossing and K/Y/X/B Local Nodes
+
+**Files:**
+
+- Modify: `algorithms/Nested_CTMRG/nested_network.jl`
+- Modify: `test/nested_network.jl`
+
+**Interfaces:**
+
+- Consumes: `Grassmann`, `Square_GPEPS`, `permutedims`, `fuse`,
+  `index_conjugation`, `add_parity_sign`, `global_sign`.
+- Produces:
+  - `_graded_pair_sign(t, i, j)`
+  - `_nested_ket(A)`
+  - `_nested_bra(A)`
+  - `_nested_x(horizontal_size, horizontal_even, vertical_size, vertical_even, T)`
+  - `_nested_y(operator, horizontal_size, horizontal_even, vertical_size, vertical_even)`
+  - `_physical_identity(A)`
+
+- [ ] **Step 1: Write failing sign and node-structure tests**
+
+Append:
+
+```julia
+import GrassmannTensorNetworks:
+    _graded_pair_sign, _nested_ket, _nested_bra, _nested_x, _nested_y
+
+@testset "Nested graded primitives" begin
+    odd_crossing = _nested_x(1, 0, 1, 0, Float64)
+    @test !haskey(odd_crossing, (0, 0, 0, 0))
+    @test only(odd_crossing[(1, 1, 1, 1)]) == -1
+
+    mixed_crossing = _nested_x(2, 1, 2, 1, Float64)
+    dense = convert(Array, mixed_crossing)
+    @test dense[1, 1, 1, 1] == 1
+    @test dense[2, 2, 1, 1] == 1
+    @test dense[1, 1, 2, 2] == 1
+    @test dense[2, 2, 2, 2] == -1
+
+    peps = Square_GPEPS(2, 1, 2, 1, 1, Float64, false)
+    A = peps.A[1, 1]
+    K = _nested_ket(A)
+    B = _nested_bra(A)
+    @test size(K) == (2, 4, 2, 2)
+    @test size(B) == (2, 2, 4, 2)
+    @test index_type(K) == (:out, :in, :in, :out)
+    @test index_type(B) == (:out, :in, :in, :out)
+
+    identity = Grassmann(Matrix{Float64}(I, 2, 2), (2, 2), (1, 1), (:out, :in))
+    Y = _nested_y(identity, 2, 1, 2, 1)
+    @test size(Y) == (4, 2, 2, 4)
+    @test index_type(Y) == (:out, :in, :in, :out)
+end
+```
+
+- [ ] **Step 2: Run and confirm missing-function failures**
+
+Expected: FAIL at import because `_graded_pair_sign` and node functions do not
+exist.
+
+- [ ] **Step 3: Implement the pair sign and pure crossing**
+
+Add:
+
+```julia
+function _graded_pair_sign(t::Grassmann{T, N, AT}, i::Int, j::Int) where {T, N, AT}
+    1 <= i <= N && 1 <= j <= N && i != j ||
+        throw(ArgumentError("graded-pair indices must be distinct and in bounds"))
+    blocks = Dict{NTuple{N, Int}, AT}()
+    for (sector, block) in nonzero_pairs(t)
+        blocks[sector] = (-1)^(sector[i] * sector[j]) .* block
+    end
+    return Grassmann(size(t), even(t), index_type(t), blocks)
+end
+
+function _nested_x(
+    horizontal_size::Int,
+    horizontal_even::Int,
+    vertical_size::Int,
+    vertical_even::Int,
+    ::Type{T}) where {T}
+
+    dense = zeros(T, horizontal_size, horizontal_size, vertical_size, vertical_size)
+    parity(index, even_dim) = index <= even_dim ? 0 : 1
+    for h in 1:horizontal_size, v in 1:vertical_size
+        dense[h, h, v, v] =
+            (-one(T))^(parity(h, horizontal_even) * parity(v, vertical_even))
+    end
+    return Grassmann(
+        dense,
+        (horizontal_size, horizontal_size, vertical_size, vertical_size),
+        (horizontal_even, horizontal_even, vertical_even, vertical_even),
+        (:out, :in, :in, :out),
+    )
+end
+```
+
+- [ ] **Step 4: Implement K, B, identity, and operator-dressed Y**
+
+Use one explicit arrow-bend helper so every bend carries the same parity
+twist:
+
+```julia
+function _bend_index(t::Grassmann, index::Int)
+    return add_parity_sign(
+        index_conjugation(t, index), index; sign_function=global_sign
+    )
+end
+
+function _nested_ket_raw(A::Grassmann{T, 5}) where {T}
+    signed = _graded_pair_sign(A, 1, 3)
+    routed = permutedims(signed, (2, 1, 3, 4, 5); sign_function=global_sign)
+    return fuse(routed, (2, 3); index_type_fused=:in)
+end
+_nested_ket(A::Grassmann{T, 5}) where {T} = _nested_ket_raw(A)
+
+function _nested_bra_raw(A::Grassmann{T, 5}) where {T}
+    bra = conj(A; sign_function=global_sign)
+    signed = _graded_pair_sign(bra, 1, 4)
+    routed = permutedims(signed, (2, 3, 1, 4, 5); sign_function=global_sign)
+    fused = fuse(routed, (3, 4); index_type_fused=:in)
+    return foldl(_bend_index, (1, 2, 4); init=fused)
+end
+_nested_bra(A::Grassmann{T, 5}) where {T} = _nested_bra_raw(A)
+
+function _physical_identity(A::Grassmann{T, 5}) where {T}
+    p, pe = size(A, 1), even(A)[1]
+    return Grassmann(Matrix{T}(I, p, p), (p, p), (pe, pe), (:out, :in))
+end
+
+function _nested_y(
+    operator::Grassmann{T, 2},
+    horizontal_size::Int,
+    horizontal_even::Int,
+    vertical_size::Int,
+    vertical_even::Int) where {T}
+
+    crossing = _nested_x(
+        horizontal_size, horizontal_even, vertical_size, vertical_even, T
+    )
+    product = contract(operator, crossing; sign_function=global_sign)
+    routed = permutedims(
+        product, (1, 3, 4, 5, 2, 6); sign_function=global_sign
+    )
+    west_fused = fuse(routed, (1, 2); index_type_fused=:out)
+    return fuse(west_fused, (4, 5); index_type_fused=:out)
+end
+```
+
+- [ ] **Step 5: Add local closure and factorization tests**
+
+Add helpers that contract the nested tile and compare with `reduced_tensor`.
+The comparison must use the documented external order
+`(left, right, up, down)`:
+
+```julia
+function contract_nested_tile(K, Y, X, B)
+    ky = contract(K, Y, (2, 1); sign_function=global_sign)
+    kx = contract(ky, X, (3, 3); sign_function=global_sign)
+    tile = contract(kx, B, ((3, 6), (3, 1)); sign_function=global_sign)
+    ordered = permutedims(tile, (1, 4, 2, 5, 3, 6, 7, 8); sign_function=global_sign)
+    left = fuse(ordered, (1, 2); index_type_fused=:out)
+    right = fuse(left, (2, 3); index_type_fused=:in)
+    up = fuse(right, (3, 4); index_type_fused=:in)
+    return fuse(up, (4, 5); index_type_fused=:out)
+end
+
+@testset "Local nested factorization" begin
+    for T in (Float64, ComplexF64)
+        peps = Square_GPEPS(2, 1, 2, 1, 1, T, false)
+        A = peps.A[1, 1]
+        K, B = _nested_ket(A), _nested_bra(A)
+        X = _nested_x(size(A, 2), even(A)[2], size(A, 5), even(A)[5], T)
+        Y = _nested_y(
+            _physical_identity(A),
+            size(A, 3), even(A)[3],
+            size(A, 4), even(A)[4],
+        )
+        @test contract_nested_tile(K, Y, X, B) ≈ reduced_tensor(A) rtol=1e-10
+    end
+end
+```
+
+The exact contraction indices and the documented external order are
+implementation invariants; do not weaken this comparison or substitute a
+dense contraction that bypasses Grassmann signs.
+
+- [ ] **Step 6: Run tests and commit**
+
+Expected: odd-odd sign, node structure, and local factorization all PASS.
+
+```bash
+git add algorithms/Nested_CTMRG/nested_network.jl test/nested_network.jl
+git commit -m "feat: construct graded nested tensor nodes"
+```
+
+---
+
+### Task 3: Assemble Periodic Nested Networks and Reuse GCTMRG
+
+**Files:**
+
+- Modify: `algorithms/Nested_CTMRG/nested_network.jl`
+- Modify: `test/nested_network.jl`
+
+**Interfaces:**
+
+- Consumes: all Task 2 primitives.
+- Produces working `nested_network`, `initialize_nested_environment`, and
+  `run_nested_GCTMRG!`.
+
+- [ ] **Step 1: Write failing assembly and periodic-link tests**
+
+```julia
+@testset "Nested network assembly" begin
+    peps = Square_GPEPS(2, 1, 2, 2, 2, Float64, false)
+    nested = nested_network(peps)
+    @test size(nested) == (4, 4)
+    @test nested[nested.layout.ket_sites[1, 1]] ≈ _nested_ket(peps.A[1, 1])
+    @test nested[nested.layout.bra_sites[2, 2]] ≈ _nested_bra(peps.A[2, 2])
+
+    for r in axes(nested, 1), c in axes(nested, 2)
+        below = Nmod(r + 1, size(nested, 1))
+        right = Nmod(c + 1, size(nested, 2))
+        @test size(nested[r, c], 2) == size(nested[r, right], 1)
+        @test even(nested[r, c])[2] == even(nested[r, right])[1]
+        @test size(nested[r, c], 4) == size(nested[below, c], 3)
+        @test even(nested[r, c])[4] == even(nested[below, c])[3]
+        @test index_type(nested[r, c])[2] != index_type(nested[r, right])[1]
+        @test index_type(nested[r, c])[4] != index_type(nested[below, c])[3]
+    end
+
+    wrong = NestedLayout((1, 1))
+    @test_throws ArgumentError nested_network(peps, wrong)
+end
+```
+
+- [ ] **Step 2: Run and verify the assembly failure**
+
+Expected: FAIL because `nested_network` has no assembly method.
+
+- [ ] **Step 3: Implement periodic checkerboard assembly**
+
+```julia
+function nested_network(
+    peps::Square_GPEPS{T},
+    layout::NestedLayout=NestedLayout(peps)) where {T}
+
+    layout.source_size == size(peps) ||
+        throw(ArgumentError("layout source size does not match PEPS unit cell"))
+    rows, cols = size(peps)
+    ket = [_nested_ket(peps.A[r, c]) for r in 1:rows, c in 1:cols]
+    bra = [_nested_bra(peps.A[r, c]) for r in 1:rows, c in 1:cols]
+    x = [
+        _nested_x(
+            size(ket[r, c], 4), even(ket[r, c])[4],
+            size(bra[r, c], 1), even(bra[r, c])[1], T,
+        ) for r in 1:rows, c in 1:cols
+    ]
+
+    tensors = Matrix{Grassmann{T, 4}}(undef, size(layout)...)
+    for r in 1:rows, c in 1:cols
+        tensors[layout.ket_sites[r, c]] = ket[r, c]
+        tensors[layout.bra_sites[r, c]] = bra[r, c]
+        tensors[layout.x_sites[r, c]] = x[r, c]
+        north_bra = bra[Nmod(r - 1, rows), c]
+        east_ket = ket[r, Nmod(c + 1, cols)]
+        tensors[layout.y_sites[r, c]] = _nested_y(
+            _physical_identity(peps.A[r, c]),
+            size(east_ket, 1), even(east_ket)[1],
+            size(north_bra, 4), even(north_bra)[4],
+        )
+    end
+    nested = NestedNetwork(tensors, layout, x)
+    _check_nested_links(nested)
+    return nested
+end
+```
+
+Add the link validator used above:
+
+```julia
+function _check_nested_link(
+    left::Grassmann,
+    left_axis::Int,
+    right::Grassmann,
+    right_axis::Int,
+    left_site::CartesianIndex{2},
+    right_site::CartesianIndex{2},
+)
+    size(left, left_axis) == size(right, right_axis) ||
+        throw(DimensionMismatch(
+            "nested link $left_site[$left_axis] -> " *
+            "$right_site[$right_axis] has unequal dimensions",
+        ))
+    even(left)[left_axis] == even(right)[right_axis] ||
+        throw(DimensionMismatch(
+            "nested link $left_site[$left_axis] -> " *
+            "$right_site[$right_axis] has unequal even sectors",
+        ))
+    index_type(left)[left_axis] != index_type(right)[right_axis] ||
+        throw(DimensionMismatch(
+            "nested link $left_site[$left_axis] -> " *
+            "$right_site[$right_axis] has equal arrow directions",
+        ))
+    return nothing
+end
+
+function _check_nested_links(nested::NestedNetwork)
+    for site in CartesianIndices(nested.network)
+        below = CartesianIndex(
+            Nmod(site[1] + 1, size(nested, 1)), site[2]
+        )
+        right = CartesianIndex(
+            site[1], Nmod(site[2] + 1, size(nested, 2))
+        )
+        _check_nested_link(
+            nested[site], 2, nested[right], 1, site, right
+        )
+        _check_nested_link(
+            nested[site], 4, nested[below], 3, site, below
+        )
+    end
+    return nested
+end
+```
+
+- [ ] **Step 4: Implement CTMRG adapters and smoke test**
+
+```julia
+initialize_nested_environment(
+    nested::NestedNetwork, chi::Int, chi_even::Int=div(chi, 2)
+) = CTMRGEnv(nested.network, chi, chi_even)
+
+function run_nested_GCTMRG!(
+    nested::NestedNetwork,
+    env::CTMRGEnv,
+    chi::Int;
+    kwargs...)
+
+    size(env) == size(nested) ||
+        throw(DimensionMismatch("nested environment and network sizes differ"))
+    run_GCTMRG!(nested.network, nested.network, env, chi; kwargs...)
+    return env
+end
+```
+
+Add:
+
+```julia
+@testset "Nested CTMRG smoke" begin
+    peps = Square_GPEPS(2, 1, 2, 1, 1, Float64, false)
+    nested = nested_network(peps)
+    env = initialize_nested_environment(nested, 4)
+    @test size(env) == size(nested)
+    @test run_nested_GCTMRG!(
+        nested, env, 4; ctmrg_iter=1, verbosity=0, save_iter=0
+    ) === env
+end
+```
+
+- [ ] **Step 5: Run tests and commit**
+
+```bash
+git add algorithms/Nested_CTMRG/nested_network.jl test/nested_network.jl
+git commit -m "feat: assemble nested network for GCTMRG"
+```
+
+---
+
+### Task 4: Operator-Dressed Y and One-Site Measurements
+
+**Files:**
+
+- Create: `algorithms/Nested_CTMRG/measurements.jl`
+- Create: `test/nested_measurements.jl`
+- Modify: `test/runtests.jl`
+- Modify: `test/server_runtests.jl`
+- Modify: `src/GrassmannTensorNetworks.jl`
+
+**Interfaces:**
+
+- Consumes: `NestedNetwork`, `_nested_y`, existing scalar
+  `compute_exp_site(Tbulk, Timp, El, Er, Eu, Ed, Clu, Cru, Cld, Crd)`.
+- Produces:
+  - `nested_y_operator(nested, peps, site, operator)`
+  - `compute_nested_exp_site(nested, peps, operator, env, site)`
+  - `compute_nested_exp_site(nested, peps, operator_matrix, env)`
+
+- [ ] **Step 1: Write failing identity and number-operator tests**
+
+```julia
+using Test
+using GrassmannTensorNetworks
+
+function physical_identity(::Type{T}=Float64) where {T}
+    return Grassmann(Matrix{T}(I, 2, 2), (2, 2), (1, 1), (:out, :in))
+end
+
+@testset "Nested one-site measurements" begin
+    peps = Square_GPEPS(2, 1, 2, 1, 1, Float64, false)
+    nested = nested_network(peps)
+    env = initialize_nested_environment(nested, 4)
+    run_nested_GCTMRG!(nested, env, 4; ctmrg_iter=2, verbosity=0)
+
+    denominator, identity_value =
+        compute_nested_exp_site(nested, peps, physical_identity(), env, (1, 1))
+    @test isfinite(real(denominator))
+    @test identity_value ≈ 1 atol=1e-10
+
+    number = n_site(SpinlessFermionModel(1.0, 1.0, 3.0))
+    _, nested_number =
+        compute_nested_exp_site(nested, peps, number, env, (1, 1))
+    @test isfinite(real(nested_number))
+end
+```
+
+The reduced-layer comparison is added in Step 4 with a separate environment.
+
+- [ ] **Step 2: Run and confirm missing measurement failure**
+
+Expected: FAIL with `UndefVarError: compute_nested_exp_site not defined`.
+
+- [ ] **Step 3: Implement operator-dressed Y and scalar measurement**
+
+Append to `src/algorithms.jl`:
+
+```julia
+include(joinpath(@__DIR__, "..", "algorithms", "Nested_CTMRG", "measurements.jl"))
+```
+
+Append to `src/GrassmannTensorNetworks.jl`:
+
+```julia
+export nested_y_operator
+export compute_nested_exp_site, compute_nested_exp_hbond, compute_nested_exp_vbond
+```
+
+Create `algorithms/Nested_CTMRG/measurements.jl` with:
+
+```julia
+_source_site(site::CartesianIndex{2}) = site
+_source_site(site::Tuple{Int, Int}) = CartesianIndex(site)
+
+function _nested_y_operator_raw(
+    nested::NestedNetwork,
+    peps::Square_GPEPS,
+    source::CartesianIndex{2},
+    operator::Grassmann{T, 2},
+) where {T}
+    rows, cols = size(peps)
+    east_source = CartesianIndex(source[1], Nmod(source[2] + 1, cols))
+    north_source = CartesianIndex(Nmod(source[1] - 1, rows), source[2])
+    east_ket = nested[nested.layout.ket_sites[east_source]]
+    north_bra = nested[nested.layout.bra_sites[north_source]]
+    return _nested_y(
+        operator,
+        size(east_ket, 1), even(east_ket)[1],
+        size(north_bra, 4), even(north_bra)[4],
+    )
+end
+
+function nested_y_operator(
+    nested::NestedNetwork,
+    peps::Square_GPEPS,
+    site,
+    operator::Grassmann{T, 2}) where {T}
+
+    source = _source_site(site)
+    checkbounds(Bool, peps.A, source) ||
+        throw(ArgumentError("source site $source is outside the unit cell"))
+    physical_size = size(peps.A[source], 1)
+    physical_even = even(peps.A[source])[1]
+    size(operator) == (physical_size, physical_size) ||
+        throw(DimensionMismatch("operator physical dimensions do not match PEPS"))
+    even(operator) == (physical_even, physical_even) ||
+        throw(DimensionMismatch("operator physical parity split does not match PEPS"))
+    index_type(operator) == (:out, :in) ||
+        throw(ArgumentError("operator arrows must be (:out, :in)"))
+    return _nested_y_operator_raw(nested, peps, source, operator)
+end
+
+function compute_nested_exp_site(
+    nested::NestedNetwork,
+    peps::Square_GPEPS,
+    operator::Grassmann{<:Number, 2},
+    env::CTMRGEnv,
+    site)
+
+    source = _source_site(site)
+    ysite = nested.layout.y_sites[source]
+    impurity = nested_y_operator(nested, peps, source, operator)
+    return compute_exp_site(
+        nested[ysite], impurity,
+        env.El[ysite], env.Er[ysite], env.Eu[ysite], env.Ed[ysite],
+        env.Clu[ysite], env.Cru[ysite], env.Cld[ysite], env.Crd[ysite],
+    )
+end
+```
+
+- [ ] **Step 4: Implement matrix overload and direct-layer comparison**
+
+```julia
+function compute_nested_exp_site(
+    nested::NestedNetwork,
+    peps::Square_GPEPS,
+    operators::AbstractMatrix{<:Grassmann{Q, 2}},
+    env::CTMRGEnv) where {Q}
+
+    size(operators) == size(peps) ||
+        throw(DimensionMismatch("operator and PEPS unit cells differ"))
+    denominator = Matrix{promote_type(eltype(peps), Q)}(
+        undef, size(peps)...
+    )
+    values = similar(denominator)
+    for site in CartesianIndices(peps.A)
+        denominator[site], values[site] =
+            compute_nested_exp_site(nested, peps, operators[site], env, site)
+    end
+    return denominator, values
+end
+```
+
+Create separate nested and reduced environments in the test, run each for
+five iterations at `chi=8`, and require number expectations to agree to
+`rtol=5e-3`:
+
+```julia
+Random.seed!(0x4e455354)
+peps = Square_GPEPS(2, 1, 2, 1, 1, Float64, false)
+number = n_site(SpinlessFermionModel(1.0, 1.0, 3.0))
+
+nested = nested_network(peps)
+nested_env = initialize_nested_environment(nested, 8)
+run_nested_GCTMRG!(
+    nested, nested_env, 8; ctmrg_iter=5, verbosity=0, save_iter=0
+)
+_, nested_number =
+    compute_nested_exp_site(nested, peps, number, nested_env, (1, 1))
+
+reduced_bulk = reduced_tensor.(peps.A)
+reduced_impurity = reduced_tensor.(peps.A, Ref(number))
+reduced_env = CTMRGEnv(reduced_bulk, 8, 4)
+run_GCTMRG!(
+    reduced_bulk, reduced_bulk, reduced_env, 8;
+    ctmrg_iter=5, verbosity=0, save_iter=0,
+)
+_, reduced_number =
+    compute_exp_site(reduced_bulk, reduced_impurity, reduced_env)
+@test nested_number ≈ reduced_number[1, 1] rtol=5e-3
+```
+
+This is a cross-representation smoke tolerance, not the exact local
+factorization tolerance.
+
+- [ ] **Step 5: Run tests and commit**
+
+```bash
+git add algorithms/Nested_CTMRG/measurements.jl \
+        test/nested_measurements.jl test/runtests.jl test/server_runtests.jl \
+        src/GrassmannTensorNetworks.jl
+git commit -m "feat: measure nested one-site operators"
+```
+
+---
+
+### Task 5: Horizontal and Vertical Three-Node Measurements
+
+**Files:**
+
+- Modify: `algorithms/Nested_CTMRG/measurements.jl`
+- Modify: `test/nested_measurements.jl`
+
+**Interfaces:**
+
+- Consumes: operator-dressed Y tensors and nested CTMRG environments.
+- Produces:
+  - `_contract_nested_hpatch3(nested, env, source, left_y, right_y)`
+  - `_contract_nested_vpatch3(nested, env, source, top_y, bottom_y)`
+  - `compute_nested_exp_hbond(...)`
+  - `compute_nested_exp_vbond(...)`
+
+- [ ] **Step 1: Write failing identity and Hamiltonian-bond tests**
+
+```julia
+function two_site_identity(::Type{T}=Float64) where {T}
+    dense = reshape(Matrix{T}(I, 4, 4), 2, 2, 2, 2)
+    return Grassmann(
+        dense, (2, 2, 2, 2), (1, 1, 1, 1),
+        (:out, :out, :in, :in),
+    )
+end
+
+@testset "Nested nearest-neighbor measurements" begin
+    peps = Square_GPEPS(2, 1, 2, 2, 2, Float64, false)
+    nested = nested_network(peps)
+    env = initialize_nested_environment(nested, 8)
+    run_nested_GCTMRG!(nested, env, 8; ctmrg_iter=3, verbosity=0)
+    identity2 = two_site_identity()
+
+    _, h_identity =
+        compute_nested_exp_hbond(nested, peps, identity2, env, (1, 1))
+    _, v_identity =
+        compute_nested_exp_vbond(nested, peps, identity2, env, (1, 1))
+    @test h_identity ≈ 1 atol=1e-10
+    @test v_identity ≈ 1 atol=1e-10
+
+    hamiltonian = nn_bond(SpinlessFermionModel(1.0, 1.0, 3.0))
+    _, eh = compute_nested_exp_hbond(nested, peps, hamiltonian, env, (1, 1))
+    _, ev = compute_nested_exp_vbond(nested, peps, hamiltonian, env, (1, 1))
+    @test isfinite(real(eh))
+    @test isfinite(real(ev))
+end
+```
+
+- [ ] **Step 2: Run and verify missing-function failures**
+
+Expected: FAIL because the two bond functions do not exist.
+
+- [ ] **Step 3: Factor a two-site operator into parity-preserving one-site terms**
+
+Implement an internal exact operator Schmidt decomposition. This converts one
+two-site insertion into a sum of products of two operator-dressed Y tensors
+and avoids inventing a separate rank-eight Grassmann impurity type:
+
+```julia
+function _operator_schmidt(operator::Grassmann{T, 4}) where {T}
+    dense = convert(Array, operator)
+    dout1, dout2, din1, din2 = size(operator)
+    matrix = reshape(
+        permutedims(dense, (1, 3, 2, 4)),
+        dout1 * din1, dout2 * din2,
+    )
+    parity(index, even_dim) = index <= even_dim ? 0 : 1
+    row_parity = [
+        mod(
+            parity(out, even(operator)[1]) +
+            parity(input, even(operator)[3]),
+            2,
+        ) for out in 1:dout1, input in 1:din1
+    ][:]
+    col_parity = [
+        mod(
+            parity(out, even(operator)[2]) +
+            parity(input, even(operator)[4]),
+            2,
+        ) for out in 1:dout2, input in 1:din2
+    ][:]
+
+    terms = Tuple{Grassmann, Grassmann}[]
+    for sector in 0:1
+        rows = findall(==(sector), row_parity)
+        cols = findall(==(sector), col_parity)
+        factor = svd(matrix[rows, cols])
+        for alpha in eachindex(factor.S)
+            factor.S[alpha] > eps(real(float(one(T)))) || continue
+            left_vector = zeros(eltype(factor.U), dout1 * din1)
+            right_vector = zeros(eltype(factor.Vt), dout2 * din2)
+            left_vector[rows] =
+                factor.U[:, alpha] * sqrt(factor.S[alpha])
+            right_vector[cols] =
+                factor.Vt[alpha, :] * sqrt(factor.S[alpha])
+            parity_symbol = sector == 0 ? :even : :odd
+            left = Grassmann(
+                reshape(left_vector, dout1, din1),
+                (dout1, din1),
+                (even(operator)[1], even(operator)[3]),
+                (:out, :in);
+                parity=parity_symbol,
+            )
+            right = Grassmann(
+                reshape(right_vector, dout2, din2),
+                (dout2, din2),
+                (even(operator)[2], even(operator)[4]),
+                (:out, :in);
+                parity=parity_symbol,
+            )
+            push!(terms, (left, right))
+        end
+    end
+    return terms
+end
+```
+
+Verify reconstruction before using the terms:
+
+```julia
+reconstructed = sum(
+    contract(left, right; sign_function=global_sign) for (left, right) in terms
+)
+ordered = permutedims(reconstructed, (1, 3, 2, 4); sign_function=global_sign)
+@test ordered ≈ operator rtol=1e-12
+```
+
+The two parity sectors are decomposed separately, so every Schmidt term has a
+defined one-site operator parity and odd terms occur in odd-odd pairs.
+
+- [ ] **Step 4: Implement normalized arbitrary-strip contractions**
+
+Build each numerator as a sum over operator-Schmidt terms. For a horizontal
+bond, replace the two endpoint Y tensors and retain the K tensor between them;
+for a vertical bond retain the B tensor. Reuse the tested `left_move` and
+`up_move` primitives from `algorithms/CTMRG/measurements.jl`; these absorb one
+bulk column/row with the same fermionic axis order as ordinary correlation
+functions. Add these complete strip helpers:
+
+```julia
+function _contract_horizontal_strip(
+    bulks::NTuple{N, <:Grassmann},
+    env::CTMRGEnv,
+    sites::NTuple{N, CartesianIndex{2}},
+) where {N}
+    N > 0 || throw(ArgumentError("a strip must contain at least one tensor"))
+    left_site = first(sites)
+    right_site = last(sites)
+
+    # L[top, bulk, bottom] from the left corners and edge.
+    left_top = contract(
+        env.Clu[left_site], env.El[left_site], (2, 1);
+        sign_function=global_sign,
+    )
+    state = contract(
+        left_top, env.Cld[left_site], (2, 2);
+        sign_function=global_sign,
+    )
+    for (bulk, site) in zip(bulks, sites)
+        state, _ = left_move(
+            state, env.Ed[site], bulk, env.Eu[site]
+        )
+    end
+
+    # R[top, bulk, bottom] from the right corners and edge.
+    right_top = contract(
+        env.Cru[right_site], env.Er[right_site], (2, 1);
+        sign_function=global_sign,
+    )
+    right = contract(
+        right_top, env.Crd[right_site], (2, 2);
+        sign_function=global_sign,
+    )
+    return contract(
+        state, right, ((1, 2, 3), (1, 2, 3));
+        sign_function=global_sign,
+    )
+end
+
+function _contract_vertical_strip(
+    bulks::NTuple{N, <:Grassmann},
+    env::CTMRGEnv,
+    sites::NTuple{N, CartesianIndex{2}},
+) where {N}
+    N > 0 || throw(ArgumentError("a strip must contain at least one tensor"))
+    top_site = first(sites)
+    bottom_site = last(sites)
+
+    # U[left, bulk, right] from the upper corners and edge.
+    upper_left = contract(
+        env.Clu[top_site], env.Eu[top_site], (1, 1);
+        sign_function=global_sign,
+    )
+    state = contract(
+        upper_left, env.Cru[top_site], (2, 1);
+        sign_function=global_sign,
+    )
+    for (bulk, site) in zip(bulks, sites)
+        state, _ = up_move(
+            state, env.El[site], bulk, env.Er[site]
+        )
+    end
+
+    # D[left, bulk, right] from the lower corners and edge.
+    lower_left = contract(
+        env.Cld[bottom_site], env.Ed[bottom_site], (1, 1);
+        sign_function=global_sign,
+    )
+    lower = contract(
+        lower_left, env.Crd[bottom_site], (2, 1);
+        sign_function=global_sign,
+    )
+    return contract(
+        state, lower, ((1, 2, 3), (1, 2, 3));
+        sign_function=global_sign,
+    )
+end
+
+function _contract_nested_hpatch3(
+    nested::NestedNetwork,
+    env::CTMRGEnv,
+    source::CartesianIndex{2},
+    left_y::Grassmann,
+    right_y::Grassmann,
+)
+    y1 = nested.layout.y_sites[source]
+    next_source = CartesianIndex(
+        source[1],
+        Nmod(source[2] + 1, nested.layout.source_size[2]),
+    )
+    y2 = nested.layout.y_sites[next_source]
+    middle = CartesianIndex(
+        y1[1], Nmod(y1[2] + 1, size(nested, 2))
+    )
+    return _contract_horizontal_strip(
+        (left_y, nested[middle], right_y),
+        env,
+        (y1, middle, y2),
+    )
+end
+
+function _contract_nested_vpatch3(
+    nested::NestedNetwork,
+    env::CTMRGEnv,
+    source::CartesianIndex{2},
+    top_y::Grassmann,
+    bottom_y::Grassmann,
+)
+    y1 = nested.layout.y_sites[source]
+    next_source = CartesianIndex(
+        Nmod(source[1] + 1, nested.layout.source_size[1]),
+        source[2],
+    )
+    y2 = nested.layout.y_sites[next_source]
+    middle = CartesianIndex(
+        Nmod(y1[1] + 1, size(nested, 1)), y1[2]
+    )
+    return _contract_vertical_strip(
+        (top_y, nested[middle], bottom_y),
+        env,
+        (y1, middle, y2),
+    )
+end
+```
+
+Return the raw scalar patch contraction. Compute a denominator once using two
+physical identities, and divide the summed operator-Schmidt numerator by that
+same denominator.
+
+- [ ] **Step 5: Implement public horizontal/vertical functions**
+
+```julia
+function compute_nested_exp_hbond(
+    nested::NestedNetwork, peps::Square_GPEPS,
+    operator::Grassmann{<:Number, 4}, env::CTMRGEnv, site)
+
+    source = _source_site(site)
+    neighbor = CartesianIndex(source[1], Nmod(source[2] + 1, size(peps, 2)))
+    identity_left = _physical_identity(peps.A[source])
+    identity_right = _physical_identity(peps.A[neighbor])
+    closed_left = nested_y_operator(nested, peps, source, identity_left)
+    closed_right = nested_y_operator(nested, peps, neighbor, identity_right)
+    denominator = _contract_nested_hpatch3(
+        nested, env, source, closed_left, closed_right
+    )
+    terms = _operator_schmidt(operator)
+    numerator = isempty(terms) ? zero(denominator) : sum(terms) do (left_op, right_op)
+        left_y = nested_y_operator(nested, peps, source, left_op)
+        right_y = nested_y_operator(nested, peps, neighbor, right_op)
+        _contract_nested_hpatch3(nested, env, source, left_y, right_y)
+    end
+    return denominator, scalar(numerator) / scalar(denominator)
+end
+```
+
+Add the vertical method and explicit unit-cell overloads:
+
+```julia
+function compute_nested_exp_vbond(
+    nested::NestedNetwork, peps::Square_GPEPS,
+    operator::Grassmann{<:Number, 4}, env::CTMRGEnv, site)
+
+    source = _source_site(site)
+    neighbor = CartesianIndex(Nmod(source[1] + 1, size(peps, 1)), source[2])
+    identity_top = _physical_identity(peps.A[source])
+    identity_bottom = _physical_identity(peps.A[neighbor])
+    closed_top = nested_y_operator(nested, peps, source, identity_top)
+    closed_bottom = nested_y_operator(nested, peps, neighbor, identity_bottom)
+    denominator = _contract_nested_vpatch3(
+        nested, env, source, closed_top, closed_bottom
+    )
+    terms = _operator_schmidt(operator)
+    numerator = isempty(terms) ? zero(denominator) : sum(terms) do (top_op, bottom_op)
+        top_y = nested_y_operator(nested, peps, source, top_op)
+        bottom_y = nested_y_operator(nested, peps, neighbor, bottom_op)
+        _contract_nested_vpatch3(nested, env, source, top_y, bottom_y)
+    end
+    return denominator, scalar(numerator) / scalar(denominator)
+end
+
+function compute_nested_exp_hbond(
+    nested::NestedNetwork, peps::Square_GPEPS,
+    operators::AbstractMatrix{<:Grassmann}, env::CTMRGEnv)
+
+    size(operators) == size(peps) ||
+        throw(DimensionMismatch("operator and PEPS unit cells differ"))
+    results = map(CartesianIndices(peps.A)) do site
+        compute_nested_exp_hbond(
+            nested, peps, operators[site], env, site
+        )
+    end
+    return first.(results), last.(results)
+end
+
+function compute_nested_exp_vbond(
+    nested::NestedNetwork, peps::Square_GPEPS,
+    operators::AbstractMatrix{<:Grassmann}, env::CTMRGEnv)
+
+    size(operators) == size(peps) ||
+        throw(DimensionMismatch("operator and PEPS unit cells differ"))
+    results = map(CartesianIndices(peps.A)) do site
+        compute_nested_exp_vbond(
+            nested, peps, operators[site], env, site
+        )
+    end
+    return first.(results), last.(results)
+end
+```
+
+- [ ] **Step 6: Cross-check reduced-layer bond energies**
+
+Create independent nested and reduced environments at `chi=8`, five CTMRG
+iterations, deterministic seed, and compare:
+
+```julia
+Random.seed!(0x424f4e44)
+peps = Square_GPEPS(2, 1, 2, 2, 2, Float64, false)
+hamiltonian = nn_bond(SpinlessFermionModel(1.0, 1.0, 3.0))
+
+nested = nested_network(peps)
+nested_env = initialize_nested_environment(nested, 8)
+run_nested_GCTMRG!(
+    nested, nested_env, 8; ctmrg_iter=5, verbosity=0, save_iter=0
+)
+_, eh_nested =
+    compute_nested_exp_hbond(nested, peps, hamiltonian, nested_env, (1, 1))
+_, ev_nested =
+    compute_nested_exp_vbond(nested, peps, hamiltonian, nested_env, (1, 1))
+
+reduced_bulk = reduced_tensor.(peps.A)
+vertical_impurity, horizontal_impurity = reduced_tensor(peps, hamiltonian)
+reduced_env = CTMRGEnv(reduced_bulk, 8, 4)
+run_GCTMRG!(
+    reduced_bulk, reduced_bulk, reduced_env, 8;
+    ctmrg_iter=5, verbosity=0, save_iter=0,
+)
+_, eh_reduced = compute_exp_hbond(
+    reduced_bulk, horizontal_impurity, reduced_env
+)
+_, ev_reduced = compute_exp_vbond(
+    reduced_bulk, vertical_impurity, reduced_env
+)
+@test eh_nested ≈ eh_reduced[1, 1] rtol=5e-3
+@test ev_nested ≈ ev_reduced[1, 1] rtol=5e-3
+@test abs(imag(eh_nested)) <= 1e-10
+@test abs(imag(ev_nested)) <= 1e-10
+```
+
+- [ ] **Step 7: Run tests and commit**
+
+```bash
+git add algorithms/Nested_CTMRG/measurements.jl test/nested_measurements.jl
+git commit -m "feat: measure nested nearest-neighbor operators"
+```
+
+---
+
+### Task 6: Reverse Rules and Gradient Accuracy
+
+**Files:**
+
+- Create: `algorithms/Nested_CTMRG/nested_chainrules.jl`
+- Create: `test/nested_chainrules.jl`
+- Modify: `ext/GrassmannChainRulesCoreExt/GrassmannChainRulesCoreExt.jl`
+- Modify: `test/runtests.jl`
+- Modify: `test/server_runtests.jl`
+
+**Interfaces:**
+
+- Consumes: K/B/Y construction and existing Grassmann ChainRules.
+- Produces `rrule`s for `_graded_pair_sign`, `_nested_ket`, `_nested_bra`,
+  `nested_network`, and `nested_y_operator`.
+
+- [ ] **Step 1: Write a reusable centered directional-derivative test**
+
+```julia
+using ChainRulesCore
+using FiniteDifferences
+using LinearAlgebra
+using Random
+using Test
+using Zygote
+
+function directional_error(f, x, direction; step=1e-6)
+    value, pullback = Zygote.pullback(f, x)
+    gradient = only(pullback(one(value)))
+    finite = (f(x + step * direction) - f(x - step * direction)) / (2step)
+    analytic = real(dot(gradient, direction))
+    relative =
+        abs(analytic - finite) /
+        max(abs(analytic), abs(finite), eps(Float64))
+    return relative, analytic, finite
+end
+
+@testset "Nested reverse rules" begin
+    Random.seed!(0x4e455354)
+    count = square_gpeps_parameter_count(2, 1, 2, 1, 1)
+    params = randn(count)
+    direction = randn(count)
+    direction ./= norm(direction)
+
+    nested_norm2(x) = begin
+        peps = Square_GPEPS(2, 1, 2, 1, 1, x, false)
+        nested = nested_network(peps)
+        sum(t -> sum(abs2, t), nested.network)
+    end
+    relative, analytic, finite =
+        directional_error(nested_norm2, params, direction)
+    @info "nested network directional derivative" relative analytic finite
+    @test relative <= 1e-4
+end
+```
+
+- [ ] **Step 2: Run and confirm reverse-mode failure**
+
+Expected: Zygote fails on dictionary mutation, matrix assignment, or a missing
+pullback in nested construction.
+
+- [ ] **Step 3: Include nested rules only from the extension**
+
+Add a second import statement after the existing
+`import GrassmannTensorNetworks: ...` block:
+
+```julia
+import GrassmannTensorNetworks:
+    NestedLayout, NestedNetwork,
+    nested_network, nested_y_operator,
+    _source_site, _graded_pair_sign,
+    _nested_ket, _nested_ket_raw,
+    _nested_bra, _nested_bra_raw,
+    _nested_y_operator_raw
+```
+
+Append:
+
+```julia
+include(joinpath(
+    @__DIR__, "..", "..", "algorithms", "Nested_CTMRG", "nested_chainrules.jl"
+))
+```
+
+Do not include this file from `src/algorithms.jl`.
+
+- [ ] **Step 4: Implement linear pair-sign and node pullbacks**
+
+```julia
+function ChainRulesCore.rrule(
+    ::typeof(_graded_pair_sign), t::Grassmann, i::Int, j::Int)
+
+    y = _graded_pair_sign(t, i, j)
+    pullback(delta) = (
+        NoTangent(),
+        _graded_pair_sign(unthunk(delta), i, j),
+        NoTangent(),
+        NoTangent(),
+    )
+    return y, pullback
+end
+```
+
+Define `_nested_ket` and `_nested_bra` rules around their raw pipelines:
+
+```julia
+function ChainRulesCore.rrule(
+    config::RuleConfig{>:HasReverseMode},
+    ::typeof(_nested_ket),
+    A::Grassmann,
+)
+    y, raw_pullback = rrule_via_ad(config, _nested_ket_raw, A)
+    function pullback(delta)
+        _, delta_A = raw_pullback(unthunk(delta))
+        return NoTangent(), delta_A
+    end
+    return y, pullback
+end
+
+function ChainRulesCore.rrule(
+    config::RuleConfig{>:HasReverseMode},
+    ::typeof(_nested_bra),
+    A::Grassmann,
+)
+    y, raw_pullback = rrule_via_ad(config, _nested_bra_raw, A)
+    function pullback(delta)
+        _, delta_A = raw_pullback(unthunk(delta))
+        return NoTangent(), delta_A
+    end
+    return y, pullback
+end
+```
+
+This keeps the static integer permutations out of the returned tangent tuple
+while reusing existing `fuse`, sign, bend, and conjugation rules.
+
+- [ ] **Step 5: Implement the network assembly pullback**
+
+Materialize `Tangent`-backed Grassmann cotangents before adding the K and B
+paths:
+
+```julia
+function _materialize_nested_cotangent(delta, primal)
+    delta = unthunk(delta)
+    return delta isa Tangent ?
+        ChainRulesCore.construct(
+            typeof(primal), ChainRulesCore.backing(delta)
+        ) : delta
+end
+
+function _add_nested_cotangents(first, second, primal)
+    first = _materialize_nested_cotangent(first, primal)
+    second = _materialize_nested_cotangent(second, primal)
+    first isa AbstractZero && return second
+    second isa AbstractZero && return first
+    return first + second
+end
+```
+
+Then use the approved reference pattern:
+
+```julia
+function ChainRulesCore.rrule(
+    config::RuleConfig{>:HasReverseMode},
+    ::typeof(nested_network),
+    peps::Square_GPEPS,
+    layout::NestedLayout)
+
+    ket_rules = map(A -> rrule_via_ad(config, _nested_ket, A), peps.A)
+    bra_rules = map(A -> rrule_via_ad(config, _nested_bra, A), peps.A)
+    nested = nested_network(peps, layout)
+
+    function pullback(delta_nested)
+        delta_nested = unthunk(delta_nested)
+        delta_nested isa AbstractZero &&
+            return NoTangent(), ZeroTangent(), NoTangent()
+        delta_network = unthunk(getproperty(delta_nested, :network))
+        raw_gradients = map(CartesianIndices(peps.A)) do source
+            _, dket = last(ket_rules[source])(
+                delta_network[layout.ket_sites[source]]
+            )
+            _, dbra = last(bra_rules[source])(
+                delta_network[layout.bra_sites[source]]
+            )
+            return _add_nested_cotangents(
+                unthunk(dket), unthunk(dbra), peps.A[source]
+            )
+        end
+        Tensor = eltype(peps.A)
+        gradients = map(CartesianIndices(peps.A)) do source
+            gradient = raw_gradients[source]
+            primal = peps.A[source]
+            gradient isa AbstractZero ? zero(primal) : gradient
+        end
+        delta_peps = Tangent{typeof(peps)}(
+            ; A=Matrix{Tensor}(gradients),
+              Λx=NoTangent(), Λy=NoTangent()
+        )
+        return NoTangent(), delta_peps, NoTangent()
+    end
+    return nested, pullback
+end
+```
+
+Add the two-argument rule by delegating to `NestedLayout(peps)`:
+
+```julia
+function ChainRulesCore.rrule(
+    config::RuleConfig{>:HasReverseMode},
+    ::typeof(nested_network),
+    peps::Square_GPEPS,
+)
+    nested, pullback =
+        rrule(config, nested_network, peps, NestedLayout(peps))
+    function two_argument_pullback(delta)
+        _, delta_peps, _ = pullback(delta)
+        return NoTangent(), delta_peps
+    end
+    return nested, two_argument_pullback
+end
+```
+
+Add the operator-dressed Y rule. Geometry and PEPS dimensions are static;
+only the operator is a numerical input to this rule:
+
+```julia
+function ChainRulesCore.rrule(
+    config::RuleConfig{>:HasReverseMode},
+    ::typeof(nested_y_operator),
+    nested::NestedNetwork,
+    peps::Square_GPEPS,
+    site,
+    operator::Grassmann,
+)
+    source = _source_site(site)
+    y, raw_pullback = rrule_via_ad(
+        config, _nested_y_operator_raw,
+        nested, peps, source, operator,
+    )
+    function pullback(delta)
+        _, _, _, _, delta_operator = raw_pullback(unthunk(delta))
+        return (
+            NoTangent(), NoTangent(), NoTangent(),
+            NoTangent(), delta_operator,
+        )
+    end
+    return y, pullback
+end
+```
+
+Use the actual `Square_GPEPS` field names `A`, `Λx`, and `Λy`.
+
+- [ ] **Step 6: Add one-site and bond-energy gradient tests**
+
+Freeze a deterministic one-iteration environment and define the three
+objectives:
+
+```julia
+function convert_nested_env(env::CTMRGEnv, ::Type{T}) where {T}
+    convert_grid(grid) = Matrix{Grassmann{T, ndims(first(grid))}}(
+        reshape([convert(tensor, T) for tensor in grid], size(grid))
+    )
+    return CTMRGEnv{T}(
+        convert_grid(env.El), convert_grid(env.Er),
+        convert_grid(env.Eu), convert_grid(env.Ed),
+        convert_grid(env.Clu), convert_grid(env.Cru),
+        convert_grid(env.Cld), convert_grid(env.Crd),
+    )
+end
+
+initial_peps = Square_GPEPS(2, 1, 2, 1, 1, params, false)
+initial_nested = nested_network(initial_peps)
+frozen_env = initialize_nested_environment(initial_nested, 4)
+run_nested_GCTMRG!(
+    initial_nested, frozen_env, 4;
+    ctmrg_iter=1, verbosity=0, save_iter=0,
+)
+model = SpinlessFermionModel(1.0, 1.0, 3.0)
+number = n_site(model)
+bond = nn_bond(model)
+
+function nested_inputs(x)
+    peps = Square_GPEPS(2, 1, 2, 1, 1, x, false)
+    nested = nested_network(peps)
+    return peps, nested, convert_nested_env(frozen_env, eltype(x))
+end
+
+site_energy(x) = begin
+    peps, nested, env = nested_inputs(x)
+    _, value =
+        compute_nested_exp_site(nested, peps, number, env, (1, 1))
+    real(value)
+end
+horizontal_energy(x) = begin
+    peps, nested, env = nested_inputs(x)
+    _, value =
+        compute_nested_exp_hbond(nested, peps, bond, env, (1, 1))
+    real(value)
+end
+vertical_energy(x) = begin
+    peps, nested, env = nested_inputs(x)
+    _, value =
+        compute_nested_exp_vbond(nested, peps, bond, env, (1, 1))
+    real(value)
+end
+
+for (name, objective) in (
+    ("site", site_energy),
+    ("horizontal", horizontal_energy),
+    ("vertical", vertical_energy),
+)
+    relative, analytic, finite =
+        directional_error(objective, params, direction)
+    @info "nested measurement directional derivative" name relative analytic finite
+    @test relative <= 1e-4
+end
+```
+
+The logged values let a server failure distinguish a sign error from
+numerical noise.
+
+- [ ] **Step 7: Run tests and commit**
+
+```bash
+git add algorithms/Nested_CTMRG/nested_chainrules.jl \
+        ext/GrassmannChainRulesCoreExt/GrassmannChainRulesCoreExt.jl \
+        test/nested_chainrules.jl test/runtests.jl test/server_runtests.jl
+git commit -m "feat: differentiate nested Grassmann networks"
+```
+
+---
+
+### Task 7: Spinless-Fermion Nested AD Driver and Exact Energy
+
+**Files:**
+
+- Create: `examples/Spinless_Fermion_2D_Square_AD_nested/Project.toml`
+- Create: `examples/Spinless_Fermion_2D_Square_AD_nested/Spinless_Fermion_2D_Square_AD_nested.jl`
+- Modify: `test/nested_measurements.jl`
+
+**Interfaces:**
+
+- Consumes: all nested public APIs, `Optim`, `Zygote`.
+- Produces:
+  - `spinless_exact_energy(t, gamma, lambda; nk=1024)`
+  - `compute_nested_energy(h, peps, nested, env)`
+  - `run_Square_SpinlessFermion_AD_nested(...)`
+  - JSON-compatible result named tuple/dictionary.
+
+- [ ] **Step 1: Add exact-energy regression test**
+
+```julia
+include(joinpath(
+    @__DIR__, "..", "examples", "Spinless_Fermion_2D_Square_AD_nested",
+    "Spinless_Fermion_2D_Square_AD_nested.jl",
+))
+
+@test spinless_exact_energy(1.0, 1.0, 3.0; nk=512) ≈
+    -6.170521774015 atol=2e-6
+```
+
+- [ ] **Step 2: Create the example environment**
+
+`Project.toml`:
+
+```toml
+[deps]
+Optim = "429524aa-4258-5aef-a3af-852621145aeb"
+Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
+
+[compat]
+Optim = "1"
+Zygote = "0.7"
+```
+
+- [ ] **Step 3: Implement exact Brillouin-zone quadrature**
+
+Use a periodic midpoint rule that is deterministic and allocation-light:
+
+```julia
+function spinless_exact_energy(
+    t::Real, gamma::Real, lambda::Real; nk::Int=1024)
+
+    nk > 0 || throw(ArgumentError("nk must be positive"))
+    delta = 2pi / nk
+    integral = 0.0
+    for ix in 0:(nk - 1), iy in 0:(nk - 1)
+        kx = -pi + (ix + 0.5) * delta
+        ky = -pi + (iy + 0.5) * delta
+        normal = t * (cos(kx) + cos(ky)) - lambda
+        pairing = gamma * (sin(kx) + sin(ky))
+        integral += hypot(normal, pairing)
+    end
+    return -lambda - integral / nk^2
+end
+```
+
+- [ ] **Step 4: Adapt the existing trust-region optimization**
+
+Start the example with the same isolated environment setup as the ordinary AD
+example, then import Zygote explicitly:
+
+```julia
+using Pkg
+
+const GTN_ROOT = normpath(joinpath(@__DIR__, "../.."))
+if abspath(PROGRAM_FILE) == @__FILE__
+    Pkg.activate(GTN_ROOT)
+    Pkg.instantiate()
+    Pkg.activate(@__DIR__)
+    Pkg.instantiate()
+    GTN_ROOT in LOAD_PATH || push!(LOAD_PATH, GTN_ROOT)
+end
+
+using GrassmannTensorNetworks
+using LinearAlgebra
+using Printf
+using Random
+using Zygote
+
+const _OPTIM_LOADED = Ref(false)
+function ensure_optim_loaded()
+    if !_OPTIM_LOADED[]
+        @eval import Optim
+        _OPTIM_LOADED[] = true
+    end
+    return nothing
+end
+
+function normalized_params(params::AbstractVector{<:Real})
+    scale = norm(params) / sqrt(length(params))
+    return collect(params) ./ (scale + eps(Float64))
+end
+
+function convert_grassmann_grid(
+    grid::Matrix{<:Grassmann{S, N}}, ::Type{T}
+) where {S, N, T}
+    converted = [convert(tensor, T) for tensor in grid]
+    return Matrix{Grassmann{T, N}}(reshape(converted, size(grid)))
+end
+
+convert_ctmrg_env(env::CTMRGEnv{T}, ::Type{T}) where {T} = env
+function convert_ctmrg_env(env::CTMRGEnv, ::Type{T}) where {T}
+    return CTMRGEnv{T}(
+        convert_grassmann_grid(env.El, T),
+        convert_grassmann_grid(env.Er, T),
+        convert_grassmann_grid(env.Eu, T),
+        convert_grassmann_grid(env.Ed, T),
+        convert_grassmann_grid(env.Clu, T),
+        convert_grassmann_grid(env.Cru, T),
+        convert_grassmann_grid(env.Cld, T),
+        convert_grassmann_grid(env.Crd, T),
+    )
+end
+```
+
+Define energy as the unit-cell average. Pass the already-built bond operator
+instead of rebuilding the model inside differentiated code:
+
+```julia
+function compute_nested_energy(
+    h::Grassmann{TH, 4},
+    peps::Square_GPEPS{T},
+    nested::NestedNetwork,
+    env::CTMRGEnv,
+) where {TH, T}
+    h_t = TH === T ? h : convert(h, T)
+    env_t = convert_ctmrg_env(env, T)
+    energy = zero(promote_type(T, TH))
+    for site in CartesianIndices(peps.A)
+        _, eh =
+            compute_nested_exp_hbond(nested, peps, h_t, env_t, site)
+        _, ev =
+            compute_nested_exp_vbond(nested, peps, h_t, env_t, site)
+        energy += eh + ev
+    end
+    return real(energy / length(peps.A))
+end
+```
+
+Add environment refresh and the fixed-environment Zygote/Optim candidate:
+
+```julia
+function update_nested_environment!(
+    D::Int, Lx::Int, Ly::Int, params::AbstractVector,
+    chi::Int, ctmrg_iter::Int;
+    env::Union{Nothing, CTMRGEnv}=nothing,
+    ctmrg_tol::Float64=1e-10,
+    average_trunc::Bool=true,
+    verbosity::Int=0,
+)
+    peps = Square_GPEPS(2, 1, D, Lx, Ly, params, false)
+    nested = nested_network(peps)
+    env = env === nothing ?
+        initialize_nested_environment(nested, chi) : env
+    run_nested_GCTMRG!(
+        nested, env, chi;
+        ctmrg_iter=ctmrg_iter,
+        ctmrg_tol=ctmrg_tol,
+        average_trunc=average_trunc,
+        verbosity=verbosity,
+        save_iter=0,
+    )
+    return peps, nested, env
+end
+
+function fixed_environment_candidate(
+    h, D::Int, Lx::Int, Ly::Int,
+    params::Vector{Float64}, env::CTMRGEnv;
+    inner_optim_iter::Int=2,
+    max_step_norm::Float64=0.25,
+)
+    ensure_optim_loaded()
+    objective = x -> begin
+        normalized = normalized_params(x)
+        peps = Square_GPEPS(2, 1, D, Lx, Ly, normalized, false)
+        nested = nested_network(peps)
+        compute_nested_energy(h, peps, nested, env)
+    end
+    function fg!(F, G, x)
+        value, gradient_tuple = Zygote.withgradient(objective, x)
+        if G !== nothing
+            copyto!(G, only(gradient_tuple))
+        end
+        return F === nothing ? nothing : value
+    end
+    options = Optim.Options(
+        iterations=inner_optim_iter, show_trace=false, store_trace=false
+    )
+    result = Optim.optimize(
+        Optim.only_fg!(fg!), params, Optim.LBFGS(), options
+    )
+    raw = normalized_params(Optim.minimizer(result))
+    delta = raw - params
+    delta_norm = norm(delta)
+    candidate = delta_norm <= max_step_norm ? raw :
+        normalized_params(params + (max_step_norm / delta_norm) * delta)
+    value, gradient_tuple = Zygote.withgradient(objective, params)
+    return (
+        candidate=candidate,
+        energy=value,
+        gradient=only(gradient_tuple),
+        optim_iterations=Optim.iterations(result),
+        optim_converged=Optim.converged(result),
+    )
+end
+```
+
+Implement the complete outer AD loop. Each candidate first passes the cheap
+fixed-environment check, then passes a fresh-CTMRG validation before it is
+accepted:
+
+```julia
+function run_Square_SpinlessFermion_AD_nested(
+    t::Float64, gamma::Float64, lambda::Float64,
+    D::Int, Lx::Int, Ly::Int, chi::Int, ctmrg_iter::Int;
+    ad_iter::Int=20,
+    inner_optim_iter::Int=2,
+    seed::Int=1234,
+    step_shrink::Float64=0.5,
+    min_step::Float64=1e-4,
+    max_step_norm::Float64=0.25,
+    ctmrg_tol::Float64=1e-10,
+    average_trunc::Bool=true,
+    verbosity::Int=0,
+)
+    Random.seed!(seed)
+    started = time()
+    count = square_gpeps_parameter_count(2, 1, D, Lx, Ly)
+    params = normalized_params(randn(count))
+    h = nn_bond(SpinlessFermionModel(t, gamma, lambda))
+    exact = spinless_exact_energy(t, gamma, lambda)
+    history = NamedTuple[]
+    env = nothing
+
+    for iteration in 1:ad_iter
+        peps, nested, env = update_nested_environment!(
+            D, Lx, Ly, params, chi, ctmrg_iter;
+            env=env, ctmrg_tol=ctmrg_tol,
+            average_trunc=average_trunc, verbosity=verbosity,
+        )
+        current = compute_nested_energy(h, peps, nested, env)
+        proposal = fixed_environment_candidate(
+            h, D, Lx, Ly, params, env;
+            inner_optim_iter=inner_optim_iter,
+            max_step_norm=max_step_norm,
+        )
+
+        accepted = false
+        accepted_step = 0.0
+        validated = current
+        trial_params = params
+        trial_env = env
+        alpha = 1.0
+        validation_trials = 0
+        while alpha >= min_step && validation_trials < 2
+            candidate = normalized_params(
+                params + alpha * (proposal.candidate - params)
+            )
+            candidate_peps = Square_GPEPS(
+                2, 1, D, Lx, Ly, candidate, false
+            )
+            candidate_nested = nested_network(candidate_peps)
+            fixed_energy = compute_nested_energy(
+                h, candidate_peps, candidate_nested, env
+            )
+            if isfinite(fixed_energy) && fixed_energy <= current
+                validation_trials += 1
+                validated_peps, validated_nested, candidate_env =
+                    update_nested_environment!(
+                        D, Lx, Ly, candidate, chi, ctmrg_iter;
+                        env=nothing, ctmrg_tol=ctmrg_tol,
+                        average_trunc=average_trunc,
+                        verbosity=verbosity,
+                    )
+                candidate_energy = compute_nested_energy(
+                    h, validated_peps, validated_nested, candidate_env
+                )
+                if isfinite(candidate_energy) && candidate_energy <= current
+                    accepted = true
+                    accepted_step = alpha
+                    validated = candidate_energy
+                    trial_params = candidate
+                    trial_env = candidate_env
+                    break
+                end
+            end
+            alpha *= step_shrink
+        end
+
+        params = copy(trial_params)
+        env = trial_env
+        gradient_norm = norm(proposal.gradient)
+        push!(history, (
+            iteration=iteration,
+            energy=current,
+            validated_energy=validated,
+            gradient_norm=gradient_norm,
+            accepted=accepted,
+            accepted_step=accepted_step,
+            validation_trials=validation_trials,
+            optim_iterations=proposal.optim_iterations,
+            optim_converged=proposal.optim_converged,
+        ))
+        @printf(
+            "AD %2d/%2d E %.12f -> %.12f |g| %.4e step %.3e%s\n",
+            iteration, ad_iter, current, validated, gradient_norm,
+            accepted_step, accepted ? "" : " (rejected)",
+        )
+        flush(stdout)
+    end
+
+    peps, nested, env = update_nested_environment!(
+        D, Lx, Ly, params, chi, ctmrg_iter;
+        env=env, ctmrg_tol=ctmrg_tol,
+        average_trunc=average_trunc, verbosity=verbosity,
+    )
+    energy = compute_nested_energy(h, peps, nested, env)
+    environment_max_norm = maximum(
+        maximum(norm, grid) for grid in
+        (env.El, env.Er, env.Eu, env.Ed,
+         env.Clu, env.Cru, env.Cld, env.Crd)
+    )
+    report = (
+        chi=chi,
+        D=D,
+        ctmrg_iter=ctmrg_iter,
+        ad_iter=ad_iter,
+        energy=energy,
+        exact_energy=exact,
+        signed_error=energy - exact,
+        absolute_error=abs(energy - exact),
+        relative_error=abs((energy - exact) / exact),
+        elapsed_seconds=time() - started,
+        accepted_steps=count(record -> record.accepted, history),
+        final_gradient_norm=last(history).gradient_norm,
+        environment_max_norm=environment_max_norm,
+        environment_finite=isfinite(environment_max_norm),
+    )
+    return (
+        params=params, peps=peps, nested=nested, env=env,
+        history=history, report=report,
+    )
+end
+```
+
+- [ ] **Step 5: Add environment-variable script entry point**
+
+```julia
+if abspath(PROGRAM_FILE) == @__FILE__
+    GrassmannTensorNetworks.global_sign = auto_sign
+    chi = parse(Int, get(ENV, "NESTED_CHI", "4"))
+    result = run_Square_SpinlessFermion_AD_nested(
+        1.0, 1.0, 3.0,
+        2, 2, 2, chi, 20;
+        ad_iter=20,
+        seed=parse(Int, get(ENV, "NESTED_SEED", "1234")),
+        verbosity=parse(Int, get(ENV, "NESTED_VERBOSITY", "0")),
+    )
+    println("NESTED_RESULT=", repr(result.report))
+end
+```
+
+The report contains `chi`, `D`, `ctmrg_iter`, `ad_iter`, `energy`,
+`exact_energy`, signed/absolute/relative errors, elapsed seconds, accepted
+steps, and final CTMRG diagnostics.
+
+- [ ] **Step 6: Run exact-energy and one-step example smoke tests**
+
+Add this guarded smoke test to `test/nested_measurements.jl` after including
+the example:
+
+```julia
+@testset "Nested AD example smoke" begin
+    smoke = run_Square_SpinlessFermion_AD_nested(
+        1.0, 1.0, 3.0, 2, 1, 1, 4, 1;
+        ad_iter=1,
+        inner_optim_iter=1,
+        seed=1234,
+        verbosity=0,
+    )
+    @test length(smoke.history) == 1
+    @test isfinite(smoke.report.energy)
+    @test isfinite(smoke.report.final_gradient_norm)
+end
+```
+
+Run:
+
+```bash
+julia_grassmann --project=. test/server_runtests.jl
+```
+
+Expected: exact-energy and nested-example smoke testsets PASS with finite
+energy and gradient and no exception.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add examples/Spinless_Fermion_2D_Square_AD_nested \
+        test/nested_measurements.jl
+git commit -m "feat: add nested spinless fermion AD example"
+```
+
+---
+
+### Task 8: Documentation and Full Local-Equivalent Verification
+
+**Files:**
+
+- Modify: `docs/algorithms.md`
+- Modify: `README.md`
+
+**Interfaces:**
+
+- Documents all public Task 1/4/5 APIs and limitations.
+
+- [ ] **Step 1: Add API documentation**
+
+Document:
+
+```markdown
+## Nested CTMRG
+
+`nested_network(peps)` maps an `Lx x Ly` Grassmann PEPS to a
+`2Lx x 2Ly` K/Y/X/B network. Use `initialize_nested_environment` and
+`run_nested_GCTMRG!` to reuse the package CTMRG implementation.
+
+`compute_nested_exp_site`, `compute_nested_exp_hbond`, and
+`compute_nested_exp_vbond` support one-site and horizontal/vertical
+nearest-neighbor operators. All crossing, fusion, permutation, and arrow
+operations preserve the Z2 fermionic sign convention.
+```
+
+Add the new example path to the README example list.
+
+```markdown
+- `examples/Spinless_Fermion_2D_Square_AD_nested/Spinless_Fermion_2D_Square_AD_nested.jl`:
+  Grassmann nested-CTMRG optimization for the square-lattice spinless fermion.
+```
+
+- [ ] **Step 2: Run formatting and static checks**
+
+```bash
+git diff --check
+git grep -n -E 'TO[D]O|TB[D]|FIX[M]E|broken[=]true' -- \
+    algorithms/Nested_CTMRG \
+    test/nested_*.jl examples/Spinless_Fermion_2D_Square_AD_nested
+```
+
+Expected: `git diff --check` exits 0 and the scan returns no matches.
+
+- [ ] **Step 3: Run the complete isolated server test suite**
+
+Use the Julia server skill to run:
+
+```bash
+julia_grassmann --project=. test/server_runtests.jl
+```
+
+Expected: all legacy and nested testsets PASS; no memory kill.
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add docs/algorithms.md README.md
+git commit -m "docs: document nested CTMRG"
+```
+
+---
+
+### Task 9: Requested Three-Chi Acceptance
+
+**Files:**
+
+- Create locally through the server skill:
+  `D:\C 盘备份\Back up\Work_Save\coding\codex_server_logs\2026\0730\<task>.md`
+- Do not commit runtime logs unless the repository documentation explicitly
+  links a concise result table.
+
+**Interfaces:**
+
+- Consumes the completed example.
+- Produces authoritative exit codes, energy/error rows, timings, convergence
+  diagnostics, and memory outcomes for all requested χ values.
+
+- [ ] **Step 1: Prepare three isolated server tasks**
+
+Use separate remote task directories and the exact commands:
+
+```bash
+NESTED_CHI=4 NESTED_SEED=1234 julia_grassmann \
+  examples/Spinless_Fermion_2D_Square_AD_nested/Spinless_Fermion_2D_Square_AD_nested.jl
+NESTED_CHI=8 NESTED_SEED=1234 julia_grassmann \
+  examples/Spinless_Fermion_2D_Square_AD_nested/Spinless_Fermion_2D_Square_AD_nested.jl
+NESTED_CHI=12 NESTED_SEED=1234 julia_grassmann \
+  examples/Spinless_Fermion_2D_Square_AD_nested/Spinless_Fermion_2D_Square_AD_nested.jl
+```
+
+Each task must use `D=2`, `Lx=Ly=2`, `ctmrg_iter=20`, `ad_iter=20`, the
+20 GB memory monitor, and a distinct local Markdown log.
+
+- [ ] **Step 2: Run at most three tasks concurrently**
+
+The three tasks are independent and remain below the five-task server limit.
+Monitor each with the server-skill polling interval. Do not run Julia locally.
+
+- [ ] **Step 3: Parse and verify each result**
+
+For each χ require:
+
+```julia
+@assert exit_code == 0
+@assert !memory_killed
+@assert isfinite(energy)
+@assert isfinite(absolute_error)
+@assert ctmrg_iter == 20
+@assert ad_iter == 20
+```
+
+- [ ] **Step 4: Evaluate the χ trend**
+
+Create a table:
+
+```text
+chi | energy | signed error | absolute error | relative error | seconds | peak RSS
+4   | ...    | ...          | ...            | ...            | ...     | ...
+8   | ...    | ...          | ...            | ...            | ...     | ...
+12  | ...    | ...          | ...            | ...            | ...     | ...
+```
+
+Acceptance requires `abs_error(12) < abs_error(4)` and the three diagnostics
+to support an overall approach toward the exact value. Small χ=8
+nonmonotonicity is reported rather than hidden.
+
+- [ ] **Step 5: If the trend fails, diagnose before changing tolerances**
+
+Inspect accepted-step history, CTMRG residuals, candidate-validation energy,
+and gradient norms. Fix a demonstrated algorithmic or sign problem, rerun the
+focused tests, and repeat all affected acceptance tasks. Do not relax the
+user-approved trend criterion.
+
+---
+
+### Task 10: Completion Review, Push, and Pull Request
+
+**Files:**
+
+- Review all files changed since `origin/main`.
+
+**Interfaces:**
+
+- Produces the final verified branch and GitHub pull request.
+
+- [ ] **Step 1: Run the verification-before-completion checklist**
+
+Re-run:
+
+```bash
+git diff --check origin/main...HEAD
+julia_grassmann --project=. test/server_runtests.jl
+```
+
+Confirm all three Task 9 logs correspond to the current commit, not an older
+source snapshot.
+
+- [ ] **Step 2: Review scope and repository state**
+
+```bash
+git status --short --branch
+git diff --stat origin/main...HEAD
+git log --oneline --decorate origin/main..HEAD
+```
+
+Expected: only approved nested implementation, tests, example, and docs;
+working tree clean except known ignored/local artifacts.
+
+- [ ] **Step 3: Request code review and address findings**
+
+Use the `requesting-code-review` skill against the full diff. Resolve every
+correctness or acceptance finding, rerun the affected tests, and commit fixes
+as Codex.
+
+- [ ] **Step 4: Push the branch**
+
+```bash
+git push -u origin codex/grassmann-nested-ctmrg
+```
+
+- [ ] **Step 5: Open a ready GitHub pull request as Codex**
+
+Title:
+
+```text
+Add Grassmann nested CTMRG and spinless-fermion AD example
+```
+
+The body includes:
+
+- K/Y/X/B construction and fermionic sign invariants;
+- one-site and nearest-neighbor measurement support;
+- reverse-mode gradient-check maximum error;
+- full test command and result;
+- exact acceptance commands;
+- the `chi=4,8,12` result table;
+- exact energy `-6.170521774015...`;
+- limitations and any nonmonotonic χ behavior.
+
+Open the PR only after every acceptance condition above is supported by
+current logs.
