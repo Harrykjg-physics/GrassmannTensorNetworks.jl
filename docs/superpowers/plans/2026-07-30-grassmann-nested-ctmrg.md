@@ -77,9 +77,6 @@
   - `NestedLayout(source_size::Tuple{Int,Int})`
   - `NestedLayout(peps::Square_GPEPS)`
   - `NestedNetwork(network, layout, x_crossings)`
-  - `nested_network(peps, layout=NestedLayout(peps))`
-  - `initialize_nested_environment(nested, chi, chi_even=div(chi,2))`
-  - `run_nested_GCTMRG!(nested, env, chi; kwargs...)`
 
 - [ ] **Step 1: Write the failing layout and export tests**
 
@@ -106,7 +103,6 @@ entry points. Add assertions to the existing package-symbol smoke test:
 ```julia
 @test isdefined(GrassmannTensorNetworks, :NestedLayout)
 @test isdefined(GrassmannTensorNetworks, :NestedNetwork)
-@test isdefined(GrassmannTensorNetworks, :nested_network)
 ```
 
 - [ ] **Step 2: Run the focused test to verify failure**
@@ -169,15 +165,12 @@ include(joinpath(@__DIR__, "..", "algorithms", "Nested_CTMRG", "nested_network.j
 Export the types and entry points from `src/GrassmannTensorNetworks.jl`:
 
 ```julia
-export NestedLayout, NestedNetwork, nested_network
-export initialize_nested_environment, run_nested_GCTMRG!
+export NestedLayout, NestedNetwork
 ```
 
 - [ ] **Step 4: Run the focused tests**
 
-Run the same server command. Expected: layout tests PASS; symbol tests for
-measurement functions still fail only if they were asserted before Task 4,
-so do not add those symbol assertions until Task 4.
+Run the same server command. Expected: layout and wrapper symbol tests PASS.
 
 - [ ] **Step 5: Commit**
 
@@ -404,6 +397,10 @@ git commit -m "feat: construct graded nested tensor nodes"
 - [ ] **Step 1: Write failing assembly and periodic-link tests**
 
 ```julia
+@test isdefined(GrassmannTensorNetworks, :nested_network)
+@test isdefined(GrassmannTensorNetworks, :initialize_nested_environment)
+@test isdefined(GrassmannTensorNetworks, :run_nested_GCTMRG!)
+
 @testset "Nested network assembly" begin
     peps = Square_GPEPS(2, 1, 2, 2, 2, Float64, false)
     nested = nested_network(peps)
@@ -425,6 +422,12 @@ git commit -m "feat: construct graded nested tensor nodes"
     wrong = NestedLayout((1, 1))
     @test_throws ArgumentError nested_network(peps, wrong)
 end
+```
+
+Export these Task 3 entry points from `src/GrassmannTensorNetworks.jl`:
+
+```julia
+export nested_network, initialize_nested_environment, run_nested_GCTMRG!
 ```
 
 - [ ] **Step 2: Run and verify the assembly failure**
