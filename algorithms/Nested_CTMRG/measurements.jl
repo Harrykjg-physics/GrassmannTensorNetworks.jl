@@ -314,6 +314,9 @@ function _contract_nested_vpatch3(
     )
 end
 
+_nested_scalar_or_zero(value::GrassmannScalar) =
+    isempty(nonzero_keys(value)) ? zero(eltype(value)) : scalar(value)
+
 function compute_nested_exp_hbond(
     nested::NestedNetwork,
     peps::Square_GPEPS,
@@ -333,17 +336,22 @@ function compute_nested_exp_hbond(
     denominator = _contract_nested_hpatch3(
         nested, env, source, closed_left, closed_right
     )
+    denominator_value = _nested_scalar_or_zero(denominator)
     terms = _operator_schmidt(operator)
-    numerator = isempty(terms) ? zero(denominator) : sum(terms) do (left_op, right_op)
+    numerator_type =
+        promote_type(typeof(denominator_value), eltype(operator))
+    numerator = zero(numerator_type)
+    for (left_op, right_op) in terms
         left_y = nested_y_operator(nested, peps, source, left_op)
         right_y = nested_y_operator(nested, peps, neighbor, right_op)
         term_sign =
             (-one(eltype(operator)))^tensor_parity(left_op)
-        term_sign * _contract_nested_hpatch3(
+        term = _contract_nested_hpatch3(
             nested, env, source, left_y, right_y
         )
+        numerator += term_sign * _nested_scalar_or_zero(term)
     end
-    return denominator, scalar(numerator) / scalar(denominator)
+    return denominator, numerator / denominator_value
 end
 
 function compute_nested_exp_vbond(
@@ -365,13 +373,20 @@ function compute_nested_exp_vbond(
     denominator = _contract_nested_vpatch3(
         nested, env, source, closed_top, closed_bottom
     )
+    denominator_value = _nested_scalar_or_zero(denominator)
     terms = _operator_schmidt(operator)
-    numerator = isempty(terms) ? zero(denominator) : sum(terms) do (top_op, bottom_op)
+    numerator_type =
+        promote_type(typeof(denominator_value), eltype(operator))
+    numerator = zero(numerator_type)
+    for (top_op, bottom_op) in terms
         top_y = nested_y_operator(nested, peps, source, top_op)
         bottom_y = nested_y_operator(nested, peps, neighbor, bottom_op)
-        _contract_nested_vpatch3(nested, env, source, top_y, bottom_y)
+        term = _contract_nested_vpatch3(
+            nested, env, source, top_y, bottom_y
+        )
+        numerator += _nested_scalar_or_zero(term)
     end
-    return denominator, scalar(numerator) / scalar(denominator)
+    return denominator, numerator / denominator_value
 end
 
 function compute_nested_exp_hbond(

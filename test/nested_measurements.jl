@@ -334,3 +334,93 @@ end
     end
     @test all(value -> value > 1e-12, bond_numerators)
 end
+
+@testset "Public nested bond measurements sum multiple Schmidt terms" begin
+    Random.seed!(0x5055424c4943)
+    peps = Square_GPEPS(2, 1, 2, 1, 1, Float64, false)
+    nested = nested_network(peps)
+    env = initialize_nested_environment(nested, 4)
+    source = CartesianIndex(1, 1)
+    identity = physical_identity()
+    bond = nn_bond(SpinlessFermionModel(1.0, 1.0, 3.0))
+    terms = GrassmannTensorNetworks._operator_schmidt(bond)
+    @test length(terms) > 1
+    zero_complex_bond = Grassmann(
+        size(bond), even(bond), index_type(bond), ComplexF64;
+        init=:zeros, parity=:even,
+    )
+    @test isempty(
+        GrassmannTensorNetworks._operator_schmidt(zero_complex_bond)
+    )
+
+    closed = nested_y_operator(nested, peps, source, identity)
+    scalar_or_zero(value) = isempty(nonzero_keys(value)) ?
+        zero(eltype(value)) : scalar(value)
+
+    horizontal_denominator =
+        GrassmannTensorNetworks._contract_nested_hpatch3(
+            nested, env, source, closed, closed
+        )
+    horizontal_numerator = sum(terms; init=zero(Float64)) do term
+        left_operator, right_operator = term
+        left_y = nested_y_operator(
+            nested, peps, source, left_operator
+        )
+        right_y = nested_y_operator(
+            nested, peps, source, right_operator
+        )
+        sign = (-one(eltype(bond)))^tensor_parity(left_operator)
+        term = GrassmannTensorNetworks._contract_nested_hpatch3(
+            nested, env, source, left_y, right_y
+        )
+        sign * scalar_or_zero(term)
+    end
+
+    vertical_denominator =
+        GrassmannTensorNetworks._contract_nested_vpatch3(
+            nested, env, source, closed, closed
+        )
+    vertical_numerator = sum(terms; init=zero(Float64)) do term
+        top_operator, bottom_operator = term
+        top_y = nested_y_operator(
+            nested, peps, source, top_operator
+        )
+        bottom_y = nested_y_operator(
+            nested, peps, source, bottom_operator
+        )
+        term = GrassmannTensorNetworks._contract_nested_vpatch3(
+            nested, env, source, top_y, bottom_y
+        )
+        scalar_or_zero(term)
+    end
+
+    @testset "horizontal" begin
+        denominator, value = compute_nested_exp_hbond(
+            nested, peps, bond, env, source
+        )
+        @test scalar(denominator) ≈ scalar(horizontal_denominator)
+        @test value ≈
+            horizontal_numerator / scalar(horizontal_denominator)
+    end
+
+    @testset "vertical" begin
+        denominator, value = compute_nested_exp_vbond(
+            nested, peps, bond, env, source
+        )
+        @test scalar(denominator) ≈ scalar(vertical_denominator)
+        @test value ≈ vertical_numerator / scalar(vertical_denominator)
+    end
+
+    @testset "zero complex operator" begin
+        for compute_bond in (
+            compute_nested_exp_hbond,
+            compute_nested_exp_vbond,
+        )
+            _, value = compute_bond(
+                nested, peps, zero_complex_bond, env, source
+            )
+            @test value isa ComplexF64
+            @test iszero(value)
+        end
+    end
+end
