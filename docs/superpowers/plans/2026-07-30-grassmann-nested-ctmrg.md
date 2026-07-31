@@ -1104,19 +1104,36 @@ function compute_nested_exp_hbond(
     denominator = _contract_nested_hpatch3(
         nested, env, source, closed_left, closed_right
     )
+    denominator_value = _nested_scalar_or_zero(denominator)
     terms = _operator_schmidt(operator)
-    numerator = isempty(terms) ? zero(denominator) : sum(terms) do (left_op, right_op)
+    numerator = sum(terms; init=zero(denominator_value)) do (left_op, right_op)
         left_y = nested_y_operator(nested, peps, source, left_op)
         right_y = nested_y_operator(nested, peps, neighbor, right_op)
         term_sign =
             (-one(eltype(operator)))^tensor_parity(left_op)
-        term_sign * _contract_nested_hpatch3(
-            nested, env, source, left_y, right_y
+        term_sign * _nested_scalar_or_zero(
+            _contract_nested_hpatch3(
+                nested, env, source, left_y, right_y
+            )
         )
     end
-    return denominator, scalar(numerator) / scalar(denominator)
+    return denominator, numerator / denominator_value
 end
 ```
+
+Here `_nested_scalar_or_zero` is private to nested measurements and handles a
+structurally empty rank-zero sector without invoking Grassmann tensor
+addition:
+
+```julia
+_nested_scalar_or_zero(t::GrassmannScalar) =
+    isempty(nonzero_keys(t)) ? zero(eltype(t)) : scalar(t)
+```
+
+The numeric accumulation is required because adding two rank-zero
+`GrassmannScalar`s calls `tensor_parity` on the empty tuple sector key. Do not
+change the global `Base.+` or `tensor_parity` implementations for this local
+measurement issue.
 
 Add the vertical method and explicit unit-cell overloads:
 
@@ -1137,13 +1154,18 @@ function compute_nested_exp_vbond(
     denominator = _contract_nested_vpatch3(
         nested, env, source, closed_top, closed_bottom
     )
+    denominator_value = _nested_scalar_or_zero(denominator)
     terms = _operator_schmidt(operator)
-    numerator = isempty(terms) ? zero(denominator) : sum(terms) do (top_op, bottom_op)
+    numerator = sum(terms; init=zero(denominator_value)) do (top_op, bottom_op)
         top_y = nested_y_operator(nested, peps, source, top_op)
         bottom_y = nested_y_operator(nested, peps, neighbor, bottom_op)
-        _contract_nested_vpatch3(nested, env, source, top_y, bottom_y)
+        _nested_scalar_or_zero(
+            _contract_nested_vpatch3(
+                nested, env, source, top_y, bottom_y
+            )
+        )
     end
-    return denominator, scalar(numerator) / scalar(denominator)
+    return denominator, numerator / denominator_value
 end
 
 function compute_nested_exp_hbond(
@@ -1181,6 +1203,14 @@ Execute Task 2 Steps 1, 2, and 5 of the exact-test companion. Compare raw
 denominators, raw numerators, and normalized horizontal/vertical
 expectations at `rtol=5e-12` and `atol=1e-12`. Do not construct or iterate
 a CTMRG environment in `test/nested_measurements.jl`.
+
+As a regression-only exception for the public H/V API, construct a boundary
+with `initialize_nested_environment(nested, 4)` but run zero CTMRG
+iterations. Use a bond operator with more than one Schmidt term and compare
+both public orientations against explicit per-term numeric accumulation.
+This smoke test guards the rank-zero `GrassmannScalar` aggregation defect; it
+does not replace the environment-free nested/reduced physics comparisons
+above and must not be used as CTMRG convergence evidence.
 
 - [ ] **Step 7: Run tests and commit**
 
