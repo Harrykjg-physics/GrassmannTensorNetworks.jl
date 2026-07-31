@@ -429,6 +429,16 @@ git commit -m "feat: construct graded nested tensor nodes"
 
 ### Task 3: Assemble Periodic Nested Networks and Reuse GCTMRG
 
+> **Superseded:** Do not execute the steps in this Task 3 section. The
+> approved universal existing-operations replacement is
+> `docs/superpowers/plans/2026-07-31-grassmann-nested-existing-ops.md`.
+> Complete and independently review both tasks in that supplement, then
+> resume this parent plan at Task 4. The supplement preserves the `2m x 2n`
+> checkerboard and replaces the non-composable comparison-map proposal with
+> universal K/B/X/Y placement signs.
+
+<!-- SUPERSEDED TASK 3 ARCHIVE: retained only for historical context.
+
 **Files:**
 
 - Modify: `algorithms/Nested_CTMRG/nested_network.jl`
@@ -613,6 +623,8 @@ git add algorithms/Nested_CTMRG/nested_network.jl test/nested_network.jl
 git commit -m "feat: assemble nested network for GCTMRG"
 ```
 
+-->
+
 ---
 
 ### Task 4: Operator-Dressed Y and One-Site Measurements
@@ -627,7 +639,7 @@ git commit -m "feat: assemble nested network for GCTMRG"
 
 **Interfaces:**
 
-- Consumes: `NestedNetwork`, `_nested_y`, existing scalar
+- Consumes: `NestedNetwork`, `_nested_y`, `_nested_y_for_network`, existing scalar
   `compute_exp_site(Tbulk, Timp, El, Er, Eu, Ed, Clu, Cru, Cld, Crd)`.
 - Produces:
   - `nested_y_operator(nested, peps, site, operator)`
@@ -700,11 +712,12 @@ function _nested_y_operator_raw(
     north_source = CartesianIndex(Nmod(source[1] - 1, rows), source[2])
     east_ket = nested[nested.layout.ket_sites[east_source]]
     north_bra = nested[nested.layout.bra_sites[north_source]]
-    return _nested_y(
+    raw = _nested_y(
         operator,
-        size(east_ket, 1), even(east_ket)[1],
-        size(north_bra, 4), even(north_bra)[4],
+        size(east_ket)[1], even(east_ket)[1],
+        size(north_bra)[4], even(north_bra)[4],
     )
+    return _nested_y_for_network(raw)
 end
 
 function nested_y_operator(
@@ -1222,8 +1235,8 @@ git commit -m "feat: measure nested nearest-neighbor operators"
 **Interfaces:**
 
 - Consumes: K/B/Y construction and existing Grassmann ChainRules.
-- Produces `rrule`s for `_graded_pair_sign`, `_nested_ket`, `_nested_bra`,
-  `nested_network`, and `nested_y_operator`.
+- Produces `rrule`s for `_graded_pair_sign`, the four native placement
+  helpers, `nested_network`, and `nested_y_operator`.
 
 - [ ] **Step 1: Write a reusable centered directional-derivative test**
 
@@ -1282,6 +1295,8 @@ import GrassmannTensorNetworks:
     _source_site, _graded_pair_sign,
     _nested_ket, _nested_ket_raw,
     _nested_bra, _nested_bra_raw,
+    _nested_ket_for_network, _nested_bra_for_network,
+    _nested_x_for_network, _nested_y_for_network,
     _nested_y_operator_raw
 ```
 
@@ -1345,6 +1360,73 @@ end
 This keeps the static integer permutations out of the returned tangent tuple
 while reusing existing `fuse`, sign, bend, and conjugation rules.
 
+Define the placement-helper rules. The K/B rules include the north-input
+twist; the X/Y placement maps are diagonal signs and therefore self-adjoint:
+
+```julia
+function ChainRulesCore.rrule(
+    config::RuleConfig{>:HasReverseMode},
+    ::typeof(_nested_ket_for_network),
+    A::Grassmann,
+)
+    y, pullback_A = rrule_via_ad(
+        config,
+        input -> _nested_ket(
+            add_parity_sign(
+                input, 4;
+                sign_function=GrassmannTensorNetworks.global_sign,
+            )
+        ),
+        A,
+    )
+    function pullback(delta)
+        _, delta_A = pullback_A(unthunk(delta))
+        return NoTangent(), delta_A
+    end
+    return y, pullback
+end
+
+function ChainRulesCore.rrule(
+    config::RuleConfig{>:HasReverseMode},
+    ::typeof(_nested_bra_for_network),
+    A::Grassmann,
+)
+    y, pullback_A = rrule_via_ad(
+        config,
+        input -> _nested_bra(
+            add_parity_sign(
+                input, 4;
+                sign_function=GrassmannTensorNetworks.global_sign,
+            )
+        ),
+        A,
+    )
+    function pullback(delta)
+        _, delta_A = pullback_A(unthunk(delta))
+        return NoTangent(), delta_A
+    end
+    return y, pullback
+end
+
+function ChainRulesCore.rrule(
+    ::typeof(_nested_x_for_network), xraw::Grassmann
+)
+    y = _nested_x_for_network(xraw)
+    pullback(delta) =
+        (NoTangent(), _nested_x_for_network(unthunk(delta)))
+    return y, pullback
+end
+
+function ChainRulesCore.rrule(
+    ::typeof(_nested_y_for_network), yraw::Grassmann
+)
+    y = _nested_y_for_network(yraw)
+    pullback(delta) =
+        (NoTangent(), _nested_y_for_network(unthunk(delta)))
+    return y, pullback
+end
+```
+
 - [ ] **Step 5: Implement the network assembly pullback**
 
 Materialize `Tangent`-backed Grassmann cotangents before adding the K and B
@@ -1377,8 +1459,12 @@ function ChainRulesCore.rrule(
     peps::Square_GPEPS,
     layout::NestedLayout)
 
-    ket_rules = map(A -> rrule_via_ad(config, _nested_ket, A), peps.A)
-    bra_rules = map(A -> rrule_via_ad(config, _nested_bra, A), peps.A)
+    ket_rules = map(
+        A -> rrule_via_ad(config, _nested_ket_for_network, A), peps.A
+    )
+    bra_rules = map(
+        A -> rrule_via_ad(config, _nested_bra_for_network, A), peps.A
+    )
     nested = nested_network(peps, layout)
 
     function pullback(delta_nested)
