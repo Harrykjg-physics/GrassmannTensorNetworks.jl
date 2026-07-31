@@ -633,6 +633,7 @@ git commit -m "feat: assemble nested network for GCTMRG"
 
 - Create: `algorithms/Nested_CTMRG/measurements.jl`
 - Create: `test/nested_measurements.jl`
+- Modify: `src/algorithms.jl`
 - Modify: `test/runtests.jl`
 - Modify: `test/server_runtests.jl`
 - Modify: `src/GrassmannTensorNetworks.jl`
@@ -650,6 +651,7 @@ git commit -m "feat: assemble nested network for GCTMRG"
 
 ```julia
 using Test
+using Random
 using GrassmannTensorNetworks
 
 function physical_identity(::Type{T}=Float64) where {T}
@@ -729,7 +731,7 @@ function nested_y_operator(
     source = _source_site(site)
     checkbounds(Bool, peps.A, source) ||
         throw(ArgumentError("source site $source is outside the unit cell"))
-    physical_size = size(peps.A[source], 1)
+    physical_size = size(peps.A[source])[1]
     physical_even = even(peps.A[source])[1]
     size(operator) == (physical_size, physical_size) ||
         throw(DimensionMismatch("operator physical dimensions do not match PEPS"))
@@ -817,7 +819,8 @@ factorization tolerance.
 
 ```bash
 git add algorithms/Nested_CTMRG/measurements.jl \
-        test/nested_measurements.jl test/runtests.jl test/server_runtests.jl \
+        src/algorithms.jl test/nested_measurements.jl \
+        test/runtests.jl test/server_runtests.jl \
         src/GrassmannTensorNetworks.jl
 git commit -m "feat: measure nested one-site operators"
 ```
