@@ -97,9 +97,14 @@ function deterministic_nested_tensor(::Type{T}, sizes, evens) where {T}
     A = Grassmann(
         sizes, evens, (:out, :out, :in, :in, :out), T; init=:zeros
     )
-    for (number, sector) in enumerate(sort!(collect(nonzero_keys(A))))
-        value = T <: Complex ? T(number, 2number + 1) : T(number)
-        fill!(A[sector], value)
+    for (block_number, sector) in enumerate(sort!(collect(nonzero_keys(A))))
+        block = A[sector]
+        for (coordinate_number, coordinate) in
+            enumerate(CartesianIndices(block))
+            serial = 10_000 * block_number + coordinate_number
+            block[coordinate] =
+                T <: Complex ? T(serial, -2 * serial - 1) : T(serial)
+        end
     end
     return A
 end
@@ -125,6 +130,24 @@ const NESTED_PAIR_TO_FUSED_INDEX = Dict(
     (1, 0) => 3,
     (0, 1) => 4,
 )
+
+@testset "Native bra-first pair fusion basis" begin
+    pair_fixture = Grassmann(
+        (2, 2, 2), (1, 1, 1), (:out, :out, :in), ComplexF64; init=:zeros
+    )
+    pair_fixture[(0, 0, 0)][1] = 11 + 2im
+    pair_fixture[(1, 1, 0)][1] = 22 + 3im
+    pair_fixture[(1, 0, 1)][1] = 31 + 5im
+    pair_fixture[(0, 1, 1)][1] = 41 + 7im
+
+    fused = convert(
+        Array, fuse(pair_fixture, (1, 2); index_type_fused=:out)
+    )
+    @test fused[NESTED_PAIR_TO_FUSED_INDEX[(0, 0)], 1] == 11 + 2im
+    @test fused[NESTED_PAIR_TO_FUSED_INDEX[(1, 1)], 1] == 22 + 3im
+    @test fused[NESTED_PAIR_TO_FUSED_INDEX[(1, 0)], 2] == 31 + 5im
+    @test fused[NESTED_PAIR_TO_FUSED_INDEX[(0, 1)], 2] == 41 + 7im
+end
 
 @testset "Local nested factorization" begin
     for T in (Float64, ComplexF64)
@@ -160,16 +183,22 @@ end
 @testset "Nested factorization preserves anisotropic link roles" begin
     sizes = (3, 3, 4, 3, 4)
     evens = (2, 1, 3, 2, 1)
-    A = deterministic_nested_tensor(Float64, sizes, evens)
-    Xraw = _nested_x(sizes[2], evens[2], sizes[5], evens[5], Float64)
-    Y = _nested_y(_physical_identity(A), sizes[3], evens[3], sizes[4], evens[4])
+    for T in (Float64, ComplexF64)
+        A = deterministic_nested_tensor(T, sizes, evens)
+        entries = reduce(vcat, vec(block) for block in nonzero_vals(A))
+        @test length(unique(entries)) == length(entries)
 
-    @test size(Xraw) == (sizes[2], sizes[2], sizes[5], sizes[5])
-    @test size(Y) == (
-        sizes[1] * sizes[3],
-        sizes[3],
-        sizes[4],
-        sizes[1] * sizes[4],
-    )
-    @test closed_nested_tile(A) ≈ reduced_tensor(A) rtol = 5e-13
+        Xraw = _nested_x(sizes[2], evens[2], sizes[5], evens[5], T)
+        Y = _nested_y(
+            _physical_identity(A), sizes[3], evens[3], sizes[4], evens[4]
+        )
+        @test size(Xraw) == (sizes[2], sizes[2], sizes[5], sizes[5])
+        @test size(Y) == (
+            sizes[1] * sizes[3],
+            sizes[3],
+            sizes[4],
+            sizes[1] * sizes[4],
+        )
+        @test closed_nested_tile(A) ≈ reduced_tensor(A) rtol = 5e-13
+    end
 end
