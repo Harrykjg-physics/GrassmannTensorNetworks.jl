@@ -629,6 +629,12 @@ git commit -m "feat: assemble nested network for GCTMRG"
 
 ### Task 4: Operator-Dressed Y and One-Site Measurements
 
+> **Testing amendment:** Keep the production steps in this task, but replace
+> its CTMRG-based tests with Task 1 of
+> `docs/superpowers/plans/2026-07-31-nested-exact-measurement-tests.md`.
+> Measurement tests must compare exact nested and reduced closures without
+> constructing or iterating a CTMRG environment.
+
 **Files:**
 
 - Create: `algorithms/Nested_CTMRG/measurements.jl`
@@ -647,40 +653,18 @@ git commit -m "feat: assemble nested network for GCTMRG"
   - `compute_nested_exp_site(nested, peps, operator, env, site)`
   - `compute_nested_exp_site(nested, peps, operator_matrix, env)`
 
-- [ ] **Step 1: Write failing identity and number-operator tests**
+- [ ] **Step 1: Write exact one-site nested/reduced tests**
 
-```julia
-using Test
-using Random
-using GrassmannTensorNetworks
-
-function physical_identity(::Type{T}=Float64) where {T}
-    return Grassmann(Matrix{T}(I, 2, 2), (2, 2), (1, 1), (:out, :in))
-end
-
-@testset "Nested one-site measurements" begin
-    peps = Square_GPEPS(2, 1, 2, 1, 1, Float64, false)
-    nested = nested_network(peps)
-    env = initialize_nested_environment(nested, 4)
-    run_nested_GCTMRG!(nested, env, 4; ctmrg_iter=2, verbosity=0)
-
-    denominator, identity_value =
-        compute_nested_exp_site(nested, peps, physical_identity(), env, (1, 1))
-    @test isfinite(real(denominator))
-    @test identity_value ≈ 1 atol=1e-10
-
-    number = n_site(SpinlessFermionModel(1.0, 1.0, 3.0))
-    _, nested_number =
-        compute_nested_exp_site(nested, peps, number, env, (1, 1))
-    @test isfinite(real(nested_number))
-end
-```
-
-The reduced-layer comparison is added in Step 4 with a separate environment.
+Execute Task 1 Steps 1-3 of
+`docs/superpowers/plans/2026-07-31-nested-exact-measurement-tests.md`.
+Those steps contain the complete environment-free identity, number,
+validation, matrix-unit-cell, and four-spin-structure tests.
 
 - [ ] **Step 2: Run and confirm missing measurement failure**
 
-Expected: FAIL with `UndefVarError: compute_nested_exp_site not defined`.
+Use the guarded RED command in the exact-test companion. Expected: FAIL
+because `nested_y_operator`, `compute_nested_exp_site`, or
+`_check_nested_operator_unit_cell` is missing. No CTMRG iteration is run.
 
 - [ ] **Step 3: Implement operator-dressed Y and scalar measurement**
 
@@ -783,37 +767,11 @@ function compute_nested_exp_site(
 end
 ```
 
-Create separate nested and reduced environments in the test, run each for
-five iterations at `chi=8`, and require number expectations to agree to
-`rtol=5e-3`:
-
-```julia
-Random.seed!(0x4e455354)
-peps = Square_GPEPS(2, 1, 2, 1, 1, Float64, false)
-number = n_site(SpinlessFermionModel(1.0, 1.0, 3.0))
-
-nested = nested_network(peps)
-nested_env = initialize_nested_environment(nested, 8)
-run_nested_GCTMRG!(
-    nested, nested_env, 8; ctmrg_iter=5, verbosity=0, save_iter=0
-)
-_, nested_number =
-    compute_nested_exp_site(nested, peps, number, nested_env, (1, 1))
-
-reduced_bulk = reduced_tensor.(peps.A)
-reduced_impurity = reduced_tensor.(peps.A, Ref(number))
-reduced_env = CTMRGEnv(reduced_bulk, 8, 4)
-run_GCTMRG!(
-    reduced_bulk, reduced_bulk, reduced_env, 8;
-    ctmrg_iter=5, verbosity=0, save_iter=0,
-)
-_, reduced_number =
-    compute_exp_site(reduced_bulk, reduced_impurity, reduced_env)
-@test nested_number ≈ reduced_number[1, 1] rtol=5e-3
-```
-
-This is a cross-representation smoke tolerance, not the exact local
-factorization tolerance.
+Add `_check_nested_operator_unit_cell` and the exact comparison tests from
+Task 1 Steps 1-5 of the exact-test companion. The companion replaces the
+old finite-iteration cross-representation smoke test with exact nested and
+reduced denominator/numerator comparisons at `rtol=5e-12` and
+`atol=1e-12`.
 
 - [ ] **Step 5: Run tests and commit**
 
@@ -829,6 +787,13 @@ git commit -m "feat: measure nested one-site operators"
 
 ### Task 5: Horizontal and Vertical Three-Node Measurements
 
+> **Testing amendment:** Keep the production steps in this task, but replace
+> its CTMRG-based tests with Task 2 of
+> `docs/superpowers/plans/2026-07-31-nested-exact-measurement-tests.md`.
+> Measurement tests must compare exact horizontal and vertical nested and
+> reduced bond closures without constructing or iterating a CTMRG
+> environment.
+
 **Files:**
 
 - Modify: `algorithms/Nested_CTMRG/measurements.jl`
@@ -843,38 +808,13 @@ git commit -m "feat: measure nested one-site operators"
   - `compute_nested_exp_hbond(...)`
   - `compute_nested_exp_vbond(...)`
 
-- [ ] **Step 1: Write failing identity and Hamiltonian-bond tests**
+- [ ] **Step 1: Write exact identity and Hamiltonian-bond tests**
 
-```julia
-function two_site_identity(::Type{T}=Float64) where {T}
-    dense = reshape(Matrix{T}(I, 4, 4), 2, 2, 2, 2)
-    return Grassmann(
-        dense, (2, 2, 2, 2), (1, 1, 1, 1),
-        (:out, :out, :in, :in),
-    )
-end
-
-@testset "Nested nearest-neighbor measurements" begin
-    peps = Square_GPEPS(2, 1, 2, 2, 2, Float64, false)
-    nested = nested_network(peps)
-    env = initialize_nested_environment(nested, 8)
-    run_nested_GCTMRG!(nested, env, 8; ctmrg_iter=3, verbosity=0)
-    identity2 = two_site_identity()
-
-    _, h_identity =
-        compute_nested_exp_hbond(nested, peps, identity2, env, (1, 1))
-    _, v_identity =
-        compute_nested_exp_vbond(nested, peps, identity2, env, (1, 1))
-    @test h_identity ≈ 1 atol=1e-10
-    @test v_identity ≈ 1 atol=1e-10
-
-    hamiltonian = nn_bond(SpinlessFermionModel(1.0, 1.0, 3.0))
-    _, eh = compute_nested_exp_hbond(nested, peps, hamiltonian, env, (1, 1))
-    _, ev = compute_nested_exp_vbond(nested, peps, hamiltonian, env, (1, 1))
-    @test isfinite(real(eh))
-    @test isfinite(real(ev))
-end
-```
+Execute Task 2 Steps 1-3 of
+`docs/superpowers/plans/2026-07-31-nested-exact-measurement-tests.md`.
+Those steps contain the complete two-site identity, operator reconstruction,
+rank-six reduced closure, horizontal/vertical comparison, nonzero-numerator,
+and four-spin-structure tests.
 
 - [ ] **Step 2: Run and verify missing-function failures**
 
@@ -1177,44 +1117,12 @@ function compute_nested_exp_vbond(
 end
 ```
 
-- [ ] **Step 6: Cross-check reduced-layer bond energies**
+- [ ] **Step 6: Cross-check exact reduced-layer bond contractions**
 
-Create independent nested and reduced environments at `chi=8`, five CTMRG
-iterations, deterministic seed, and compare:
-
-```julia
-Random.seed!(0x424f4e44)
-peps = Square_GPEPS(2, 1, 2, 2, 2, Float64, false)
-hamiltonian = nn_bond(SpinlessFermionModel(1.0, 1.0, 3.0))
-
-nested = nested_network(peps)
-nested_env = initialize_nested_environment(nested, 8)
-run_nested_GCTMRG!(
-    nested, nested_env, 8; ctmrg_iter=5, verbosity=0, save_iter=0
-)
-_, eh_nested =
-    compute_nested_exp_hbond(nested, peps, hamiltonian, nested_env, (1, 1))
-_, ev_nested =
-    compute_nested_exp_vbond(nested, peps, hamiltonian, nested_env, (1, 1))
-
-reduced_bulk = reduced_tensor.(peps.A)
-vertical_impurity, horizontal_impurity = reduced_tensor(peps, hamiltonian)
-reduced_env = CTMRGEnv(reduced_bulk, 8, 4)
-run_GCTMRG!(
-    reduced_bulk, reduced_bulk, reduced_env, 8;
-    ctmrg_iter=5, verbosity=0, save_iter=0,
-)
-_, eh_reduced = compute_exp_hbond(
-    reduced_bulk, horizontal_impurity, reduced_env
-)
-_, ev_reduced = compute_exp_vbond(
-    reduced_bulk, vertical_impurity, reduced_env
-)
-@test eh_nested ≈ eh_reduced[1, 1] rtol=5e-3
-@test ev_nested ≈ ev_reduced[1, 1] rtol=5e-3
-@test abs(imag(eh_nested)) <= 1e-10
-@test abs(imag(ev_nested)) <= 1e-10
-```
+Execute Task 2 Steps 1, 2, and 5 of the exact-test companion. Compare raw
+denominators, raw numerators, and normalized horizontal/vertical
+expectations at `rtol=5e-12` and `atol=1e-12`. Do not construct or iterate
+a CTMRG environment in `test/nested_measurements.jl`.
 
 - [ ] **Step 7: Run tests and commit**
 
