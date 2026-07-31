@@ -199,8 +199,10 @@ git commit -m "feat: add nested CTMRG layout"
   - `_nested_ket(A)`
   - `_nested_bra(A)`
   - `_nested_x(horizontal_size, horizontal_even, vertical_size, vertical_even, T)`
+  - `_placed_nested_x(x)`
   - `_nested_y(operator, horizontal_size, horizontal_even, vertical_size, vertical_even)`
   - `_physical_identity(A)`
+  - `_nested_reduced_basis(ordered)`
 
 - [ ] **Step 1: Write failing sign and node-structure tests**
 
@@ -278,7 +280,13 @@ function _nested_x(
         (:out, :in, :in, :out),
     )
 end
+
+_placed_nested_x(x::Grassmann) =
+    add_parity_sign(x, 1; sign_function=global_sign)
 ```
+
+`_nested_x` is the raw braid and its odd-odd entry must remain `-1`.
+The west-leg twist belongs to the placed X node, not to the raw crossing.
 
 - [ ] **Step 4: Implement K, B, identity, and operator-dressed Y**
 
@@ -332,23 +340,48 @@ function _nested_y(
 end
 ```
 
-- [ ] **Step 5: Add local closure and factorization tests**
+- [ ] **Step 5: Add sector-oracle, anisotropic, and factorization tests**
 
-Add helpers that contract the nested tile and compare with `reduced_tensor`.
-The comparison must use the documented external order
-`(left, right, up, down)`:
+Native `reduced_tensor` stores each external pair in bra-first order.  The
+categorical-to-native comparison must include the derived eight-leg basis
+isomorphism before applying the exact reduced-layer fusers:
 
 ```julia
+function _nested_reduced_basis(ordered)
+    corrected = add_perm_sign(
+        ordered, (2, 3, 5, 4, 6, 7, 1, 8);
+        sign_function=global_sign,
+    )
+    for index in (2, 4, 6)
+        corrected = add_parity_sign(
+            corrected, index; sign_function=global_sign
+        )
+    end
+    return corrected
+end
+
 function contract_nested_tile(K, Y, X, B)
     ky = contract(K, Y, (2, 1); sign_function=global_sign)
     kx = contract(ky, X, (3, 3); sign_function=global_sign)
     tile = contract(kx, B, ((5, 7), (3, 1)); sign_function=global_sign)
     ordered = permutedims(
-        tile, (1, 5, 3, 7, 2, 4, 6, 8); sign_function=global_sign
+        tile, (5, 1, 7, 3, 4, 2, 8, 6); sign_function=global_sign
+    )
+    ordered = _nested_reduced_basis(ordered)
+
+    ordered = add_parity_sign(
+        ordered, 1; sign_function=global_sign
     )
     left = fuse(ordered, (1, 2); index_type_fused=:out)
+    left = add_perm_sign(
+        left, (1, 3, 2, 4, 5, 6, 7); sign_function=global_sign
+    )
     right = fuse(left, (2, 3); index_type_fused=:in)
+    right = add_perm_sign(
+        right, (1, 2, 4, 3, 5, 6); sign_function=global_sign
+    )
     up = fuse(right, (3, 4); index_type_fused=:in)
+    up = add_parity_sign(up, 4; sign_function=global_sign)
     return fuse(up, (4, 5); index_type_fused=:out)
 end
 
@@ -357,20 +390,31 @@ end
         peps = Square_GPEPS(2, 1, 2, 1, 1, T, false)
         A = peps.A[1, 1]
         K, B = _nested_ket(A), _nested_bra(A)
-        X = _nested_x(size(A, 2), even(A)[2], size(A, 5), even(A)[5], T)
+        Xraw = _nested_x(
+            size(A)[2], even(A)[2], size(A)[5], even(A)[5], T
+        )
         Y = _nested_y(
             _physical_identity(A),
-            size(A, 3), even(A)[3],
-            size(A, 4), even(A)[4],
+            size(A)[3], even(A)[3],
+            size(A)[4], even(A)[4],
         )
-        @test contract_nested_tile(K, Y, X, B) ≈ reduced_tensor(A) rtol=1e-10
+        @test contract_nested_tile(
+            K, Y, _placed_nested_x(Xraw), B
+        ) ≈ reduced_tensor(A) rtol=1e-10
     end
 end
 ```
 
-The exact contraction indices and the documented external order are
-implementation invariants; do not weaken this comparison or substitute a
-dense contraction that bypasses Grassmann signs.
+Also enumerate all 128 compatible parity sectors for the minimal
+even-dimension-one tensor and assert zero corrected sign residual.  Add a
+mixed-multiplicity anisotropic test so that horizontal X is sourced from
+`B.W` and vertical X from `K.S`; the isotropic `D=2` case cannot detect that
+argument reversal.
+
+The exact contraction indices, bra-first order, placed-X twist, basis
+isomorphism, and reduced-layer fusers are implementation invariants.  Do not
+weaken this comparison or substitute a dense production contraction that
+bypasses Grassmann signs.
 
 - [ ] **Step 6: Run tests and commit**
 
@@ -450,8 +494,8 @@ function nested_network(
     bra = [_nested_bra(peps.A[r, c]) for r in 1:rows, c in 1:cols]
     x = [
         _nested_x(
-            size(ket[r, c], 4), even(ket[r, c])[4],
-            size(bra[r, c], 1), even(bra[r, c])[1], T,
+            size(bra[r, c])[1], even(bra[r, c])[1],
+            size(ket[r, c])[4], even(ket[r, c])[4], T,
         ) for r in 1:rows, c in 1:cols
     ]
 
@@ -459,7 +503,7 @@ function nested_network(
     for r in 1:rows, c in 1:cols
         tensors[layout.ket_sites[r, c]] = ket[r, c]
         tensors[layout.bra_sites[r, c]] = bra[r, c]
-        tensors[layout.x_sites[r, c]] = x[r, c]
+        tensors[layout.x_sites[r, c]] = _placed_nested_x(x[r, c])
         north_bra = bra[Nmod(r - 1, rows), c]
         east_ket = ket[r, Nmod(c + 1, cols)]
         tensors[layout.y_sites[r, c]] = _nested_y(
@@ -473,6 +517,12 @@ function nested_network(
     return nested
 end
 ```
+
+Before accepting assembly, add a `2x2` reduced / `4x4` nested periodic
+contraction test for all four `(twist_x, twist_y)` spin structures.  Compose
+the proven external basis maps explicitly across tile boundaries.  A naïve
+periodic trace that omits those maps is not a valid comparison and must not
+be used to alter the already proven local signs.
 
 Add the link validator used above:
 
