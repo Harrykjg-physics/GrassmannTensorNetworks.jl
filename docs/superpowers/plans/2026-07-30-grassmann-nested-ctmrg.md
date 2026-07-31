@@ -1479,7 +1479,8 @@ function ChainRulesCore.rrule(
         gradients = map(CartesianIndices(peps.A)) do source
             gradient = raw_gradients[source]
             primal = peps.A[source]
-            gradient isa AbstractZero ? zero(primal) : gradient
+            gradient isa AbstractZero ?
+                primal * zero(eltype(primal)) : gradient
         end
         delta_peps = Tangent{typeof(peps)}(
             ; A=Matrix{Tensor}(gradients),
