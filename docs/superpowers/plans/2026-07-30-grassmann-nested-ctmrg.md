@@ -874,10 +874,12 @@ function _check_nested_bond_operator(
 end
 
 function _operator_schmidt(operator::Grassmann{T, 4}) where {T}
-    dense = convert(Array, operator)
     dout1, dout2, din1, din2 = size(operator)
+    grouped = permutedims(
+        operator, (1, 3, 2, 4); sign_function=global_sign
+    )
     matrix = reshape(
-        permutedims(dense, (1, 3, 2, 4)),
+        convert(Array, grouped),
         dout1 * din1, dout2 * din2,
     )
     parity(index, even_dim) = index <= even_dim ? 0 : 1
