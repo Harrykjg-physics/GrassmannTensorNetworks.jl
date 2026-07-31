@@ -1,7 +1,12 @@
 using Test
+using Random
 using GrassmannTensorNetworks
 
 @eval GrassmannTensorNetworks global global_sign = auto_sign
+
+@test isdefined(GrassmannTensorNetworks, :nested_network)
+@test isdefined(GrassmannTensorNetworks, :initialize_nested_environment)
+@test isdefined(GrassmannTensorNetworks, :run_nested_GCTMRG!)
 
 import GrassmannTensorNetworks:
     _graded_pair_sign,
@@ -265,4 +270,154 @@ end
         A = deterministic_nested_tensor(T, sizes, evens)
         @test corrected_nested_tile(A) ≈ reduced_tensor(A) rtol=5e-13
     end
+end
+
+function close_nested_test_row(row; twist_x=false)
+    sign = GrassmannTensorNetworks.global_sign
+    cols = length(row)
+    current = permutedims(row[1], (1, 3, 4, 2); sign_function=sign)
+    for c in 2:cols
+        j = c - 1
+        rank = 2j + 2
+        perm = (
+            1,
+            (2:(j + 1))...,
+            2j + 3,
+            ((j + 2):(2j + 1))...,
+            2j + 4,
+            2j + 2,
+        )
+        current = contract(
+            current, row[c], (rank, 1);
+            perm, sign_function=sign,
+        )
+    end
+    return trace(
+        current, (1, 2cols + 2);
+        pbc=!twist_x, sign_function=sign,
+    )
+end
+
+function nested_test_torus_scalar(tensors; twist_x=false, twist_y=false)
+    sign = GrassmannTensorNetworks.global_sign
+    rows, cols = size(tensors)
+    row_tensors = [
+        close_nested_test_row(collect(tensors[r, :]); twist_x)
+        for r in 1:rows
+    ]
+    current = row_tensors[1]
+    for r in 2:rows
+        current = contract(
+            current,
+            row_tensors[r],
+            (ntuple(i -> cols + i, cols), ntuple(identity, cols));
+            sign_function=sign,
+        )
+    end
+    closed = trace(
+        current,
+        (ntuple(identity, cols), ntuple(i -> cols + i, cols));
+        pbc=ntuple(_ -> !twist_y, cols),
+        sign_function=sign,
+    )
+    return scalar(closed)
+end
+
+@testset "Corrected nested network assembly" begin
+    peps = Square_GPEPS(2, 1, 2, 2, 2, Float64, false)
+    nested = nested_network(peps)
+    @test size(nested) == (4, 4)
+    @test nested[nested.layout.ket_sites[1, 1]] ≈
+        _nested_ket_for_network(peps.A[1, 1])
+    @test nested[nested.layout.bra_sites[2, 2]] ≈
+        _nested_bra_for_network(peps.A[2, 2])
+
+    raw_x = _nested_x(
+        size(_nested_bra_for_network(peps.A[1, 1]))[1],
+        even(_nested_bra_for_network(peps.A[1, 1]))[1],
+        size(_nested_ket_for_network(peps.A[1, 1]))[4],
+        even(_nested_ket_for_network(peps.A[1, 1]))[4],
+        Float64,
+    )
+    @test nested.x_crossings[1, 1] ≈ raw_x
+    @test nested[nested.layout.x_sites[1, 1]] ≈
+        _nested_x_for_network(raw_x)
+
+    for r in axes(nested, 1), c in axes(nested, 2)
+        below = Nmod(r + 1, size(nested, 1))
+        right = Nmod(c + 1, size(nested, 2))
+        @test size(nested[r, c])[2] == size(nested[r, right])[1]
+        @test even(nested[r, c])[2] == even(nested[r, right])[1]
+        @test size(nested[r, c])[4] == size(nested[below, c])[3]
+        @test even(nested[r, c])[4] == even(nested[below, c])[3]
+        @test index_type(nested[r, c])[2] != index_type(nested[r, right])[1]
+        @test index_type(nested[r, c])[4] != index_type(nested[below, c])[3]
+    end
+
+    @test_throws ArgumentError nested_network(peps, NestedLayout((1, 1)))
+end
+
+@testset "Universal odd-row and even-row periodic signs" begin
+    spin_structures =
+        ((false, false), (true, false), (false, true), (true, true))
+    for (rows, cols) in ((1, 1), (1, 2), (2, 1), (2, 2))
+        Random.seed!(10_000rows + cols)
+        peps = Square_GPEPS(2, 1, 2, rows, cols, ComplexF64, false)
+        nested = nested_network(peps)
+        reduced = reduced_tensor(peps)
+        for (twist_x, twist_y) in spin_structures
+            nested_value = nested_test_torus_scalar(
+                nested.network; twist_x, twist_y
+            )
+            reduced_value = nested_test_torus_scalar(
+                reduced; twist_x, twist_y
+            )
+            @test nested_value ≈ reduced_value rtol=5e-13 atol=1e-13
+        end
+    end
+end
+
+function mixed_periodic_peps(::Type{T}) where {T}
+    horizontal = [(2, 1) (3, 2); (4, 3) (2, 1)]
+    vertical = [(3, 2) (2, 1); (2, 1) (4, 3)]
+    tensors = Matrix{Grassmann{T, 5}}(undef, 2, 2)
+    for r in 1:2, c in 1:2
+        left = horizontal[r, Nmod(c - 1, 2)]
+        right = horizontal[r, c]
+        up = vertical[Nmod(r - 1, 2), c]
+        down = vertical[r, c]
+        sizes = (3, left[1], right[1], up[1], down[1])
+        evens = (2, left[2], right[2], up[2], down[2])
+        tensors[r, c] =
+            deterministic_nested_tensor(T, sizes, evens)
+    end
+    return Square_GPEPS{T}(tensors, missing, missing)
+end
+
+@testset "Mixed periodic nested algebra" begin
+    spin_structures =
+        ((false, false), (true, false), (false, true), (true, true))
+    for T in (Float64, ComplexF64)
+        peps = mixed_periodic_peps(T)
+        nested = nested_network(peps)
+        reduced = reduced_tensor(peps)
+        for (twist_x, twist_y) in spin_structures
+            @test nested_test_torus_scalar(
+                nested.network; twist_x, twist_y
+            ) ≈ nested_test_torus_scalar(
+                reduced; twist_x, twist_y
+            ) rtol=5e-13 atol=1e-13
+        end
+    end
+end
+
+@testset "Corrected nested CTMRG smoke" begin
+    peps = Square_GPEPS(2, 1, 2, 1, 1, Float64, false)
+    nested = nested_network(peps)
+    env = initialize_nested_environment(nested, 4)
+    @test size(env) == size(nested)
+    @test run_nested_GCTMRG!(
+        nested, env, 4;
+        ctmrg_iter=1, verbosity=0, save_iter=0,
+    ) === env
 end

@@ -40,6 +40,7 @@ export reduced_tensor, reduced_tensor_vbond, reduced_tensor_hbond
 export CTMRGEnv, run_GCTMRG!, find_maxiter, read_CTMRG_env
 export compute_exp_site, compute_exp_hbond, compute_exp_vbond
 export NestedLayout, NestedNetwork
+export nested_network, initialize_nested_environment, run_nested_GCTMRG!
 export Grassmann_SU
 
 end

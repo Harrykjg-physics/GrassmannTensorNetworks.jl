@@ -174,3 +174,114 @@ function _nested_network_reduced_basis(
     end
     return corrected
 end
+
+function nested_network(
+    peps::Square_GPEPS{T},
+    layout::NestedLayout=NestedLayout(peps),
+) where {T}
+    layout.source_size == size(peps) ||
+        throw(ArgumentError("layout source size does not match PEPS unit cell"))
+
+    rows, cols = size(peps)
+    ket = [
+        _nested_ket_for_network(peps.A[r, c])
+        for r in 1:rows, c in 1:cols
+    ]
+    bra = [
+        _nested_bra_for_network(peps.A[r, c])
+        for r in 1:rows, c in 1:cols
+    ]
+    xraw = [
+        _nested_x(
+            size(bra[r, c])[1], even(bra[r, c])[1],
+            size(ket[r, c])[4], even(ket[r, c])[4], T,
+        )
+        for r in 1:rows, c in 1:cols
+    ]
+
+    tensors = Matrix{Grassmann{T, 4}}(undef, size(layout)...)
+    for r in 1:rows, c in 1:cols
+        north_bra = bra[Nmod(r - 1, rows), c]
+        east_ket = ket[r, Nmod(c + 1, cols)]
+        yraw = _nested_y(
+            _physical_identity(peps.A[r, c]),
+            size(east_ket)[1], even(east_ket)[1],
+            size(north_bra)[4], even(north_bra)[4],
+        )
+
+        tensors[layout.ket_sites[r, c]] = ket[r, c]
+        tensors[layout.bra_sites[r, c]] = bra[r, c]
+        tensors[layout.x_sites[r, c]] =
+            _nested_x_for_network(xraw[r, c])
+        tensors[layout.y_sites[r, c]] =
+            _nested_y_for_network(yraw)
+    end
+
+    nested = NestedNetwork(tensors, layout, xraw)
+    _check_nested_links(nested)
+    return nested
+end
+
+function _check_nested_link(
+    left::Grassmann,
+    left_axis::Int,
+    right::Grassmann,
+    right_axis::Int,
+    left_site::CartesianIndex{2},
+    right_site::CartesianIndex{2},
+)
+    size(left)[left_axis] == size(right)[right_axis] ||
+        throw(DimensionMismatch(
+            "nested link $left_site[$left_axis] -> " *
+            "$right_site[$right_axis] has unequal dimensions",
+        ))
+    even(left)[left_axis] == even(right)[right_axis] ||
+        throw(DimensionMismatch(
+            "nested link $left_site[$left_axis] -> " *
+            "$right_site[$right_axis] has unequal even sectors",
+        ))
+    index_type(left)[left_axis] != index_type(right)[right_axis] ||
+        throw(DimensionMismatch(
+            "nested link $left_site[$left_axis] -> " *
+            "$right_site[$right_axis] has equal arrow directions",
+        ))
+    return nothing
+end
+
+function _check_nested_links(nested::NestedNetwork)
+    for site in CartesianIndices(nested.network)
+        right = CartesianIndex(
+            site[1], Nmod(site[2] + 1, size(nested, 2))
+        )
+        below = CartesianIndex(
+            Nmod(site[1] + 1, size(nested, 1)), site[2]
+        )
+        _check_nested_link(
+            nested[site], 2, nested[right], 1, site, right
+        )
+        _check_nested_link(
+            nested[site], 4, nested[below], 3, site, below
+        )
+    end
+    return nested
+end
+
+initialize_nested_environment(
+    nested::NestedNetwork,
+    chi::Int,
+    chi_even::Int=div(chi, 2),
+) = CTMRGEnv(nested.network, chi, chi_even)
+
+function run_nested_GCTMRG!(
+    nested::NestedNetwork,
+    env::CTMRGEnv,
+    chi::Int;
+    kwargs...,
+)
+    size(env) == size(nested) ||
+        throw(DimensionMismatch(
+            "nested environment and network sizes differ"
+        ))
+    run_GCTMRG!(nested.network, nested.network, env, chi; kwargs...)
+    return env
+end
