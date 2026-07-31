@@ -1106,7 +1106,10 @@ function compute_nested_exp_hbond(
     )
     denominator_value = _nested_scalar_or_zero(denominator)
     terms = _operator_schmidt(operator)
-    numerator = sum(terms; init=zero(denominator_value)) do (left_op, right_op)
+    numerator_type = promote_type(
+        typeof(denominator_value), eltype(operator)
+    )
+    numerator = sum(terms; init=zero(numerator_type)) do (left_op, right_op)
         left_y = nested_y_operator(nested, peps, source, left_op)
         right_y = nested_y_operator(nested, peps, neighbor, right_op)
         term_sign =
@@ -1156,7 +1159,10 @@ function compute_nested_exp_vbond(
     )
     denominator_value = _nested_scalar_or_zero(denominator)
     terms = _operator_schmidt(operator)
-    numerator = sum(terms; init=zero(denominator_value)) do (top_op, bottom_op)
+    numerator_type = promote_type(
+        typeof(denominator_value), eltype(operator)
+    )
+    numerator = sum(terms; init=zero(numerator_type)) do (top_op, bottom_op)
         top_y = nested_y_operator(nested, peps, source, top_op)
         bottom_y = nested_y_operator(nested, peps, neighbor, bottom_op)
         _nested_scalar_or_zero(
@@ -1211,6 +1217,10 @@ both public orientations against explicit per-term numeric accumulation.
 This smoke test guards the rank-zero `GrassmannScalar` aggregation defect; it
 does not replace the environment-free nested/reduced physics comparisons
 above and must not be used as CTMRG convergence evidence.
+Also pass a structurally valid zero `ComplexF64` bond operator against a
+`Float64` PEPS/environment and assert that both public values are complex
+zeros. This prevents the accumulator return type from depending on whether
+the complex operator happens to have retained Schmidt terms.
 
 - [ ] **Step 7: Run tests and commit**
 
