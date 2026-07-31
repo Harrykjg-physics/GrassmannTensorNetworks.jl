@@ -1263,7 +1263,7 @@ import GrassmannTensorNetworks:
     nested_network, nested_y_operator,
     _source_site, _graded_pair_sign,
     _nested_ket, _nested_ket_raw,
-    _nested_bra, _nested_bra_raw,
+    _nested_bra, _nested_bra_raw, _bend_index,
     _nested_ket_for_network, _nested_bra_for_network,
     _nested_x_for_network, _nested_y_for_network,
     _nested_y_operator_raw
@@ -1312,12 +1312,30 @@ function ChainRulesCore.rrule(
     return y, pullback
 end
 
+function _nested_bra_explicit_bends(A::Grassmann)
+    bra = conj(
+        A; sign_function=GrassmannTensorNetworks.global_sign
+    )
+    signed = _graded_pair_sign(bra, 1, 4)
+    routed = permutedims(
+        signed, (2, 3, 1, 4, 5);
+        sign_function=GrassmannTensorNetworks.global_sign,
+    )
+    fused = fuse(routed, (3, 4); index_type_fused=:in)
+    bent_left = _bend_index(fused, 1)
+    bent_right = _bend_index(bent_left, 2)
+    return _bend_index(bent_right, 4)
+end
+
 function ChainRulesCore.rrule(
     config::RuleConfig{>:HasReverseMode},
     ::typeof(_nested_bra),
     A::Grassmann,
 )
-    y, raw_pullback = rrule_via_ad(config, _nested_bra_raw, A)
+    y = _nested_bra_raw(A)
+    _, raw_pullback = rrule_via_ad(
+        config, _nested_bra_explicit_bends, A
+    )
     function pullback(delta)
         _, delta_A = raw_pullback(unthunk(delta))
         return NoTangent(), delta_A
@@ -1326,8 +1344,12 @@ function ChainRulesCore.rrule(
 end
 ```
 
-This keeps the static integer permutations out of the returned tangent tuple
-while reusing existing `fuse`, sign, bend, and conjugation rules.
+The bra primal remains `_nested_bra_raw(A)`. Its raw implementation uses
+`foldl` for three bends, and Julia 1.12 drops the init cotangent through that
+`foldl`. The extension-local `_nested_bra_explicit_bends` pipeline is
+forward-equivalent but keeps all three bend cotangents. This also keeps the
+static integer permutations out of the returned tangent tuple while reusing
+existing `fuse`, sign, bend, and conjugation rules.
 
 Define the placement-helper rules. The K/B rules include the north-input
 twist; the X/Y placement maps are diagonal signs and therefore self-adjoint:
