@@ -1245,7 +1245,8 @@ git commit -m "feat: measure nested nearest-neighbor operators"
 
 - Consumes: K/B/Y construction and existing Grassmann ChainRules.
 - Produces `rrule`s for `_graded_pair_sign`, the four native placement
-  helpers, `nested_network`, and `nested_y_operator`.
+  helpers, `nested_network`, `nested_y_operator`, and fixed-observable
+  horizontal/vertical measurements.
 
 - [ ] **Step 1: Write a reusable centered directional-derivative test**
 
@@ -1301,13 +1302,17 @@ Add a second import statement after the existing
 import GrassmannTensorNetworks:
     NestedLayout, NestedNetwork,
     nested_network, nested_y_operator,
+    compute_nested_exp_hbond, compute_nested_exp_vbond,
     _source_site, _graded_pair_sign,
     _nested_ket, _nested_ket_raw,
     _nested_bra, _nested_bra_raw, _bend_index,
     _nested_x,
     _nested_ket_for_network, _nested_bra_for_network,
     _nested_x_for_network, _nested_y_for_network,
-    _nested_y_operator_raw
+    _nested_y_operator_raw,
+    _physical_identity, _operator_schmidt,
+    _nested_scalar_or_zero,
+    _contract_nested_hpatch3, _contract_nested_vpatch3
 ```
 
 Append:
@@ -1614,7 +1619,72 @@ end
 
 Use the actual `Square_GPEPS` field names `A`, `Λx`, and `Λy`.
 
-- [ ] **Step 6: Add one-site and bond-energy gradient tests**
+- [ ] **Step 6: Add fixed-observable H/V measurement pullbacks**
+
+The PEPS optimization differentiates a fixed Hamiltonian. Keep the Schmidt
+decomposition, operator-dressed Y tensors, and horizontal endpoint signs
+outside AD. Extension-local prepared helpers receive only the numerical
+`nested` network and `env`; every rank-zero contraction is scalarized before
+numeric accumulation:
+
+```julia
+function _nested_hbond_from_prepared(
+    nested, env, source,
+    closed_left, closed_right,
+    prepared_terms, numerator_zero,
+)
+    denominator = _contract_nested_hpatch3(
+        nested, env, source, closed_left, closed_right
+    )
+    denominator_value = _nested_scalar_or_zero(denominator)
+    numerator = numerator_zero
+    for (sign, left_y, right_y) in prepared_terms
+        term = _contract_nested_hpatch3(
+            nested, env, source, left_y, right_y
+        )
+        numerator += sign * _nested_scalar_or_zero(term)
+    end
+    return denominator, numerator / denominator_value
+end
+
+function _nested_vbond_from_prepared(
+    nested, env, source,
+    closed_top, closed_bottom,
+    prepared_terms, numerator_zero,
+)
+    denominator = _contract_nested_vpatch3(
+        nested, env, source, closed_top, closed_bottom
+    )
+    denominator_value = _nested_scalar_or_zero(denominator)
+    numerator = numerator_zero
+    for (top_y, bottom_y) in prepared_terms
+        term = _contract_nested_vpatch3(
+            nested, env, source, top_y, bottom_y
+        )
+        numerator += _nested_scalar_or_zero(term)
+    end
+    return denominator, numerator / denominator_value
+end
+```
+
+Define `rrule`s for the scalar-site public H/V methods. First compute the
+ordinary public primal, then prepare identities, Schmidt pairs, dressed Y
+tensors, horizontal signs, and the promoted numeric zero. Use
+`rrule_via_ad(config, (n, e) -> prepared_helper(...), nested, env)` so the
+pullback returns
+`(NoTangent(), delta_nested, NoTangent(), NoTangent(), delta_env,
+NoTangent())` for function, nested, PEPS, operator, environment, and site.
+
+The direct PEPS argument is structural in these measurement methods; all
+PEPS numerical dependence flows through `nested_network(peps)`, so returning
+a second direct PEPS cotangent would double-count that path. The environment
+is numerical and must retain its cotangent. The operator cotangent is
+`NoTangent()` under this explicitly fixed-observable optimization contract.
+Do not present these rules as an operator-differentiation API: a future
+operator gradient requires the adjoint of the original rank-four
+operator-to-numerator linear map, not a zero cotangent disguised as such.
+
+- [ ] **Step 7: Add one-site and bond-energy gradient tests**
 
 Freeze a deterministic one-iteration environment and define the three
 objectives:
@@ -1683,7 +1753,12 @@ end
 The logged values let a server failure distinguish a sign error from
 numerical noise.
 
-- [ ] **Step 7: Run tests and commit**
+In addition to the three directional errors, call the public H/V `rrule`s
+directly and verify that their pullback tuple has six entries, keeps
+non-`AbstractZero` nested and environment cotangents for a nonzero output
+seed, and returns `NoTangent()` for direct PEPS, fixed operator, and site.
+
+- [ ] **Step 8: Run tests and commit**
 
 ```bash
 git add algorithms/Nested_CTMRG/nested_chainrules.jl \
