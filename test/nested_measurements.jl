@@ -332,5 +332,5 @@ end
 
         push!(bond_numerators, abs(hnumerator), abs(vnumerator))
     end
-    @test maximum(bond_numerators) > 1e-12
+    @test all(value -> value > 1e-12, bond_numerators)
 end
