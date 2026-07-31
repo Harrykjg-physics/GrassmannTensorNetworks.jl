@@ -139,3 +139,38 @@ function _nested_reduced_basis(ordered::Grassmann{T, 8}) where {T}
     end
     return corrected
 end
+
+function _nested_input_north_twist(A::Grassmann)
+    return add_parity_sign(A, 4; sign_function=global_sign)
+end
+
+_nested_ket_for_network(A::Grassmann{T, 5}) where {T} =
+    _nested_ket(_nested_input_north_twist(A))
+
+_nested_bra_for_network(A::Grassmann{T, 5}) where {T} =
+    _nested_bra(_nested_input_north_twist(A))
+
+function _nested_x_for_network(xraw::Grassmann{T, 4}) where {T}
+    placed = _placed_nested_x(xraw)
+    return add_perm_sign(
+        placed, (1, 3, 2, 4); sign_function=global_sign
+    )
+end
+
+function _nested_y_for_network(yraw::Grassmann{T, 4}) where {T}
+    return add_perm_sign(
+        yraw, (1, 3, 2, 4); sign_function=global_sign
+    )
+end
+
+function _nested_network_reduced_basis(
+    ordered::Grassmann{T, 8}
+) where {T}
+    corrected = ordered
+    for axis in (1, 2, 4, 5)
+        corrected = add_parity_sign(
+            corrected, axis; sign_function=global_sign
+        )
+    end
+    return corrected
+end

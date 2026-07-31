@@ -11,7 +11,12 @@ import GrassmannTensorNetworks:
     _placed_nested_x,
     _nested_y,
     _physical_identity,
-    _nested_reduced_basis
+    _nested_reduced_basis,
+    _nested_ket_for_network,
+    _nested_bra_for_network,
+    _nested_x_for_network,
+    _nested_y_for_network,
+    _nested_network_reduced_basis
 
 @testset "Nested layout" begin
     layout = NestedLayout((2, 3))
@@ -200,5 +205,64 @@ end
             sizes[1] * sizes[4],
         )
         @test closed_nested_tile(A) ≈ reduced_tensor(A) rtol = 5e-13
+    end
+end
+
+function contract_corrected_nested_tile(K, Y, X, B)
+    sign = GrassmannTensorNetworks.global_sign
+    ky = contract(K, Y, (2, 1); sign_function=sign)
+    kx = contract(ky, X, (3, 3); sign_function=sign)
+    tile = contract(kx, B, ((5, 7), (3, 1)); sign_function=sign)
+    ordered = permutedims(
+        tile, (5, 1, 7, 3, 4, 2, 8, 6); sign_function=sign
+    )
+    ordered = _nested_network_reduced_basis(ordered)
+    ordered = add_parity_sign(ordered, 1; sign_function=sign)
+    left = fuse(ordered, (1, 2); index_type_fused=:out)
+    left = add_perm_sign(
+        left, (1, 3, 2, 4, 5, 6, 7); sign_function=sign
+    )
+    right = fuse(left, (2, 3); index_type_fused=:in)
+    right = add_perm_sign(
+        right, (1, 2, 4, 3, 5, 6); sign_function=sign
+    )
+    up = fuse(right, (3, 4); index_type_fused=:in)
+    up = add_parity_sign(up, 4; sign_function=sign)
+    return fuse(up, (4, 5); index_type_fused=:out)
+end
+
+function corrected_nested_tile(A)
+    K = _nested_ket_for_network(A)
+    B = _nested_bra_for_network(A)
+    Xraw = _nested_x(
+        size(B)[1], even(B)[1], size(K)[4], even(K)[4], eltype(A)
+    )
+    X = _nested_x_for_network(Xraw)
+    Yraw = _nested_y(
+        _physical_identity(A),
+        size(A)[3], even(A)[3],
+        size(A)[4], even(A)[4],
+    )
+    Y = _nested_y_for_network(Yraw)
+    return contract_corrected_nested_tile(K, Y, X, B)
+end
+
+@testset "Universal native nested placement signs" begin
+    A = deterministic_nested_tensor(
+        ComplexF64, (2, 2, 2, 2, 2), (1, 1, 1, 1, 1)
+    )
+    xraw = _nested_x(2, 1, 2, 1, ComplexF64)
+    @test only(xraw[(1, 1, 1, 1)]) == -1
+    @test index_type(_nested_x_for_network(xraw)) == index_type(xraw)
+    @test size(_nested_x_for_network(xraw)) == size(xraw)
+    @test corrected_nested_tile(A) ≈ reduced_tensor(A) rtol=1e-12
+end
+
+@testset "Universal native placement preserves mixed bases" begin
+    sizes = (3, 3, 4, 3, 4)
+    evens = (2, 1, 3, 2, 1)
+    for T in (Float64, ComplexF64)
+        A = deterministic_nested_tensor(T, sizes, evens)
+        @test corrected_nested_tile(A) ≈ reduced_tensor(A) rtol=5e-13
     end
 end
