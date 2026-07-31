@@ -1108,7 +1108,11 @@ function compute_nested_exp_hbond(
     numerator = isempty(terms) ? zero(denominator) : sum(terms) do (left_op, right_op)
         left_y = nested_y_operator(nested, peps, source, left_op)
         right_y = nested_y_operator(nested, peps, neighbor, right_op)
-        _contract_nested_hpatch3(nested, env, source, left_y, right_y)
+        term_sign =
+            (-one(eltype(operator)))^tensor_parity(left_op)
+        term_sign * _contract_nested_hpatch3(
+            nested, env, source, left_y, right_y
+        )
     end
     return denominator, scalar(numerator) / scalar(denominator)
 end

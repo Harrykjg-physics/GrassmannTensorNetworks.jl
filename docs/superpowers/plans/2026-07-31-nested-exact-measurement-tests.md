@@ -339,7 +339,10 @@ function exact_nested_bond_numerator(
             nested_y_operator(
                 nested, peps, neighbor, right_operator
             )
-        total += nested_test_torus_scalar(
+        term_sign = orientation === :horizontal ?
+            (-one(eltype(operator)))^tensor_parity(left_operator) :
+            one(eltype(operator))
+        total += term_sign * nested_test_torus_scalar(
             impurity; twist_x, twist_y
         )
     end
