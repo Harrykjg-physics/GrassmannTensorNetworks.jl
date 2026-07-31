@@ -1264,6 +1264,7 @@ import GrassmannTensorNetworks:
     _source_site, _graded_pair_sign,
     _nested_ket, _nested_ket_raw,
     _nested_bra, _nested_bra_raw, _bend_index,
+    _nested_x,
     _nested_ket_for_network, _nested_bra_for_network,
     _nested_x_for_network, _nested_y_for_network,
     _nested_y_operator_raw
@@ -1509,9 +1510,30 @@ end
 ```
 
 Add the operator-dressed Y rule. Geometry and PEPS dimensions are static;
-only the operator is a numerical input to this rule:
+only the operator is a numerical input to this rule. Construct the static
+crossing before entering AD because `_nested_x` uses matrix assignment that
+Zygote cannot differentiate. The extension-local helper must therefore accept
+the crossing as a constant and reproduce only the operator-dependent
+contraction, graded routing, fusion, and final network placement:
 
 ```julia
+function _nested_y_operator_from_crossing(
+    operator::Grassmann,
+    crossing::Grassmann,
+)
+    product = contract(
+        operator, crossing;
+        sign_function=GrassmannTensorNetworks.global_sign,
+    )
+    routed = permutedims(
+        product, (1,3,4,5,2,6);
+        sign_function=GrassmannTensorNetworks.global_sign,
+    )
+    west_fused = fuse(routed, (1,2); index_type_fused=:out)
+    raw = fuse(west_fused, (4,5); index_type_fused=:out)
+    return _nested_y_for_network(raw)
+end
+
 function ChainRulesCore.rrule(
     config::RuleConfig{>:HasReverseMode},
     ::typeof(nested_y_operator),
@@ -1521,12 +1543,25 @@ function ChainRulesCore.rrule(
     operator::Grassmann,
 )
     source = _source_site(site)
-    y, raw_pullback = rrule_via_ad(
-        config, _nested_y_operator_raw,
-        nested, peps, source, operator,
+    rows, cols = size(peps)
+    east_source = CartesianIndex(source[1], Nmod(source[2] + 1, cols))
+    north_source = CartesianIndex(Nmod(source[1] - 1, rows), source[2])
+    east_ket = nested[nested.layout.ket_sites[east_source]]
+    north_bra = nested[nested.layout.bra_sites[north_source]]
+    crossing = _nested_x(
+        size(east_ket)[1], even(east_ket)[1],
+        size(north_bra)[4], even(north_bra)[4],
+        eltype(operator),
+    )
+
+    y = _nested_y_operator_raw(nested, peps, source, operator)
+    _, operator_pullback = rrule_via_ad(
+        config,
+        op -> _nested_y_operator_from_crossing(op, crossing),
+        operator,
     )
     function pullback(delta)
-        _, _, _, _, delta_operator = raw_pullback(unthunk(delta))
+        _, delta_operator = operator_pullback(unthunk(delta))
         return (
             NoTangent(), NoTangent(), NoTangent(),
             NoTangent(), delta_operator,
