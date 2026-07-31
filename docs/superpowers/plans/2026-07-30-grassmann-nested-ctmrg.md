@@ -803,6 +803,7 @@ git commit -m "feat: measure nested one-site operators"
 
 - Consumes: operator-dressed Y tensors and nested CTMRG environments.
 - Produces:
+  - `_check_nested_bond_operator(peps, operator, source, neighbor)`
   - `_contract_nested_hpatch3(nested, env, source, left_y, right_y)`
   - `_contract_nested_vpatch3(nested, env, source, top_y, bottom_y)`
   - `compute_nested_exp_hbond(...)`
@@ -827,6 +828,51 @@ two-site insertion into a sum of products of two operator-dressed Y tensors
 and avoids inventing a separate rank-eight Grassmann impurity type:
 
 ```julia
+function _check_nested_bond_operator(
+    peps::Square_GPEPS,
+    operator::Grassmann{<:Number, 4},
+    source::CartesianIndex{2},
+    neighbor::CartesianIndex{2},
+)
+    checkbounds(Bool, peps.A, source) ||
+        throw(ArgumentError("source site $source is outside the unit cell"))
+    checkbounds(Bool, peps.A, neighbor) ||
+        throw(ArgumentError(
+            "neighbor site $neighbor is outside the unit cell"
+        ))
+    source_physical = size(peps.A[source])[1]
+    neighbor_physical = size(peps.A[neighbor])[1]
+    expected_size = (
+        source_physical,
+        neighbor_physical,
+        source_physical,
+        neighbor_physical,
+    )
+    size(operator) == expected_size ||
+        throw(DimensionMismatch(
+            "bond-operator physical dimensions do not match PEPS"
+        ))
+    source_even = even(peps.A[source])[1]
+    neighbor_even = even(peps.A[neighbor])[1]
+    expected_even = (
+        source_even,
+        neighbor_even,
+        source_even,
+        neighbor_even,
+    )
+    even(operator) == expected_even ||
+        throw(DimensionMismatch(
+            "bond-operator parity splits do not match PEPS"
+        ))
+    index_type(operator) == (:out, :out, :in, :in) ||
+        throw(ArgumentError(
+            "bond-operator arrows must be (:out, :out, :in, :in)"
+        ))
+    tensor_parity(operator) == 0 ||
+        throw(ArgumentError("bond operator must have even total parity"))
+    return nothing
+end
+
 function _operator_schmidt(operator::Grassmann{T, 4}) where {T}
     dense = convert(Array, operator)
     dout1, dout2, din1, din2 = size(operator)
@@ -1045,7 +1091,10 @@ function compute_nested_exp_hbond(
     operator::Grassmann{<:Number, 4}, env::CTMRGEnv, site)
 
     source = _source_site(site)
-    neighbor = CartesianIndex(source[1], Nmod(source[2] + 1, size(peps, 2)))
+    neighbor = CartesianIndex(
+        source[1], Nmod(source[2] + 1, size(peps)[2])
+    )
+    _check_nested_bond_operator(peps, operator, source, neighbor)
     identity_left = _physical_identity(peps.A[source])
     identity_right = _physical_identity(peps.A[neighbor])
     closed_left = nested_y_operator(nested, peps, source, identity_left)
@@ -1071,7 +1120,10 @@ function compute_nested_exp_vbond(
     operator::Grassmann{<:Number, 4}, env::CTMRGEnv, site)
 
     source = _source_site(site)
-    neighbor = CartesianIndex(Nmod(source[1] + 1, size(peps, 1)), source[2])
+    neighbor = CartesianIndex(
+        Nmod(source[1] + 1, size(peps)[1]), source[2]
+    )
+    _check_nested_bond_operator(peps, operator, source, neighbor)
     identity_top = _physical_identity(peps.A[source])
     identity_bottom = _physical_identity(peps.A[neighbor])
     closed_top = nested_y_operator(nested, peps, source, identity_top)

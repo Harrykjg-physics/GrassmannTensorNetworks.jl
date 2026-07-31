@@ -271,6 +271,8 @@ git commit -m "feat: measure nested one-site operators"
 - Consumes: `_operator_schmidt`, `nested_y_operator`,
   `reduced_tensor_hbond`, `reduced_tensor_vbond`, and
   `nested_test_torus_scalar`.
+- Produces and tests:
+  `_check_nested_bond_operator(peps, operator, source, neighbor)`.
 - Preserves: the parent Task 5 environment-based strip contractions and
   public horizontal/vertical measurement methods.
 
@@ -390,6 +392,56 @@ Append:
         vpeps.A[1, 1], vpeps.A[2, 1], hamiltonian
     )
 
+    @test GrassmannTensorNetworks._check_nested_bond_operator(
+        hpeps, hamiltonian,
+        CartesianIndex(1, 1), CartesianIndex(1, 2),
+    ) === nothing
+    wrong_size = Grassmann(
+        (3, 2, 3, 2), (1, 1, 1, 1),
+        (:out, :out, :in, :in), Float64;
+        init=:zeros,
+    )
+    wrong_even = Grassmann(
+        (2, 2, 2, 2), (2, 1, 2, 1),
+        (:out, :out, :in, :in), Float64;
+        init=:zeros,
+    )
+    wrong_arrows = Grassmann(
+        (2, 2, 2, 2), (1, 1, 1, 1),
+        (:in, :out, :out, :in), Float64;
+        init=:zeros,
+    )
+    odd_operator = Grassmann(
+        (2, 2, 2, 2), (1, 1, 1, 1),
+        (:out, :out, :in, :in), Float64;
+        init=:zeros, parity=:odd,
+    )
+    @test_throws ArgumentError
+        GrassmannTensorNetworks._check_nested_bond_operator(
+            hpeps, hamiltonian,
+            CartesianIndex(2, 1), CartesianIndex(1, 2),
+        )
+    @test_throws DimensionMismatch
+        GrassmannTensorNetworks._check_nested_bond_operator(
+            hpeps, wrong_size,
+            CartesianIndex(1, 1), CartesianIndex(1, 2),
+        )
+    @test_throws DimensionMismatch
+        GrassmannTensorNetworks._check_nested_bond_operator(
+            hpeps, wrong_even,
+            CartesianIndex(1, 1), CartesianIndex(1, 2),
+        )
+    @test_throws ArgumentError
+        GrassmannTensorNetworks._check_nested_bond_operator(
+            hpeps, wrong_arrows,
+            CartesianIndex(1, 1), CartesianIndex(1, 2),
+        )
+    @test_throws ArgumentError
+        GrassmannTensorNetworks._check_nested_bond_operator(
+            hpeps, odd_operator,
+            CartesianIndex(1, 1), CartesianIndex(1, 2),
+        )
+
     bond_numerators = Float64[]
     for (twist_x, twist_y) in MEASUREMENT_SPIN_STRUCTURES
         hdenominator = nested_test_torus_scalar(
@@ -455,9 +507,9 @@ Run in
    julia_grassmann focused_runtests.jl'
 ```
 
-Expected: `_operator_schmidt`, `compute_nested_exp_hbond`, or
-`compute_nested_exp_vbond` is missing. The test output contains no CTMRG
-iteration.
+Expected: `_check_nested_bond_operator`, `_operator_schmidt`,
+`compute_nested_exp_hbond`, or `compute_nested_exp_vbond` is missing. The
+test output contains no CTMRG iteration.
 
 - [ ] **Step 4: Implement parent Task 5 production methods**
 
