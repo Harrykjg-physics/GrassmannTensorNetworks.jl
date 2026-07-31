@@ -1580,7 +1580,7 @@ objectives:
 
 ```julia
 function convert_nested_env(env::CTMRGEnv, ::Type{T}) where {T}
-    convert_grid(grid) = Matrix{Grassmann{T, ndims(first(grid))}}(
+    convert_grid(grid) = Matrix{Grassmann{T, tensor_rank(first(grid))}}(
         reshape([convert(tensor, T) for tensor in grid], size(grid))
     )
     return CTMRGEnv{T}(
