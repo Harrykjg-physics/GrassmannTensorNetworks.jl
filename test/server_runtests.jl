@@ -43,6 +43,7 @@ start_time = time()
     include("contract.jl")
     include("decomp.jl")
     include("nested_network.jl")
+    include("nested_measurements.jl")
 end
 
 elapsed_minutes = round((time() - start_time) / 60; sigdigits=3)
