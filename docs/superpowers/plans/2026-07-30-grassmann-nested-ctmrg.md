@@ -1816,7 +1816,7 @@ git commit -m "feat: differentiate nested Grassmann networks"
 
 - Create: `examples/Spinless_Fermion_2D_Square_AD_nested/Project.toml`
 - Create: `examples/Spinless_Fermion_2D_Square_AD_nested/Spinless_Fermion_2D_Square_AD_nested.jl`
-- Modify: `test/nested_measurements.jl`
+- Create: `examples/Spinless_Fermion_2D_Square_AD_nested/test/runtests.jl`
 
 **Interfaces:**
 
@@ -1830,10 +1830,10 @@ git commit -m "feat: differentiate nested Grassmann networks"
 - [ ] **Step 1: Add exact-energy regression test**
 
 ```julia
-include(joinpath(
-    @__DIR__, "..", "examples", "Spinless_Fermion_2D_Square_AD_nested",
-    "Spinless_Fermion_2D_Square_AD_nested.jl",
-))
+const EXAMPLE_ROOT = normpath(joinpath(@__DIR__, ".."))
+const GTN_ROOT = normpath(joinpath(EXAMPLE_ROOT, "..", ".."))
+GTN_ROOT in LOAD_PATH || push!(LOAD_PATH, GTN_ROOT)
+include(joinpath(EXAMPLE_ROOT, "Spinless_Fermion_2D_Square_AD_nested.jl"))
 
 @test spinless_exact_energy(1.0, 1.0, 3.0; nk=512) ≈
     -6.170521774015 atol=2e-6
@@ -1851,6 +1851,12 @@ Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 [compat]
 Optim = "1"
 Zygote = "0.7"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
 ```
 
 - [ ] **Step 3: Implement exact Brillouin-zone quadrature**
@@ -2187,8 +2193,8 @@ steps, and final CTMRG diagnostics.
 
 - [ ] **Step 6: Run exact-energy and one-step example smoke tests**
 
-Add this guarded smoke test to `test/nested_measurements.jl` after including
-the example:
+Add this smoke test to the example-local `test/runtests.jl` after including
+the example as in Step 1:
 
 ```julia
 @testset "Nested AD example smoke" begin
@@ -2208,17 +2214,24 @@ end
 Run:
 
 ```bash
-julia_grassmann --project=. test/server_runtests.jl
+julia_grassmann \
+  --project=examples/Spinless_Fermion_2D_Square_AD_nested \
+  examples/Spinless_Fermion_2D_Square_AD_nested/test/runtests.jl
 ```
 
 Expected: exact-energy and nested-example smoke testsets PASS with finite
 energy and gradient and no exception.
 
+Do not add this CTMRG/Optim smoke to `test/nested_measurements.jl`: those
+tests remain dedicated to the approved environment-free nested/reduced
+measurement comparisons (plus the separately approved zero-iteration public
+aggregation regression). The example-local project owns its Optim dependency
+and prevents the root offline test harness from acquiring a new dependency.
+
 - [ ] **Step 7: Commit**
 
 ```bash
-git add examples/Spinless_Fermion_2D_Square_AD_nested \
-        test/nested_measurements.jl
+git add examples/Spinless_Fermion_2D_Square_AD_nested
 git commit -m "feat: add nested spinless fermion AD example"
 ```
 
