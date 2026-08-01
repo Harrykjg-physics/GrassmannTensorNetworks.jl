@@ -16,6 +16,21 @@ import GrassmannTensorNetworks: Grassmann, AbstractGrassmann, GrassmannScalar, G
     conjugate, fuse, calculate_sectors, calculate_fused_size, prepare_fused_info,
     trace, contract, gsvd, gevd, gortho, truncation, check_parity
 
+import GrassmannTensorNetworks:
+    NestedLayout, NestedNetwork,
+    nested_network, nested_y_operator,
+    compute_nested_exp_hbond, compute_nested_exp_vbond,
+    _source_site, _graded_pair_sign,
+    _nested_ket, _nested_ket_raw,
+    _nested_bra, _nested_bra_raw, _bend_index,
+    _nested_x,
+    _nested_ket_for_network, _nested_bra_for_network,
+    _nested_x_for_network, _nested_y_for_network,
+    _nested_y_operator_raw,
+    _physical_identity, _operator_schmidt,
+    _nested_scalar_or_zero,
+    _contract_nested_hpatch3, _contract_nested_vpatch3
+
 # AD rules for grassmann.jl (constructors, convert, index_conjugation)
 include("grassmann.jl")
 
@@ -36,5 +51,9 @@ include("fusion.jl")
 
 # AD rules for decomp.jl (gsvd, gevd, gortho)
 include("decomp.jl")
+
+include(joinpath(
+    @__DIR__, "..", "..", "algorithms", "Nested_CTMRG", "nested_chainrules.jl"
+))
 
 end
