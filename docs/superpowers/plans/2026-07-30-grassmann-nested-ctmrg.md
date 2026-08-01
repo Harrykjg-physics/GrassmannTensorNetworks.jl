@@ -1332,12 +1332,16 @@ function ChainRulesCore.rrule(
     ::typeof(_graded_pair_sign), t::Grassmann, i::Int, j::Int)
 
     y = _graded_pair_sign(t, i, j)
-    pullback(delta) = (
-        NoTangent(),
-        _graded_pair_sign(unthunk(delta), i, j),
-        NoTangent(),
-        NoTangent(),
-    )
+    function pullback(delta)
+        delta = unthunk(delta)
+        delta isa AbstractZero && return (
+            NoTangent(), ZeroTangent(), NoTangent(), NoTangent()
+        )
+        return (
+            NoTangent(), _graded_pair_sign(delta, i, j),
+            NoTangent(), NoTangent(),
+        )
+    end
     return y, pullback
 end
 ```
@@ -1396,6 +1400,12 @@ The bra primal remains `_nested_bra_raw(A)`. Its raw implementation uses
 forward-equivalent but keeps all three bend cotangents. This also keeps the
 static integer permutations out of the returned tangent tuple while reusing
 existing `fuse`, sign, bend, and conjugation rules.
+
+Every linear pullback in this step must short-circuit an unthunked
+`AbstractZero` output cotangent to the correctly shaped tuple containing
+`ZeroTangent()` for its Grassmann input. This applies to raw K/B, placed K/B,
+placed X/Y, and the operator-dressed Y rule; never pass `ZeroTangent()` into a
+method whose primal argument must be `Grassmann`.
 
 Define the placement-helper rules. The K/B rules include the north-input
 twist; the X/Y placement maps are diagonal signs and therefore self-adjoint:
@@ -1509,6 +1519,8 @@ function ChainRulesCore.rrule(
         delta_nested isa AbstractZero &&
             return NoTangent(), ZeroTangent(), NoTangent()
         delta_network = unthunk(getproperty(delta_nested, :network))
+        delta_network isa AbstractZero &&
+            return NoTangent(), ZeroTangent(), NoTangent()
         raw_gradients = map(CartesianIndices(peps.A)) do source
             _, dket = last(ket_rules[source])(
                 delta_network[layout.ket_sites[source]]
@@ -1600,7 +1612,7 @@ function ChainRulesCore.rrule(
         eltype(operator),
     )
 
-    y = _nested_y_operator_raw(nested, peps, source, operator)
+    y = nested_y_operator(nested, peps, source, operator)
     _, operator_pullback = rrule_via_ad(
         config,
         op -> _nested_y_operator_from_crossing(op, crossing),
@@ -1684,6 +1696,12 @@ Do not present these rules as an operator-differentiation API: a future
 operator gradient requires the adjoint of the original rank-four
 operator-to-numerator linear map, not a zero cotangent disguised as such.
 
+Add direct zero-seed pullback tests for the pair-sign, raw K/B, placed K/B,
+placed X/Y, `nested_network` (including a structured tangent whose `network`
+field alone is `ZeroTangent()`), and operator-dressed Y rules. Also assert
+that the Y rule primal exactly matches `nested_y_operator` and preserves the
+public validation error for an invalid operator.
+
 - [ ] **Step 7: Add one-site and bond-energy gradient tests**
 
 Freeze a deterministic one-iteration environment and define the three
@@ -1749,6 +1767,13 @@ for (name, objective) in (
     @test relative <= 1e-4
 end
 ```
+
+The one-site fixture and direction must produce a nonzero finite-difference
+derivative. Assert `max(abs(analytic), abs(finite)) > 1e-8` for site, H, and V
+before accepting the relative error; if the original deterministic 1x1
+number fixture is symmetry-flat, diagnose and select the smallest
+deterministic unit cell/operator/direction that makes the site derivative
+non-vacuous without changing the fixed-boundary contract.
 
 The logged values let a server failure distinguish a sign error from
 numerical noise.
