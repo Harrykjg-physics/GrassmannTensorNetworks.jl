@@ -1737,10 +1737,11 @@ function nested_inputs(x)
     return peps, nested, convert_nested_env(frozen_env, eltype(x))
 end
 
-site_energy(x) = begin
-    peps, nested, env = nested_inputs(x)
+site_operator_energy(operator) = begin
     _, value =
-        compute_nested_exp_site(nested, peps, number, env, (1, 1))
+        compute_nested_exp_site(
+            initial_nested, initial_peps, operator, frozen_env, (1, 1)
+        )
     real(value)
 end
 horizontal_energy(x) = begin
@@ -1756,8 +1757,15 @@ vertical_energy(x) = begin
     real(value)
 end
 
+site_direction = _physical_identity(initial_peps.A[1, 1])
+site_direction = site_direction / norm(site_direction)
+site_relative, site_analytic, site_finite = directional_error(
+    site_operator_energy, number, site_direction
+)
+@test max(abs(site_analytic), abs(site_finite)) > 1e-8
+@test site_relative <= 1e-4
+
 for (name, objective) in (
-    ("site", site_energy),
     ("horizontal", horizontal_energy),
     ("vertical", vertical_energy),
 )
@@ -1768,12 +1776,15 @@ for (name, objective) in (
 end
 ```
 
-The one-site fixture and direction must produce a nonzero finite-difference
-derivative. Assert `max(abs(analytic), abs(finite)) > 1e-8` for site, H, and V
-before accepting the relative error; if the original deterministic 1x1
-number fixture is symmetry-flat, diagnose and select the smallest
-deterministic unit cell/operator/direction that makes the site derivative
-non-vacuous without changing the fixed-boundary contract.
+The one-site fixed-boundary closure is structurally independent of PEPS
+values: its K/B dependence is already frozen into the environment, while the
+dynamic Y tensor depends only on the operator and geometry. Therefore test a
+nonzero public-site derivative with respect to the one-site operator, using a
+normalized physical-identity direction. H/V continue to test PEPS parameter
+derivatives. Assert `max(abs(analytic), abs(finite)) > 1e-8` before accepting
+each relative error. The spinless optimization uses `nn_bond`, which already
+contains the distributed chemical-potential term, so its fixed-environment
+energy path does not require a separate site-to-PEPS derivative.
 
 The logged values let a server failure distinguish a sign error from
 numerical noise.
