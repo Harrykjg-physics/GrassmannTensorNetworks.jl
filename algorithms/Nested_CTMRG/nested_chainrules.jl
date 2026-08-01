@@ -2,12 +2,18 @@ function ChainRulesCore.rrule(
     ::typeof(_graded_pair_sign), t::Grassmann, i::Int, j::Int
 )
     y = _graded_pair_sign(t, i, j)
-    pullback(delta) = (
-        NoTangent(),
-        _graded_pair_sign(unthunk(delta), i, j),
-        NoTangent(),
-        NoTangent(),
-    )
+    function pullback(delta)
+        delta = unthunk(delta)
+        delta isa AbstractZero && return (
+            NoTangent(), ZeroTangent(), NoTangent(), NoTangent()
+        )
+        return (
+            NoTangent(),
+            _graded_pair_sign(delta, i, j),
+            NoTangent(),
+            NoTangent(),
+        )
+    end
     return y, pullback
 end
 
@@ -197,7 +203,9 @@ function ChainRulesCore.rrule(
 )
     y, raw_pullback = rrule_via_ad(config, _nested_ket_raw, A)
     function pullback(delta)
-        _, delta_A = raw_pullback(unthunk(delta))
+        delta = unthunk(delta)
+        delta isa AbstractZero && return NoTangent(), ZeroTangent()
+        _, delta_A = raw_pullback(delta)
         return NoTangent(), delta_A
     end
     return y, pullback
@@ -228,7 +236,9 @@ function ChainRulesCore.rrule(
         config, _nested_bra_explicit_bends, A
     )
     function pullback(delta)
-        _, delta_A = raw_pullback(unthunk(delta))
+        delta = unthunk(delta)
+        delta isa AbstractZero && return NoTangent(), ZeroTangent()
+        _, delta_A = raw_pullback(delta)
         return NoTangent(), delta_A
     end
     return y, pullback
@@ -250,7 +260,9 @@ function ChainRulesCore.rrule(
         A,
     )
     function pullback(delta)
-        _, delta_A = pullback_A(unthunk(delta))
+        delta = unthunk(delta)
+        delta isa AbstractZero && return NoTangent(), ZeroTangent()
+        _, delta_A = pullback_A(delta)
         return NoTangent(), delta_A
     end
     return y, pullback
@@ -272,7 +284,9 @@ function ChainRulesCore.rrule(
         A,
     )
     function pullback(delta)
-        _, delta_A = pullback_A(unthunk(delta))
+        delta = unthunk(delta)
+        delta isa AbstractZero && return NoTangent(), ZeroTangent()
+        _, delta_A = pullback_A(delta)
         return NoTangent(), delta_A
     end
     return y, pullback
@@ -282,8 +296,11 @@ function ChainRulesCore.rrule(
     ::typeof(_nested_x_for_network), xraw::Grassmann
 )
     y = _nested_x_for_network(xraw)
-    pullback(delta) =
-        (NoTangent(), _nested_x_for_network(unthunk(delta)))
+    function pullback(delta)
+        delta = unthunk(delta)
+        delta isa AbstractZero && return NoTangent(), ZeroTangent()
+        return NoTangent(), _nested_x_for_network(delta)
+    end
     return y, pullback
 end
 
@@ -291,8 +308,11 @@ function ChainRulesCore.rrule(
     ::typeof(_nested_y_for_network), yraw::Grassmann
 )
     y = _nested_y_for_network(yraw)
-    pullback(delta) =
-        (NoTangent(), _nested_y_for_network(unthunk(delta)))
+    function pullback(delta)
+        delta = unthunk(delta)
+        delta isa AbstractZero && return NoTangent(), ZeroTangent()
+        return NoTangent(), _nested_y_for_network(delta)
+    end
     return y, pullback
 end
 
@@ -331,6 +351,8 @@ function ChainRulesCore.rrule(
         delta_nested isa AbstractZero &&
             return NoTangent(), ZeroTangent(), NoTangent()
         delta_network = unthunk(getproperty(delta_nested, :network))
+        delta_network isa AbstractZero &&
+            return NoTangent(), ZeroTangent(), NoTangent()
         raw_gradients = map(CartesianIndices(peps.A)) do source
             _, dket = last(ket_rules[source])(
                 delta_network[layout.ket_sites[source]]
@@ -408,14 +430,19 @@ function ChainRulesCore.rrule(
         eltype(operator),
     )
 
-    y = _nested_y_operator_raw(nested, peps, source, operator)
+    y = nested_y_operator(nested, peps, source, operator)
     _, operator_pullback = rrule_via_ad(
         config,
         op -> _nested_y_operator_from_crossing(op, crossing),
         operator,
     )
     function pullback(delta)
-        _, delta_operator = operator_pullback(unthunk(delta))
+        delta = unthunk(delta)
+        delta isa AbstractZero && return (
+            NoTangent(), NoTangent(), NoTangent(),
+            NoTangent(), ZeroTangent(),
+        )
+        _, delta_operator = operator_pullback(delta)
         return (
             NoTangent(), NoTangent(), NoTangent(),
             NoTangent(), delta_operator,
