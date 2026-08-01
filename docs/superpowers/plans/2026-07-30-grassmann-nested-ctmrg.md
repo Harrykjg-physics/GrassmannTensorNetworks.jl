@@ -1600,6 +1600,7 @@ function ChainRulesCore.rrule(
     site,
     operator::Grassmann,
 )
+    y = nested_y_operator(nested, peps, site, operator)
     source = _source_site(site)
     rows, cols = size(peps)
     east_source = CartesianIndex(source[1], Nmod(source[2] + 1, cols))
@@ -1611,8 +1612,6 @@ function ChainRulesCore.rrule(
         size(north_bra)[4], even(north_bra)[4],
         eltype(operator),
     )
-
-    y = nested_y_operator(nested, peps, source, operator)
     _, operator_pullback = rrule_via_ad(
         config,
         op -> _nested_y_operator_from_crossing(op, crossing),
@@ -1700,7 +1699,10 @@ Add direct zero-seed pullback tests for the pair-sign, raw K/B, placed K/B,
 placed X/Y, `nested_network` (including a structured tangent whose `network`
 field alone is `ZeroTangent()`), and operator-dressed Y rules. Also assert
 that the Y rule primal exactly matches `nested_y_operator` and preserves the
-public validation error for an invalid operator.
+public validation errors for both an invalid operator and an out-of-bounds
+site. The public primal must run before any crossing/layout indexing so the
+rrule cannot replace the documented `ArgumentError` with an internal
+`BoundsError`.
 For a high-level Zygote objective that reads only constant crossing metadata,
 accept either `nothing` (Zygote's no-gradient representation) or an explicit
 numeric zero; keep the direct `rrule` structured-cotangent assertion strict.
