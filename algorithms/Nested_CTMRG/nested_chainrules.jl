@@ -418,6 +418,7 @@ function ChainRulesCore.rrule(
     site,
     operator::Grassmann,
 )
+    y = nested_y_operator(nested, peps, site, operator)
     source = _source_site(site)
     rows, cols = size(peps)
     east_source = CartesianIndex(source[1], Nmod(source[2] + 1, cols))
@@ -430,7 +431,6 @@ function ChainRulesCore.rrule(
         eltype(operator),
     )
 
-    y = nested_y_operator(nested, peps, source, operator)
     _, operator_pullback = rrule_via_ad(
         config,
         op -> _nested_y_operator_from_crossing(op, crossing),

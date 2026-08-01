@@ -204,6 +204,19 @@ end
         invalid_operator,
     )
 
+    out_of_bounds_site = (2, 1)
+    @test_throws ArgumentError nested_y_operator(
+        initial_nested, forward_peps, out_of_bounds_site, number
+    )
+    @test_throws ArgumentError rrule(
+        rule_config,
+        nested_y_operator,
+        initial_nested,
+        forward_peps,
+        out_of_bounds_site,
+        number,
+    )
+
     function convert_nested_env(env::CTMRGEnv, ::Type{T}) where {T}
         convert_grid(grid) = Matrix{Grassmann{T, tensor_rank(first(grid))}}(
             reshape([convert(tensor, T) for tensor in grid], size(grid))
