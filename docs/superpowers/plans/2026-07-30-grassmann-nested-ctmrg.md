@@ -6,7 +6,7 @@
 
 **Architecture:** Each `Square_GPEPS` tensor becomes a `2 x 2` K/Y/X/B checkerboard of four-leg `Grassmann` tensors. The doubled matrix is passed unchanged to the existing `CTMRGEnv` and `run_GCTMRG!`; measurements replace the physical identity in Y tensors and contract one-site or three-node nearest-neighbor patches. ChainRules rules propagate cotangents through the numerical K/B paths while treating layout and crossing geometry as static.
 
-**Tech Stack:** Julia 1.9+, GrassmannTensorNetworks, TensorOperations, ChainRulesCore, Zygote, FiniteDifferences, Optim, HDF5, existing GCTMRG.
+**Tech Stack:** Julia 1.9+, GrassmannTensorNetworks, TensorOperations, ChainRulesCore, Zygote, FiniteDifferences, HDF5, existing GCTMRG.
 
 ## Global Constraints
 
@@ -45,7 +45,7 @@
 - `test/nested_network.jl` - layout, sign, link, factorization, and CTMRG smoke tests.
 - `test/nested_measurements.jl` - one-site/two-site normalization and reduced-layer comparisons.
 - `test/nested_chainrules.jl` - centered finite-difference checks.
-- `examples/Spinless_Fermion_2D_Square_AD_nested/Project.toml` - example-only Optim and Zygote dependencies.
+- `examples/Spinless_Fermion_2D_Square_AD_nested/Project.toml` - example-only Zygote dependency.
 - `examples/Spinless_Fermion_2D_Square_AD_nested/Spinless_Fermion_2D_Square_AD_nested.jl` - optimization and acceptance driver.
 
 **Modify**
@@ -1820,7 +1820,7 @@ git commit -m "feat: differentiate nested Grassmann networks"
 
 **Interfaces:**
 
-- Consumes: all nested public APIs, `Optim`, `Zygote`.
+- Consumes: all nested public APIs and `Zygote`.
 - Produces:
   - `spinless_exact_energy(t, gamma, lambda; nk=1024)`
   - `compute_nested_energy(h, peps, nested, env)`
@@ -1845,11 +1845,9 @@ include(joinpath(EXAMPLE_ROOT, "Spinless_Fermion_2D_Square_AD_nested.jl"))
 
 ```toml
 [deps]
-Optim = "429524aa-4258-5aef-a3af-852621145aeb"
 Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [compat]
-Optim = "1"
 Zygote = "0.7"
 
 [extras]
@@ -1884,7 +1882,10 @@ end
 - [ ] **Step 4: Adapt the existing trust-region optimization**
 
 Start the example with the same isolated environment setup as the ordinary AD
-example, then import Zygote explicitly:
+example, then import Zygote explicitly. Do not depend on Optim: the required
+server environment cannot resolve that uncached dependency offline, and a
+small deterministic Armijo search is sufficient for this fixed-environment
+candidate step.
 
 ```julia
 using Pkg
@@ -1903,15 +1904,6 @@ using LinearAlgebra
 using Printf
 using Random
 using Zygote
-
-const _OPTIM_LOADED = Ref(false)
-function ensure_optim_loaded()
-    if !_OPTIM_LOADED[]
-        @eval import Optim
-        _OPTIM_LOADED[] = true
-    end
-    return nothing
-end
 
 function normalized_params(params::AbstractVector{<:Real})
     scale = norm(params) / sqrt(length(params))
@@ -1964,7 +1956,7 @@ function compute_nested_energy(
 end
 ```
 
-Add environment refresh and the fixed-environment Zygote/Optim candidate:
+Add environment refresh and a Zygote-only fixed-environment candidate:
 
 ```julia
 function update_nested_environment!(
@@ -1990,44 +1982,109 @@ function update_nested_environment!(
     return peps, nested, env
 end
 
+function _normalized_gradient_candidate(
+    objective,
+    params::Vector{Float64};
+    inner_optim_iter::Int=2,
+    max_step_norm::Float64=0.25,
+)
+    inner_optim_iter >= 0 ||
+        throw(ArgumentError("inner_optim_iter must be nonnegative"))
+    max_step_norm >= 0 ||
+        throw(ArgumentError("max_step_norm must be nonnegative"))
+
+    origin = normalized_params(params)
+    initial_value, gradient_tuple = Zygote.withgradient(objective, origin)
+    initial_gradient = only(gradient_tuple)
+    initial_gradient === nothing &&
+        (initial_gradient = zeros(eltype(origin), length(origin)))
+    current = origin
+    current_value = initial_value
+    current_gradient = initial_gradient
+    status = :no_step
+    attempted_iterations = 0
+    accepted_inner_steps = 0
+    backtracking_trials = 0
+
+    if !isfinite(initial_value)
+        status = :nonfinite_value
+    elseif !all(isfinite, initial_gradient)
+        status = :nonfinite_gradient
+    elseif inner_optim_iter > 0 && max_step_norm > 0
+        for iteration in 1:inner_optim_iter
+            attempted_iterations = iteration
+            gradient_norm = norm(current_gradient)
+            if gradient_norm <= sqrt(eps(Float64)) * max(1, norm(origin))
+                status = :zero_gradient
+                break
+            end
+            direction = -current_gradient / gradient_norm
+            alpha = max_step_norm
+            accepted = false
+            for _ in 1:12
+                backtracking_trials += 1
+                trial = normalized_params(current + alpha * direction)
+                if norm(trial - origin) <= max_step_norm + 64eps(Float64)
+                    displacement = trial - current
+                    slope = dot(current_gradient, displacement)
+                    trial_value = objective(trial)
+                    if slope < 0 && isfinite(trial_value) &&
+                       trial_value <= current_value + 1e-4 * slope
+                        current = trial
+                        current_value = trial_value
+                        accepted_inner_steps += 1
+                        accepted = true
+                        status = :accepted
+                        break
+                    end
+                end
+                alpha *= 0.5
+            end
+            if !accepted
+                status = :line_search_failed
+                break
+            elseif iteration < inner_optim_iter
+                current_value, gradient_tuple =
+                    Zygote.withgradient(objective, current)
+                current_gradient = only(gradient_tuple)
+                current_gradient === nothing &&
+                    (current_gradient = zeros(eltype(origin), length(origin)))
+                if !isfinite(current_value) || !all(isfinite, current_gradient)
+                    status = :nonfinite_gradient
+                    break
+                end
+            end
+        end
+    end
+
+    return (
+        candidate=current,
+        energy=initial_value,
+        gradient=initial_gradient,
+        candidate_energy=current_value,
+        optim_iterations=attempted_iterations,
+        optim_converged=status == :zero_gradient,
+        optim_status=status,
+        accepted_inner_steps=accepted_inner_steps,
+        backtracking_trials=backtracking_trials,
+    )
+end
+
 function fixed_environment_candidate(
     h, D::Int, Lx::Int, Ly::Int,
     params::Vector{Float64}, env::CTMRGEnv;
     inner_optim_iter::Int=2,
     max_step_norm::Float64=0.25,
 )
-    ensure_optim_loaded()
     objective = x -> begin
-        normalized = normalized_params(x)
-        peps = Square_GPEPS(2, 1, D, Lx, Ly, normalized, false)
+        peps = Square_GPEPS(2, 1, D, Lx, Ly, x, false)
         nested = nested_network(peps)
         compute_nested_energy(h, peps, nested, env)
     end
-    function fg!(F, G, x)
-        value, gradient_tuple = Zygote.withgradient(objective, x)
-        if G !== nothing
-            copyto!(G, only(gradient_tuple))
-        end
-        return F === nothing ? nothing : value
-    end
-    options = Optim.Options(
-        iterations=inner_optim_iter, show_trace=false, store_trace=false
-    )
-    result = Optim.optimize(
-        Optim.only_fg!(fg!), params, Optim.LBFGS(), options
-    )
-    raw = normalized_params(Optim.minimizer(result))
-    delta = raw - params
-    delta_norm = norm(delta)
-    candidate = delta_norm <= max_step_norm ? raw :
-        normalized_params(params + (max_step_norm / delta_norm) * delta)
-    value, gradient_tuple = Zygote.withgradient(objective, params)
-    return (
-        candidate=candidate,
-        energy=value,
-        gradient=only(gradient_tuple),
-        optim_iterations=Optim.iterations(result),
-        optim_converged=Optim.converged(result),
+    return _normalized_gradient_candidate(
+        objective, params;
+        inner_optim_iter=inner_optim_iter,
+        max_step_norm=max_step_norm,
     )
 end
 ```
@@ -2077,7 +2134,10 @@ function run_Square_SpinlessFermion_AD_nested(
         validated = current
         trial_params = params
         trial_env = env
-        alpha = 1.0
+        proposal_usable = proposal.optim_status ∉ (
+            :nonfinite_value, :nonfinite_gradient, :no_step,
+        ) && norm(proposal.candidate - params) > sqrt(eps(Float64))
+        alpha = proposal_usable ? 1.0 : 0.0
         validation_trials = 0
         while alpha >= min_step && validation_trials < 2
             candidate = normalized_params(
@@ -2127,6 +2187,9 @@ function run_Square_SpinlessFermion_AD_nested(
             validation_trials=validation_trials,
             optim_iterations=proposal.optim_iterations,
             optim_converged=proposal.optim_converged,
+            optim_status=proposal.optim_status,
+            accepted_inner_steps=proposal.accepted_inner_steps,
+            backtracking_trials=proposal.backtracking_trials,
         ))
         @printf(
             "AD %2d/%2d E %.12f -> %.12f |g| %.4e step %.3e%s\n",
@@ -2222,10 +2285,16 @@ julia_grassmann \
 Expected: exact-energy and nested-example smoke testsets PASS with finite
 energy and gradient and no exception.
 
-Do not add this CTMRG/Optim smoke to `test/nested_measurements.jl`: those
+Before the nested smoke, test `_normalized_gradient_candidate` on pure
+numeric objectives: deterministic repeatability, quadratic descent,
+normalization and total trust radius, constant-objective zero-gradient/no
+move, and nonfinite-objective no move. Check the smoke history contains finite
+candidate diagnostics and the Armijo status/trial counters.
+
+Do not add this CTMRG/AD smoke to `test/nested_measurements.jl`: those
 tests remain dedicated to the approved environment-free nested/reduced
 measurement comparisons (plus the separately approved zero-iteration public
-aggregation regression). The example-local project owns its Optim dependency
+aggregation regression). The example-local project owns its Zygote dependency
 and prevents the root offline test harness from acquiring a new dependency.
 
 - [ ] **Step 7: Commit**
