@@ -2052,8 +2052,8 @@ function run_Square_SpinlessFermion_AD_nested(
 )
     Random.seed!(seed)
     started = time()
-    count = square_gpeps_parameter_count(2, 1, D, Lx, Ly)
-    params = normalized_params(randn(count))
+    parameter_count = square_gpeps_parameter_count(2, 1, D, Lx, Ly)
+    params = normalized_params(randn(parameter_count))
     h = nn_bond(SpinlessFermionModel(t, gamma, lambda))
     exact = spinless_exact_energy(t, gamma, lambda)
     history = NamedTuple[]
