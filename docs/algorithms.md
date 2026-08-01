@@ -74,7 +74,7 @@ Useful helpers include:
 
 `NestedLayout` records the source and doubled unit-cell sizes and maps every
 source site to its K, Y, X, and B positions. `NestedNetwork` stores the
-resulting rank-4 tensor matrix, its layout, and the raw X crossings. The
+resulting rank-4 tensor matrix, its layout, and the final bulk X tensors. The
 public constructors and main builder are:
 
 ```julia
@@ -85,8 +85,10 @@ nested = nested_network(peps)
 nested = nested_network(peps, layout)
 ```
 
-For an `Lx x Ly` `Square_GPEPS`, this constructs a `2Lx x 2Ly` K/Y/X/B
-checkerboard. `NestedNetwork` supports `size`, `axes`, and indexing like its
+For an `Lx x Ly` `Square_GPEPS`, this constructs a `2Lx x 2Ly` checkerboard.
+Each source tensor is represented by the periodic source-centred cell
+`[B X; Y K]`: X is to the right of B, and Y is to the left of K.
+`NestedNetwork` supports `size`, `axes`, and indexing like its
 underlying tensor matrix. The three-argument `NestedNetwork` constructor wraps
 an already assembled compatible network; `nested_network` performs the K/Y/X/B
 construction and link checks.
@@ -105,9 +107,10 @@ updates and returns `env`.
 
 ### Measurements
 
-`nested_y_operator(nested, peps, site, operator)` constructs the Y tensor with
+`nested_x_operator(nested, peps, site, operator)` constructs the X tensor with
 a rank-2 physical operator inserted at `site`. The operator must match the
 local physical dimension and parity split and have arrows `(:out, :in)`.
+`nested_y_operator` remains as a compatibility alias for the former public API.
 
 The public expectation-value routines are:
 
@@ -129,23 +132,28 @@ result is `(denominators, values)`, two matrices with that same unit-cell size.
 Horizontal and vertical bond routines use the periodic right and lower
 neighbor, respectively.
 
-The exact one-site and nearest-neighbor tests do not run CTMRG. They close the
-nested and reduced networks directly for all four boundary twists and compare
-their denominator, numerator, and ratio. A separate public multi-Schmidt-term
-aggregation regression uses a freshly initialized environment with zero
-CTMRG iterations; it is not a CTMRG convergence test.
+The exact one-site and nearest-neighbor tests do not initialize or iterate a
+CTMRG environment. They reblock each `[B X; Y K]` cell, compare every tensor
+element, block metadata, maximum element error, absolute norm error, and
+relative norm error with `reduced_tensor`, and then close the reblocked and
+reduced networks for all four boundary twists. Measurement tests compare the
+denominator, numerator, and normalized ratio.
 
 ### Fermionic signs and representation
 
 The nested construction keeps all signs in the existing Grassmann operations:
 
-- K and B inputs receive the north-leg parity twist before their local
-  construction.
-- X and Y placement applies the graded permutation convention through
-  `add_perm_sign`; X placement also carries its required parity sign.
-- A horizontal odd operator-Schmidt term receives the endpoint-exchange
-  factor `(-1)^tensor_parity(left_operator)`. The corresponding vertical term
-  has no additional endpoint-exchange factor.
+- K and B use explicit parity signs on the legs crossed by the chosen planar
+  routing. Their fused legs are ordered as `(physical, virtual)`.
+- X carries the physical identity or impurity. Its internal crossing uses
+  `add_parity_sign` and `add_perm_sign`. An operator of total parity `q`
+  additionally contributes `(-1)^(q*(1+u))` before fusion; this is unity for
+  bulk/even operators and is required for odd Schmidt endpoints. Y is a pure
+  virtual crossing built from identities, `index_conjugation`, and
+  `add_parity_sign`.
+- A horizontal operator-Schmidt term has no additional endpoint-exchange
+  factor. A vertical odd term receives
+  `(-1)^tensor_parity(top_operator)`.
 - Conjugation, index bending, contraction, fusion, and permutation continue
   to use the package `global_sign` convention.
 
@@ -160,7 +168,7 @@ Nested reverse rules are defined in
 `algorithms/Nested_CTMRG/nested_chainrules.jl` and loaded only through
 `GrassmannChainRulesCoreExt`. Loading `ChainRulesCore` and `Zygote` activates
 them without adding either package to the core dependency path. The extension
-provides rules for `nested_network` and operator-dressed `nested_y_operator`
+provides rules for `nested_network` and operator-dressed `nested_x_operator`
 construction.
 
 The public horizontal and vertical measurement rules use a fixed-observable

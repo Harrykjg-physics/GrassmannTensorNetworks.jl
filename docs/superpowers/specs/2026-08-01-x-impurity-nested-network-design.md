@@ -106,11 +106,12 @@ The impurity routes are:
 - horizontal bond: `X-B-X`;
 - vertical bond: `X-K-X`.
 
-The graded Schmidt decomposition remains parity resolved. The endpoint sign
-is attached to the ket-mediated vertical route rather than assumed from the
-old topology. Exact nested-versus-reduced tests determine and lock the final
-sign convention; the expected topology transfer is no extra scalar sign for
-`X-B-X` and `(-1)^tensor_parity(top_operator)` for `X-K-X`.
+The graded Schmidt decomposition remains parity resolved. Exact
+nested-versus-reduced tests determine and lock the sign convention. The X
+constructor contributes `(-1)^(q*(1+u))` for an operator of total parity `q`;
+after this local correction, the reference reduced-bond contraction requires
+no extra scalar sign for `X-B-X` and
+`(-1)^tensor_parity(top_operator)` for `X-K-X`.
 
 ## Automatic differentiation and examples
 

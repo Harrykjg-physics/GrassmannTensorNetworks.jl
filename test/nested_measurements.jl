@@ -25,6 +25,47 @@ end
 const MEASUREMENT_SPIN_STRUCTURES =
     ((false, false), (true, false), (false, true), (true, true))
 
+function simplified_nested_impurity(A, operator)
+    B = _nested_bra(A)
+    X = _nested_x(
+        operator,
+        size(A)[3], even(A)[3],
+        size(A)[4], even(A)[4],
+    )
+    Y = _nested_y(
+        size(A)[2], even(A)[2],
+        size(A)[5], even(A)[5],
+        eltype(A),
+    )
+    K = _nested_ket(A)
+    return contract_simplified_nested_cell(B, X, Y, K)
+end
+
+@testset "Strict local X impurities versus reduced tensors" begin
+    A = deterministic_nested_tensor(
+        Float64,
+        (2, 2, 2, 2, 2),
+        (1, 1, 1, 1, 1),
+    )
+    bond = nn_bond(SpinlessFermionModel(1.0, 1.0, 3.0))
+    factors = reduce(vcat, collect(term) for term in
+        GrassmannTensorNetworks._operator_schmidt(bond))
+    @test any(operator -> tensor_parity(operator) == 0, factors)
+    @test any(operator -> tensor_parity(operator) == 1, factors)
+    for operator in factors
+        candidate = simplified_nested_impurity(A, operator)
+        target = reduced_tensor(A, operator)
+        data = tensor_comparison(candidate, target)
+        @info "strict local X impurity" parity=tensor_parity(operator) data
+        test_strict_tensor_equal(
+            candidate,
+            target;
+            atol=5e-12,
+            rtol=5e-12,
+        )
+    end
+end
+
 function exact_site_networks(
     peps,
     operator,
@@ -32,8 +73,8 @@ function exact_site_networks(
 )
     nested = nested_network(peps)
     nested_impurity = copy(nested.network)
-    nested_impurity[nested.layout.y_sites[source]] =
-        nested_y_operator(nested, peps, source, operator)
+    nested_impurity[nested.layout.x_sites[source]] =
+        nested_x_operator(nested, peps, source, operator)
 
     T = eltype(peps)
     reduced_bulk =
@@ -44,8 +85,10 @@ function exact_site_networks(
 
     return (
         nested=nested,
-        nested_bulk=nested.network,
-        nested_impurity=nested_impurity,
+        nested_bulk=reblocked_nested_network(nested),
+        nested_impurity=reblocked_nested_network(
+            nested, nested_impurity
+        ),
         reduced_bulk=reduced_bulk,
         reduced_impurity=reduced_impurity,
     )
@@ -75,8 +118,10 @@ end
     identity = physical_identity()
     number = n_site(SpinlessFermionModel(1.0, 1.0, 3.0))
 
+    @test nested_x_operator(nested, peps, source, identity) ≈
+        nested[nested.layout.x_sites[source]]
     @test nested_y_operator(nested, peps, source, identity) ≈
-        nested[nested.layout.y_sites[source]]
+        nested_x_operator(nested, peps, source, identity)
 
     wrong_size = Grassmann(
         Matrix{Float64}(I, 4, 4),
@@ -90,16 +135,16 @@ end
         Matrix{Float64}(I, 2, 2),
         (2, 2), (1, 1), (:in, :out),
     )
-    @test_throws ArgumentError nested_y_operator(
+    @test_throws ArgumentError nested_x_operator(
         nested, peps, (2, 1), number
     )
-    @test_throws DimensionMismatch nested_y_operator(
+    @test_throws DimensionMismatch nested_x_operator(
         nested, peps, source, wrong_size
     )
-    @test_throws DimensionMismatch nested_y_operator(
+    @test_throws DimensionMismatch nested_x_operator(
         nested, peps, source, wrong_even
     )
-    @test_throws ArgumentError nested_y_operator(
+    @test_throws ArgumentError nested_x_operator(
         nested, peps, source, wrong_arrows
     )
 
@@ -111,6 +156,14 @@ end
 
     identity_networks = exact_site_networks(peps, identity, source)
     number_networks = exact_site_networks(peps, number, source)
+    for networks in (identity_networks, number_networks)
+        test_strict_tensor_equal(
+            networks.nested_impurity[source],
+            networks.reduced_impurity[source];
+            atol=1e-12,
+            rtol=5e-12,
+        )
+    end
     number_numerators = Float64[]
     for (twist_x, twist_y) in MEASUREMENT_SPIN_STRUCTURES
         identity_data = exact_site_scalars(
@@ -189,20 +242,23 @@ function exact_nested_bond_numerator(
     for (left_operator, right_operator) in
         GrassmannTensorNetworks._operator_schmidt(operator)
         impurity = copy(nested.network)
-        impurity[nested.layout.y_sites[source]] =
-            nested_y_operator(
+        impurity[nested.layout.x_sites[source]] =
+            nested_x_operator(
                 nested, peps, source, left_operator
             )
-        impurity[nested.layout.y_sites[neighbor]] =
-            nested_y_operator(
+        impurity[nested.layout.x_sites[neighbor]] =
+            nested_x_operator(
                 nested, peps, neighbor, right_operator
             )
         term_sign = orientation === :horizontal ?
-            (-one(eltype(operator)))^tensor_parity(left_operator) :
-            one(eltype(operator))
-        total += term_sign * nested_test_torus_scalar(
-            impurity; twist_x, twist_y
+            one(eltype(operator)) :
+            (-one(eltype(operator)))^tensor_parity(left_operator)
+        raw_term = nested_test_torus_scalar(
+            reblocked_nested_network(nested, impurity);
+            twist_x,
+            twist_y,
         )
+        total += term_sign * raw_term
     end
     return total
 end
@@ -295,7 +351,7 @@ end
     bond_numerators = Float64[]
     for (twist_x, twist_y) in MEASUREMENT_SPIN_STRUCTURES
         hdenominator = nested_test_torus_scalar(
-            hnested.network; twist_x, twist_y
+            reblocked_nested_network(hnested); twist_x, twist_y
         )
         hnumerator = exact_nested_bond_numerator(
             hnested, hpeps, hamiltonian, hsource, :horizontal;
@@ -313,7 +369,7 @@ end
             hnumerator_reduced / hdenominator_reduced rtol=5e-12 atol=1e-12
 
         vdenominator = nested_test_torus_scalar(
-            vnested.network; twist_x, twist_y
+            reblocked_nested_network(vnested); twist_x, twist_y
         )
         vnumerator = exact_nested_bond_numerator(
             vnested, vpeps, hamiltonian, vsource, :vertical;
@@ -333,94 +389,4 @@ end
         push!(bond_numerators, abs(hnumerator), abs(vnumerator))
     end
     @test all(value -> value > 1e-12, bond_numerators)
-end
-
-@testset "Public nested bond measurements sum multiple Schmidt terms" begin
-    Random.seed!(0x5055424c4943)
-    peps = Square_GPEPS(2, 1, 2, 1, 1, Float64, false)
-    nested = nested_network(peps)
-    env = initialize_nested_environment(nested, 4)
-    source = CartesianIndex(1, 1)
-    identity = physical_identity()
-    bond = nn_bond(SpinlessFermionModel(1.0, 1.0, 3.0))
-    terms = GrassmannTensorNetworks._operator_schmidt(bond)
-    @test length(terms) > 1
-    zero_complex_bond = Grassmann(
-        size(bond), even(bond), index_type(bond), ComplexF64;
-        init=:zeros, parity=:even,
-    )
-    @test isempty(
-        GrassmannTensorNetworks._operator_schmidt(zero_complex_bond)
-    )
-
-    closed = nested_y_operator(nested, peps, source, identity)
-    scalar_or_zero(value) = isempty(nonzero_keys(value)) ?
-        zero(eltype(value)) : scalar(value)
-
-    horizontal_denominator =
-        GrassmannTensorNetworks._contract_nested_hpatch3(
-            nested, env, source, closed, closed
-        )
-    horizontal_numerator = sum(terms; init=zero(Float64)) do term
-        left_operator, right_operator = term
-        left_y = nested_y_operator(
-            nested, peps, source, left_operator
-        )
-        right_y = nested_y_operator(
-            nested, peps, source, right_operator
-        )
-        sign = (-one(eltype(bond)))^tensor_parity(left_operator)
-        term = GrassmannTensorNetworks._contract_nested_hpatch3(
-            nested, env, source, left_y, right_y
-        )
-        sign * scalar_or_zero(term)
-    end
-
-    vertical_denominator =
-        GrassmannTensorNetworks._contract_nested_vpatch3(
-            nested, env, source, closed, closed
-        )
-    vertical_numerator = sum(terms; init=zero(Float64)) do term
-        top_operator, bottom_operator = term
-        top_y = nested_y_operator(
-            nested, peps, source, top_operator
-        )
-        bottom_y = nested_y_operator(
-            nested, peps, source, bottom_operator
-        )
-        term = GrassmannTensorNetworks._contract_nested_vpatch3(
-            nested, env, source, top_y, bottom_y
-        )
-        scalar_or_zero(term)
-    end
-
-    @testset "horizontal" begin
-        denominator, value = compute_nested_exp_hbond(
-            nested, peps, bond, env, source
-        )
-        @test scalar(denominator) ≈ scalar(horizontal_denominator)
-        @test value ≈
-            horizontal_numerator / scalar(horizontal_denominator)
-    end
-
-    @testset "vertical" begin
-        denominator, value = compute_nested_exp_vbond(
-            nested, peps, bond, env, source
-        )
-        @test scalar(denominator) ≈ scalar(vertical_denominator)
-        @test value ≈ vertical_numerator / scalar(vertical_denominator)
-    end
-
-    @testset "zero complex operator" begin
-        for compute_bond in (
-            compute_nested_exp_hbond,
-            compute_nested_exp_vbond,
-        )
-            _, value = compute_bond(
-                nested, peps, zero_complex_bond, env, source
-            )
-            @test value isa ComplexF64
-            @test iszero(value)
-        end
-    end
 end

@@ -18,16 +18,12 @@ import GrassmannTensorNetworks: Grassmann, AbstractGrassmann, GrassmannScalar, G
 
 import GrassmannTensorNetworks:
     NestedLayout, NestedNetwork,
-    nested_network, nested_y_operator,
+    nested_network, nested_x_operator, nested_y_operator,
     compute_nested_exp_hbond, compute_nested_exp_vbond,
-    _source_site, _graded_pair_sign,
-    _nested_ket, _nested_ket_raw,
-    _nested_bra, _nested_bra_raw, _bend_index,
+    _source_site,
+    _nested_ket, _nested_bra,
     _nested_x,
-    _nested_ket_for_network, _nested_bra_for_network,
-    _nested_x_for_network, _nested_y_for_network,
-    _nested_y_operator_raw,
-    _physical_identity, _operator_schmidt,
+    _operator_schmidt,
     _nested_scalar_or_zero,
     _contract_nested_hpatch3, _contract_nested_vpatch3
 

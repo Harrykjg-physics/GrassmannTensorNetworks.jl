@@ -9,12 +9,23 @@ end
 
 function NestedLayout(source_size::Tuple{Int, Int})
     rows, cols = source_size
-    rows > 0 && cols > 0 ||
-        throw(ArgumentError("source unit-cell dimensions must be positive"))
-    ket = [CartesianIndex(2r - 1, 2c - 1) for r in 1:rows, c in 1:cols]
-    y = [CartesianIndex(2r - 1, 2c) for r in 1:rows, c in 1:cols]
+    rows > 0 && cols > 0 || throw(ArgumentError("source unit-cell dimensions must be positive"))
     x = [CartesianIndex(2r, 2c - 1) for r in 1:rows, c in 1:cols]
-    bra = [CartesianIndex(2r, 2c) for r in 1:rows, c in 1:cols]
+    bra = [
+        CartesianIndex(2r, 2Nmod(c - 1, cols))
+        for r in 1:rows, c in 1:cols
+    ]
+    ket = [
+        CartesianIndex(2Nmod(r + 1, rows) - 1, 2c - 1)
+        for r in 1:rows, c in 1:cols
+    ]
+    y = [
+        CartesianIndex(
+            2Nmod(r + 1, rows) - 1,
+            2Nmod(c - 1, cols),
+        )
+        for r in 1:rows, c in 1:cols
+    ]
     return NestedLayout(source_size, (2rows, 2cols), ket, y, x, bra)
 end
 
@@ -32,147 +43,141 @@ Base.size(nested::NestedNetwork, args...) = size(nested.network, args...)
 Base.axes(nested::NestedNetwork, args...) = axes(nested.network, args...)
 Base.getindex(nested::NestedNetwork, inds...) = getindex(nested.network, inds...)
 
-function _graded_pair_sign(
-    t::Grassmann{T, N, AT}, i::Int, j::Int
-) where {T, N, AT}
-    1 <= i <= N && 1 <= j <= N && i != j ||
-        throw(ArgumentError("graded-pair indices must be distinct and in bounds"))
-    blocks = Dict{NTuple{N, Int}, AT}()
-    for (sector, block) in nonzero_pairs(t)
-        blocks[sector] = (-1)^(sector[i] * sector[j]) .* block
-    end
-    return Grassmann(size(t), even(t), index_type(t), blocks)
+# K[l, r, U, d] carries the ket tensor and the fused physical-up index U = (p, u).
+function _nested_ket(A::Grassmann{T, 5}) where {T}
+    # A_perm[l, r, p, u, d] <-- A[p, l, r, u, d]
+    A_perm = permutedims(A, (2, 3, 1, 4, 5); sign_function=global_sign)
+    # Ao1[l, r, p, u, d] = (-1)^p A_perm[l, r, p, u, d]
+    Ao1 = add_parity_sign(A_perm, 3; sign_function=global_sign)
+    # Ao2[l, r, U, d] = Ao1[l, r, (p, u), d]
+    Ao2 = fuse(Ao1, (3, 4); index_type_fused=:in)
+    # Ao3[l, r, U, d] = (-1)^l Ao2[l, r, U, d]
+    Ao3 = add_parity_sign(Ao2, 1; sign_function=global_sign)
+    # Ao4[l, r, U, d] = (-1)^r Ao3[l, r, U, d]
+    Ao4 = add_parity_sign(Ao3, 2; sign_function=global_sign)
+    # Ao5[l, r, U, d] = (-1)^d Ao4[l, r, U, d]
+    return add_parity_sign(Ao4, 4; sign_function=global_sign)
+end
+
+# B[l, R, u, d] carries the bra tensor and the fused physical-right index R = (p, r).
+function _nested_bra(A::Grassmann{T, 5}) where {T}
+    A_conj = conj(A; sign_function=global_sign)
+    # A_perm[l, p, r, u, d] <-- A_conj[p, l, r, u, d]
+    A_perm = permutedims(A_conj, (2, 1, 3, 4, 5); sign_function=global_sign)
+    # Ao1[l, p, r, u, d] = (-1)^d A_perm[l, p, r, u, d]
+    Ao1 = add_parity_sign(A_perm, 5; sign_function=global_sign)
+    # Ao2[l, R, u, d] = Ao1[l, (p, r), u, d]
+    Ao2 = fuse(Ao1, (2, 3); index_type_fused=:in)
+    # Ao3[l, R, u, d] = conjugation(Ao2[l, R, u, d], (l, u, d))
+    Ao3 = index_conjugation(Ao2, (1, 3, 4))
+    # Ao4[l, R, u, d] = (-1)^l Ao3[l, R, u, d]
+    Ao4 = add_parity_sign(Ao3, 1; sign_function=global_sign)
+    # Ao5[l, R, u, d] = (-1)^u Ao4[l, R, u, d]
+    return add_parity_sign(Ao4, 3; sign_function=global_sign)
+end
+
+# X is at the right of B and carries the physical identity or local operator.
+function _nested_x(
+    operator::Grassmann{T, 2},
+    hor_total_size::Int,
+    hor_even_size::Int,
+    ver_total_size::Int,
+    ver_even_size::Int,
+) where {T}
+    identity_hor = Grassmann(
+        Matrix{T}(I, hor_total_size, hor_total_size),
+        (hor_total_size, hor_total_size),
+        (hor_even_size, hor_even_size),
+        (:out, :in),
+    )
+    identity_ver = Grassmann(
+        Matrix{T}(I, ver_total_size, ver_total_size),
+        (ver_total_size, ver_total_size),
+        (ver_even_size, ver_even_size),
+        (:in, :out),
+    )
+
+    # X0[l, r, u, d] = identity_hor[l, r] * identity_ver[u, d]
+    X0 = contract(identity_hor, identity_ver; sign_function=global_sign)
+    # X1[po, l, r, u, pi, d] = operator[po, pi] * X0[l, r, u, d]
+    X1 = contract(
+        X0,
+        operator;
+        perm=(5, 1, 2, 3, 6, 4),
+        sign_function=global_sign,
+    )
+    # X2[po, l, r, u, pi, d] = (-1)^l X1[po, l, r, u, pi, d]
+    X2 = add_parity_sign(X1, 2; sign_function=global_sign)
+    # X3[po, l, r, u, pi, d] = (-1)^(po*l) X2[po, l, r, u, pi, d]
+    X3 = add_perm_sign(
+        X2, (2, 1, 3, 4, 5, 6);
+        sign_function=global_sign,
+    )
+    # X4[po, l, r, u, pi, d] = (-1)^(po*u) X3[po, l, r, u, pi, d]
+    X4 = add_perm_sign(
+        X3, (2, 3, 4, 1, 5, 6);
+        sign_function=global_sign,
+    )
+    # X5[po, l, r, u, pi, d] = (-1)^(|O|*(1+u)) X4[po, l, r, u, pi, d]
+    X5 = tensor_parity(operator) == 0 ? X4 :
+        add_parity_sign(X4, 4; sign_function=global_sign) * (-one(T))
+    # X6[L, r, u, pi, d] = X5[(po, l), r, u, pi, d]
+    X6 = fuse(X5, (1, 2); index_type_fused=:out)
+    # X7[L, r, u, D] = X6[L, r, u, (pi, d)]
+    return fuse(X6, (4, 5); index_type_fused=:out)
 end
 
 function _nested_x(
-    horizontal_size::Int,
-    horizontal_even::Int,
-    vertical_size::Int,
-    vertical_even::Int,
+    hor_total_size::Int,
+    hor_even_size::Int,
+    ver_total_size::Int,
+    ver_even_size::Int,
+    phy_total_size::Int,
+    phy_even_size::Int,
     ::Type{T},
 ) where {T}
-    crossing = Grassmann(
-        (horizontal_size, horizontal_size, vertical_size, vertical_size),
-        (horizontal_even, horizontal_even, vertical_even, vertical_even),
-        (:out, :in, :in, :out),
-        T;
-        init=:zeros,
+    identity_phy = Grassmann(
+        Matrix{T}(I, phy_total_size, phy_total_size),
+        (phy_total_size, phy_total_size),
+        (phy_even_size, phy_even_size),
+        (:out, :in),
     )
-    for horizontal_parity in 0:1, vertical_parity in 0:1
-        sector = (
-            horizontal_parity,
-            horizontal_parity,
-            vertical_parity,
-            vertical_parity,
-        )
-        haskey(crossing, sector) || continue
-        block = crossing[sector]
-        coefficient =
-            (-one(T))^(horizontal_parity * vertical_parity)
-        for horizontal in axes(block, 1), vertical in axes(block, 3)
-            block[horizontal, horizontal, vertical, vertical] = coefficient
-        end
-    end
-    return crossing
-end
-
-_placed_nested_x(x::Grassmann) =
-    add_parity_sign(x, 1; sign_function=global_sign)
-
-function _bend_index(t::Grassmann, index::Int)
-    return add_parity_sign(
-        index_conjugation(t, index), index; sign_function=global_sign
+    return _nested_x(
+        identity_phy,
+        hor_total_size,
+        hor_even_size,
+        ver_total_size,
+        ver_even_size,
     )
 end
 
-function _nested_ket_raw(A::Grassmann{T, 5}) where {T}
-    signed = _graded_pair_sign(A, 1, 3)
-    routed = permutedims(signed, (2, 1, 3, 4, 5); sign_function=global_sign)
-    return fuse(routed, (2, 3); index_type_fused=:in)
-end
-
-_nested_ket(A::Grassmann{T, 5}) where {T} = _nested_ket_raw(A)
-
-function _nested_bra_raw(A::Grassmann{T, 5}) where {T}
-    bra = conj(A; sign_function=global_sign)
-    signed = _graded_pair_sign(bra, 1, 4)
-    routed = permutedims(signed, (2, 3, 1, 4, 5); sign_function=global_sign)
-    fused = fuse(routed, (3, 4); index_type_fused=:in)
-    return foldl(_bend_index, (1, 2, 4); init=fused)
-end
-
-_nested_bra(A::Grassmann{T, 5}) where {T} = _nested_bra_raw(A)
-
-function _physical_identity(A::Grassmann{T, 5}) where {T}
-    p, pe = size(A)[1], even(A)[1]
-    return Grassmann(Matrix{T}(I, p, p), (p, p), (pe, pe), (:out, :in))
-end
-
+# Y is at the left of K and contains only the virtual Grassmann crossing.
 function _nested_y(
-    operator::Grassmann{T, 2},
-    horizontal_size::Int,
-    horizontal_even::Int,
-    vertical_size::Int,
-    vertical_even::Int,
+    hor_total_size::Int,
+    hor_even_size::Int,
+    ver_total_size::Int,
+    ver_even_size::Int,
+    ::Type{T},
 ) where {T}
-    crossing = _nested_x(
-        horizontal_size, horizontal_even, vertical_size, vertical_even, T
+    identity_hor = Grassmann(
+        Matrix{T}(I, hor_total_size, hor_total_size),
+        (hor_total_size, hor_total_size),
+        (hor_even_size, hor_even_size),
+        (:out, :in),
     )
-    product = contract(operator, crossing; sign_function=global_sign)
-    routed = permutedims(
-        product, (1, 3, 4, 5, 2, 6); sign_function=global_sign
+    identity_ver = Grassmann(
+        Matrix{T}(I, ver_total_size, ver_total_size),
+        (ver_total_size, ver_total_size),
+        (ver_even_size, ver_even_size),
+        (:out, :in),
     )
-    west_fused = fuse(routed, (1, 2); index_type_fused=:out)
-    return fuse(west_fused, (4, 5); index_type_fused=:out)
-end
 
-function _nested_reduced_basis(ordered::Grassmann{T, 8}) where {T}
-    corrected = add_perm_sign(
-        ordered,
-        (2, 3, 5, 4, 6, 7, 1, 8);
-        sign_function=global_sign,
-    )
-    for index in (2, 4, 6)
-        corrected = add_parity_sign(
-            corrected, index; sign_function=global_sign
-        )
-    end
-    return corrected
-end
-
-function _nested_input_north_twist(A::Grassmann)
-    return add_parity_sign(A, 4; sign_function=global_sign)
-end
-
-_nested_ket_for_network(A::Grassmann{T, 5}) where {T} =
-    _nested_ket(_nested_input_north_twist(A))
-
-_nested_bra_for_network(A::Grassmann{T, 5}) where {T} =
-    _nested_bra(_nested_input_north_twist(A))
-
-function _nested_x_for_network(xraw::Grassmann{T, 4}) where {T}
-    placed = _placed_nested_x(xraw)
-    return add_perm_sign(
-        placed, (1, 3, 2, 4); sign_function=global_sign
-    )
-end
-
-function _nested_y_for_network(yraw::Grassmann{T, 4}) where {T}
-    return add_perm_sign(
-        yraw, (1, 3, 2, 4); sign_function=global_sign
-    )
-end
-
-function _nested_network_reduced_basis(
-    ordered::Grassmann{T, 8}
-) where {T}
-    corrected = ordered
-    for axis in (1, 2, 4, 5)
-        corrected = add_parity_sign(
-            corrected, axis; sign_function=global_sign
-        )
-    end
-    return corrected
+    # Y0[l, r, u, d] = identity_hor[l, r] * identity_ver[u, d]
+    Y0 = contract(identity_hor, identity_ver; sign_function=global_sign)
+    # Y1[l, r, u, d] = conjugation(Y0[l, r, u, d], (u, d))
+    Y1 = index_conjugation(Y0, (3, 4))
+    # Y2[l, r, u, d] = (-1)^u Y1[l, r, u, d]
+    return add_parity_sign(Y1, 3; sign_function=global_sign)
 end
 
 function nested_network(
@@ -184,40 +189,40 @@ function nested_network(
 
     rows, cols = size(peps)
     ket = [
-        _nested_ket_for_network(peps.A[r, c])
+        _nested_ket(peps.A[r, c])
         for r in 1:rows, c in 1:cols
     ]
     bra = [
-        _nested_bra_for_network(peps.A[r, c])
+        _nested_bra(peps.A[r, c])
         for r in 1:rows, c in 1:cols
     ]
-    xraw = [
+    x = [
         _nested_x(
-            size(bra[r, c])[1], even(bra[r, c])[1],
-            size(ket[r, c])[4], even(ket[r, c])[4], T,
+            size(peps.A[r, c])[3], even(peps.A[r, c])[3],
+            size(peps.A[r, c])[4], even(peps.A[r, c])[4],
+            size(peps.A[r, c])[1], even(peps.A[r, c])[1],
+            T,
+        )
+        for r in 1:rows, c in 1:cols
+    ]
+    y = [
+        _nested_y(
+            size(peps.A[r, c])[2], even(peps.A[r, c])[2],
+            size(peps.A[r, c])[5], even(peps.A[r, c])[5],
+            T,
         )
         for r in 1:rows, c in 1:cols
     ]
 
     tensors = Matrix{Grassmann{T, 4}}(undef, size(layout)...)
     for r in 1:rows, c in 1:cols
-        north_bra = bra[Nmod(r - 1, rows), c]
-        east_ket = ket[r, Nmod(c + 1, cols)]
-        yraw = _nested_y(
-            _physical_identity(peps.A[r, c]),
-            size(east_ket)[1], even(east_ket)[1],
-            size(north_bra)[4], even(north_bra)[4],
-        )
-
         tensors[layout.ket_sites[r, c]] = ket[r, c]
         tensors[layout.bra_sites[r, c]] = bra[r, c]
-        tensors[layout.x_sites[r, c]] =
-            _nested_x_for_network(xraw[r, c])
-        tensors[layout.y_sites[r, c]] =
-            _nested_y_for_network(yraw)
+        tensors[layout.x_sites[r, c]] = x[r, c]
+        tensors[layout.y_sites[r, c]] = y[r, c]
     end
 
-    nested = NestedNetwork(tensors, layout, xraw)
+    nested = NestedNetwork(tensors, layout, x)
     _check_nested_links(nested)
     return nested
 end

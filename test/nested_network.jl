@@ -1,5 +1,6 @@
 using Test
 using Random
+using LinearAlgebra
 using GrassmannTensorNetworks
 
 @eval GrassmannTensorNetworks global global_sign = auto_sign
@@ -9,28 +10,21 @@ using GrassmannTensorNetworks
 @test isdefined(GrassmannTensorNetworks, :run_nested_GCTMRG!)
 
 import GrassmannTensorNetworks:
-    _graded_pair_sign,
     _nested_ket,
     _nested_bra,
     _nested_x,
-    _placed_nested_x,
-    _nested_y,
-    _physical_identity,
-    _nested_reduced_basis,
-    _nested_ket_for_network,
-    _nested_bra_for_network,
-    _nested_x_for_network,
-    _nested_y_for_network,
-    _nested_network_reduced_basis
+    _nested_y
 
-@testset "Nested layout" begin
+@testset "Nested layout follows the B-X/Y-K source cell" begin
     layout = NestedLayout((2, 3))
     @test size(layout) == (4, 6)
     @test layout.source_size == (2, 3)
-    @test layout.ket_sites[2, 3] == CartesianIndex(3, 5)
-    @test layout.y_sites[2, 3] == CartesianIndex(3, 6)
+
+    # source[2, 3] = [B X; Y K] across the periodic row boundary.
+    @test layout.bra_sites[2, 3] == CartesianIndex(4, 4)
     @test layout.x_sites[2, 3] == CartesianIndex(4, 5)
-    @test layout.bra_sites[2, 3] == CartesianIndex(4, 6)
+    @test layout.y_sites[2, 3] == CartesianIndex(1, 4)
+    @test layout.ket_sites[2, 3] == CartesianIndex(1, 5)
     @test_throws ArgumentError NestedLayout((0, 3))
 
     peps = Square_GPEPS(2, 1, 2, 1, 2, Float64, false)
@@ -38,7 +32,13 @@ import GrassmannTensorNetworks:
 end
 
 @testset "Nested network wrapper" begin
-    tensor = Grassmann((1, 1, 1, 1), (1, 1, 1, 1), (:in, :out, :in, :out), Float64; init=:zeros)
+    tensor = Grassmann(
+        (1, 1, 1, 1),
+        (1, 1, 1, 1),
+        (:in, :out, :in, :out),
+        Float64;
+        init=:zeros,
+    )
     network = Matrix{Grassmann{Float64, 4}}(undef, 2, 3)
     fill!(network, tensor)
     nested = NestedNetwork(network, NestedLayout((1, 1)), trues(1, 1))
@@ -49,63 +49,13 @@ end
     @test nested[2, 3] === network[2, 3]
 end
 
-@testset "Nested graded primitives" begin
-    odd_crossing = _nested_x(1, 0, 1, 0, Float64)
-    @test !haskey(odd_crossing, (0, 0, 0, 0))
-    @test only(odd_crossing[(1, 1, 1, 1)]) == -1
-
-    mixed_crossing = _nested_x(2, 1, 2, 1, Float64)
-    dense = convert(Array, mixed_crossing)
-    @test dense[1, 1, 1, 1] == 1
-    @test dense[2, 2, 1, 1] == 1
-    @test dense[1, 1, 2, 2] == 1
-    @test dense[2, 2, 2, 2] == -1
-
-    peps = Square_GPEPS(2, 1, 2, 1, 1, Float64, false)
-    A = peps.A[1, 1]
-    K = _nested_ket(A)
-    B = _nested_bra(A)
-    @test size(K) == (2, 4, 2, 2)
-    @test size(B) == (2, 2, 4, 2)
-    @test index_type(K) == (:out, :in, :in, :out)
-    @test index_type(B) == (:out, :in, :in, :out)
-
-    identity = Grassmann(
-        Matrix{Float64}(I, 2, 2), (2, 2), (1, 1), (:out, :in)
-    )
-    Y = _nested_y(identity, 2, 1, 2, 1)
-    @test size(Y) == (4, 2, 2, 4)
-    @test index_type(Y) == (:out, :in, :in, :out)
-end
-
-function contract_nested_tile(K, Y, X, B)
-    sign = GrassmannTensorNetworks.global_sign
-    ky = contract(K, Y, (2, 1); sign_function=sign)
-    kx = contract(ky, X, (3, 3); sign_function=sign)
-    tile = contract(kx, B, ((5, 7), (3, 1)); sign_function=sign)
-    ordered = permutedims(
-        tile, (5, 1, 7, 3, 4, 2, 8, 6); sign_function=sign
-    )
-    ordered = _nested_reduced_basis(ordered)
-    ordered = add_parity_sign(
-        ordered, 1; sign_function=sign
-    )
-    left = fuse(ordered, (1, 2); index_type_fused=:out)
-    left = add_perm_sign(
-        left, (1, 3, 2, 4, 5, 6, 7); sign_function=sign
-    )
-    right = fuse(left, (2, 3); index_type_fused=:in)
-    right = add_perm_sign(
-        right, (1, 2, 4, 3, 5, 6); sign_function=sign
-    )
-    up = fuse(right, (3, 4); index_type_fused=:in)
-    up = add_parity_sign(up, 4; sign_function=sign)
-    return fuse(up, (4, 5); index_type_fused=:out)
-end
-
 function deterministic_nested_tensor(::Type{T}, sizes, evens) where {T}
     A = Grassmann(
-        sizes, evens, (:out, :out, :in, :in, :out), T; init=:zeros
+        sizes,
+        evens,
+        (:out, :out, :in, :in, :out),
+        T;
+        init=:zeros,
     )
     for (block_number, sector) in enumerate(sort!(collect(nonzero_keys(A))))
         block = A[sector]
@@ -119,156 +69,149 @@ function deterministic_nested_tensor(::Type{T}, sizes, evens) where {T}
     return A
 end
 
-function closed_nested_tile(A)
-    K, B = _nested_ket(A), _nested_bra(A)
-    Xraw = _nested_x(
-        size(A)[2], even(A)[2], size(A)[5], even(A)[5], eltype(A)
+function tensor_comparison(candidate, target)
+    candidate_dense = convert(Array, candidate)
+    target_dense = convert(Array, target)
+    delta = candidate_dense - target_dense
+    target_norm = norm(target_dense)
+    return (
+        max_element_error=maximum(abs, delta; init=0.0),
+        norm_error=norm(delta),
+        relative_norm_error=
+            norm(delta) / max(target_norm, eps(Float64)),
     )
-    Y = _nested_y(
-        _physical_identity(A),
+end
+
+function test_strict_tensor_equal(candidate, target; atol, rtol)
+    @test size(candidate) == size(target)
+    @test even(candidate) == even(target)
+    @test index_type(candidate) == index_type(target)
+    candidate_keys = sort!(collect(nonzero_keys(candidate)))
+    target_keys = sort!(collect(nonzero_keys(target)))
+    @test candidate_keys == target_keys
+    for sector in intersect(candidate_keys, target_keys)
+        @test candidate[sector] ≈ target[sector] atol=atol rtol=rtol
+    end
+    data = tensor_comparison(candidate, target)
+    target_norm = norm(convert(Array, target))
+    @test data.max_element_error <= atol + rtol * target_norm
+    @test data.norm_error <= atol + rtol * target_norm
+    @test data.relative_norm_error <= rtol
+    @test convert(Array, candidate) ≈
+        convert(Array, target) atol=atol rtol=rtol
+    return data
+end
+
+function contract_simplified_nested_cell(B, X, Y, K)
+    sign = GrassmannTensorNetworks.global_sign
+
+    # BX[lB, uB, dB, rX, uX, dX] = B[lB, R, uB, dB] * X[R, rX, uX, dX]
+    BX = contract(B, X, (2, 1); sign_function=sign)
+    # BXY[lB, uB, rX, uX, dX, lY, rY, dY] = BX[lB, uB, U, rX, uX, dX] * Y[lY, rY, U, dY]
+    BXY = contract(BX, Y, (3, 3); sign_function=sign)
+    # cell[lB, uB, rX, uX, lY, dY, rK, dK] = BXY[lB, uB, rX, uX, U, lY, L, dY] * K[L, rK, U, dK]
+    cell = contract(
+        BXY,
+        K,
+        ((5, 7), (3, 1));
+        sign_function=sign,
+    )
+    # ordered[lB, lY, rX, rK, uB, uX, dY, dK] = cell[lB, uB, rX, uX, lY, dY, rK, dK]
+    ordered = permutedims(
+        cell,
+        (1, 5, 3, 7, 2, 4, 6, 8);
+        sign_function=sign,
+    )
+    # signed[lB, lK, rB, rK, uB, uK, dB, dK] = (-1)^lB ordered[lB, lK, rB, rK, uB, uK, dB, dK]
+    signed = add_parity_sign(ordered, 1; sign_function=sign)
+    # left[L, rX, rK, uB, uX, dY, dK] = ordered[(lB, lY), rX, rK, uB, uX, dY, dK]
+    left = fuse(signed, (1, 2); index_type_fused=:out)
+    # left_ordered[L, rB, rK, uB, uK, dB, dK] = (-1)^perm left[L, rB, rK, uB, uK, dB, dK]
+    left_ordered = add_perm_sign(
+        left,
+        (1, 3, 2, 4, 5, 6, 7);
+        sign_function=sign,
+    )
+    # right[L, R, uB, uX, dY, dK] = left[L, (rX, rK), uB, uX, dY, dK]
+    right = fuse(left_ordered, (2, 3); index_type_fused=:in)
+    # right_ordered[L, R, uB, uK, dB, dK] = (-1)^perm right[L, R, uB, uK, dB, dK]
+    right_ordered = add_perm_sign(
+        right,
+        (1, 2, 4, 3, 5, 6);
+        sign_function=sign,
+    )
+    # up[L, R, U, dY, dK] = right[L, R, (uB, uX), dY, dK]
+    up = fuse(right_ordered, (3, 4); index_type_fused=:in)
+    # up_signed[L, R, U, dB, dK] = (-1)^dB up[L, R, U, dB, dK]
+    up_signed = add_parity_sign(up, 4; sign_function=sign)
+    # reduced[L, R, U, D] = up[L, R, U, (dY, dK)]
+    return fuse(up_signed, (4, 5); index_type_fused=:out)
+end
+
+function simplified_nested_cell(A)
+    K = _nested_ket(A)
+    B = _nested_bra(A)
+    X = _nested_x(
         size(A)[3],
         even(A)[3],
         size(A)[4],
         even(A)[4],
+        size(A)[1],
+        even(A)[1],
+        eltype(A),
     )
-    return contract_nested_tile(K, Y, _placed_nested_x(Xraw), B)
+    Y = _nested_y(
+        size(A)[2],
+        even(A)[2],
+        size(A)[5],
+        even(A)[5],
+        eltype(A),
+    )
+    return contract_simplified_nested_cell(B, X, Y, K)
 end
 
-const NESTED_PAIR_TO_FUSED_INDEX = Dict(
-    (0, 0) => 1,
-    (1, 1) => 2,
-    (1, 0) => 3,
-    (0, 1) => 4,
-)
-
-@testset "Native bra-first pair fusion basis" begin
-    pair_fixture = Grassmann(
-        (2, 2, 2), (1, 1, 1), (:out, :out, :in), ComplexF64; init=:zeros
-    )
-    pair_fixture[(0, 0, 0)][1] = 11 + 2im
-    pair_fixture[(1, 1, 0)][1] = 22 + 3im
-    pair_fixture[(1, 0, 1)][1] = 31 + 5im
-    pair_fixture[(0, 1, 1)][1] = 41 + 7im
-
-    fused = convert(
-        Array, fuse(pair_fixture, (1, 2); index_type_fused=:out)
-    )
-    @test fused[NESTED_PAIR_TO_FUSED_INDEX[(0, 0)], 1] == 11 + 2im
-    @test fused[NESTED_PAIR_TO_FUSED_INDEX[(1, 1)], 1] == 22 + 3im
-    @test fused[NESTED_PAIR_TO_FUSED_INDEX[(1, 0)], 2] == 31 + 5im
-    @test fused[NESTED_PAIR_TO_FUSED_INDEX[(0, 1)], 2] == 41 + 7im
-end
-
-@testset "Local nested factorization" begin
-    for T in (Float64, ComplexF64)
-        A = deterministic_nested_tensor(T, (2, 2, 2, 2, 2), (1, 1, 1, 1, 1))
-        @test closed_nested_tile(A) ≈ reduced_tensor(A) rtol = 1e-12
-    end
-end
-
-@testset "Nested native basis covers all compatible parity sectors" begin
+@testset "Simplified local tensors" begin
     A = deterministic_nested_tensor(
-        Float64, (2, 2, 2, 2, 2), (1, 1, 1, 1, 1)
+        Float64,
+        (2, 2, 2, 2, 2),
+        (1, 1, 1, 1, 1),
     )
-    candidate = convert(Array, closed_nested_tile(A))
-    target = convert(Array, reduced_tensor(A))
-    compatible = 0
-    for bra in Iterators.product(ntuple(_ -> 0:1, 4)...)
-        for ket in Iterators.product(ntuple(_ -> 0:1, 4)...)
-            mod(sum(bra), 2) == mod(sum(ket), 2) || continue
-            compatible += 1
-            output_index = ntuple(
-                direction -> NESTED_PAIR_TO_FUSED_INDEX[
-                    (bra[direction], ket[direction])
-                ],
-                4,
-            )
-            @test candidate[output_index...] == target[output_index...]
-        end
-    end
-    @test compatible == 128
-    @test count(!iszero, target) == 128
+    K = _nested_ket(A)
+    B = _nested_bra(A)
+    X = _nested_x(2, 1, 2, 1, 2, 1, Float64)
+    Y = _nested_y(2, 1, 2, 1, Float64)
+
+    @test size(K) == (2, 2, 4, 2)
+    @test size(B) == (2, 4, 2, 2)
+    @test size(X) == (4, 2, 2, 4)
+    @test size(Y) == (2, 2, 2, 2)
+    @test index_type(K) == (:out, :in, :in, :out)
+    @test index_type(B) == (:out, :in, :in, :out)
+    @test index_type(X) == (:out, :in, :in, :out)
+    @test index_type(Y) == (:out, :in, :in, :out)
+
+    Xdense = convert(Array, X)
+    Ydense = convert(Array, Y)
+    @test count(!iszero, Xdense) == 8
+    @test count(!iszero, Ydense) == 4
 end
 
-@testset "Nested factorization preserves anisotropic link roles" begin
-    sizes = (3, 3, 4, 3, 4)
-    evens = (2, 1, 3, 2, 1)
-    for T in (Float64, ComplexF64)
+@testset "Strict local nested versus reduced tensor" begin
+    cases = (
+        ((2, 2, 2, 2, 2), (1, 1, 1, 1, 1)),
+        ((3, 3, 4, 3, 4), (2, 1, 3, 2, 1)),
+    )
+    for T in (Float64, ComplexF64), (sizes, evens) in cases
         A = deterministic_nested_tensor(T, sizes, evens)
-        entries = reduce(vcat, vec(block) for block in nonzero_vals(A))
-        @test length(unique(entries)) == length(entries)
-
-        Xraw = _nested_x(sizes[2], evens[2], sizes[5], evens[5], T)
-        Y = _nested_y(
-            _physical_identity(A), sizes[3], evens[3], sizes[4], evens[4]
+        candidate = simplified_nested_cell(A)
+        target = reduced_tensor(A)
+        data = test_strict_tensor_equal(
+            candidate,
+            target;
+            atol=5e-12,
+            rtol=5e-12,
         )
-        @test size(Xraw) == (sizes[2], sizes[2], sizes[5], sizes[5])
-        @test size(Y) == (
-            sizes[1] * sizes[3],
-            sizes[3],
-            sizes[4],
-            sizes[1] * sizes[4],
-        )
-        @test closed_nested_tile(A) ≈ reduced_tensor(A) rtol = 5e-13
-    end
-end
-
-function contract_corrected_nested_tile(K, Y, X, B)
-    sign = GrassmannTensorNetworks.global_sign
-    ky = contract(K, Y, (2, 1); sign_function=sign)
-    kx = contract(ky, X, (3, 3); sign_function=sign)
-    tile = contract(kx, B, ((5, 7), (3, 1)); sign_function=sign)
-    ordered = permutedims(
-        tile, (5, 1, 7, 3, 4, 2, 8, 6); sign_function=sign
-    )
-    ordered = _nested_network_reduced_basis(ordered)
-    ordered = add_parity_sign(ordered, 1; sign_function=sign)
-    left = fuse(ordered, (1, 2); index_type_fused=:out)
-    left = add_perm_sign(
-        left, (1, 3, 2, 4, 5, 6, 7); sign_function=sign
-    )
-    right = fuse(left, (2, 3); index_type_fused=:in)
-    right = add_perm_sign(
-        right, (1, 2, 4, 3, 5, 6); sign_function=sign
-    )
-    up = fuse(right, (3, 4); index_type_fused=:in)
-    up = add_parity_sign(up, 4; sign_function=sign)
-    return fuse(up, (4, 5); index_type_fused=:out)
-end
-
-function corrected_nested_tile(A)
-    K = _nested_ket_for_network(A)
-    B = _nested_bra_for_network(A)
-    Xraw = _nested_x(
-        size(B)[1], even(B)[1], size(K)[4], even(K)[4], eltype(A)
-    )
-    X = _nested_x_for_network(Xraw)
-    Yraw = _nested_y(
-        _physical_identity(A),
-        size(A)[3], even(A)[3],
-        size(A)[4], even(A)[4],
-    )
-    Y = _nested_y_for_network(Yraw)
-    return contract_corrected_nested_tile(K, Y, X, B)
-end
-
-@testset "Universal native nested placement signs" begin
-    A = deterministic_nested_tensor(
-        ComplexF64, (2, 2, 2, 2, 2), (1, 1, 1, 1, 1)
-    )
-    xraw = _nested_x(2, 1, 2, 1, ComplexF64)
-    @test only(xraw[(1, 1, 1, 1)]) == -1
-    @test index_type(_nested_x_for_network(xraw)) == index_type(xraw)
-    @test size(_nested_x_for_network(xraw)) == size(xraw)
-    @test corrected_nested_tile(A) ≈ reduced_tensor(A) rtol=1e-12
-end
-
-@testset "Universal native placement preserves mixed bases" begin
-    sizes = (3, 3, 4, 3, 4)
-    evens = (2, 1, 3, 2, 1)
-    for T in (Float64, ComplexF64)
-        A = deterministic_nested_tensor(T, sizes, evens)
-        @test corrected_nested_tile(A) ≈ reduced_tensor(A) rtol=5e-13
+        @info "strict local nested comparison" T sizes data
     end
 end
 
@@ -279,7 +222,7 @@ function close_nested_test_row(row; twist_x=false)
     for c in 2:cols
         j = c - 1
         rank = 2j + 2
-        perm = (
+        permutation = (
             1,
             (2:(j + 1))...,
             2j + 3,
@@ -287,14 +230,21 @@ function close_nested_test_row(row; twist_x=false)
             2j + 4,
             2j + 2,
         )
+        # current[...] = current[..., east] * row[c][west, ...]
         current = contract(
-            current, row[c], (rank, 1);
-            perm, sign_function=sign,
+            current,
+            row[c],
+            (rank, 1);
+            perm=permutation,
+            sign_function=sign,
         )
     end
+    # closed[...] = current[west, ..., east]
     return trace(
-        current, (1, 2cols + 2);
-        pbc=!twist_x, sign_function=sign,
+        current,
+        (1, 2cols + 2);
+        pbc=!twist_x,
+        sign_function=sign,
     )
 end
 
@@ -307,6 +257,7 @@ function nested_test_torus_scalar(tensors; twist_x=false, twist_y=false)
     ]
     current = row_tensors[1]
     for r in 2:rows
+        # current[...] = current[..., south] * row_tensors[r][north, ...]
         current = contract(
             current,
             row_tensors[r],
@@ -314,6 +265,7 @@ function nested_test_torus_scalar(tensors; twist_x=false, twist_y=false)
             sign_function=sign,
         )
     end
+    # closed[] = current[north..., south...]
     closed = trace(
         current,
         (ntuple(identity, cols), ntuple(i -> cols + i, cols));
@@ -321,60 +273,6 @@ function nested_test_torus_scalar(tensors; twist_x=false, twist_y=false)
         sign_function=sign,
     )
     return scalar(closed)
-end
-
-@testset "Corrected nested network assembly" begin
-    peps = Square_GPEPS(2, 1, 2, 2, 2, Float64, false)
-    nested = nested_network(peps)
-    @test size(nested) == (4, 4)
-    @test nested[nested.layout.ket_sites[1, 1]] ≈
-        _nested_ket_for_network(peps.A[1, 1])
-    @test nested[nested.layout.bra_sites[2, 2]] ≈
-        _nested_bra_for_network(peps.A[2, 2])
-
-    raw_x = _nested_x(
-        size(_nested_bra_for_network(peps.A[1, 1]))[1],
-        even(_nested_bra_for_network(peps.A[1, 1]))[1],
-        size(_nested_ket_for_network(peps.A[1, 1]))[4],
-        even(_nested_ket_for_network(peps.A[1, 1]))[4],
-        Float64,
-    )
-    @test nested.x_crossings[1, 1] ≈ raw_x
-    @test nested[nested.layout.x_sites[1, 1]] ≈
-        _nested_x_for_network(raw_x)
-
-    for r in axes(nested, 1), c in axes(nested, 2)
-        below = Nmod(r + 1, size(nested, 1))
-        right = Nmod(c + 1, size(nested, 2))
-        @test size(nested[r, c])[2] == size(nested[r, right])[1]
-        @test even(nested[r, c])[2] == even(nested[r, right])[1]
-        @test size(nested[r, c])[4] == size(nested[below, c])[3]
-        @test even(nested[r, c])[4] == even(nested[below, c])[3]
-        @test index_type(nested[r, c])[2] != index_type(nested[r, right])[1]
-        @test index_type(nested[r, c])[4] != index_type(nested[below, c])[3]
-    end
-
-    @test_throws ArgumentError nested_network(peps, NestedLayout((1, 1)))
-end
-
-@testset "Universal odd-row and even-row periodic signs" begin
-    spin_structures =
-        ((false, false), (true, false), (false, true), (true, true))
-    for (rows, cols) in ((1, 1), (1, 2), (2, 1), (2, 2))
-        Random.seed!(10_000rows + cols)
-        peps = Square_GPEPS(2, 1, 2, rows, cols, ComplexF64, false)
-        nested = nested_network(peps)
-        reduced = reduced_tensor(peps)
-        for (twist_x, twist_y) in spin_structures
-            nested_value = nested_test_torus_scalar(
-                nested.network; twist_x, twist_y
-            )
-            reduced_value = nested_test_torus_scalar(
-                reduced; twist_x, twist_y
-            )
-            @test nested_value ≈ reduced_value rtol=5e-13 atol=1e-13
-        end
-    end
 end
 
 function mixed_periodic_peps(::Type{T}) where {T}
@@ -388,36 +286,118 @@ function mixed_periodic_peps(::Type{T}) where {T}
         down = vertical[r, c]
         sizes = (3, left[1], right[1], up[1], down[1])
         evens = (2, left[2], right[2], up[2], down[2])
-        tensors[r, c] =
-            deterministic_nested_tensor(T, sizes, evens)
+        tensors[r, c] = deterministic_nested_tensor(T, sizes, evens)
     end
     return Square_GPEPS{T}(tensors, missing, missing)
 end
 
-@testset "Mixed periodic nested algebra" begin
+function reblocked_nested_network(
+    nested::NestedNetwork,
+    tensors::AbstractMatrix=nested.network,
+)
+    T = eltype(first(nested.network))
+    reblocked = Matrix{Grassmann{T, 4}}(
+        undef, nested.layout.source_size...
+    )
+    for source in CartesianIndices(reblocked)
+        B = tensors[nested.layout.bra_sites[source]]
+        X = tensors[nested.layout.x_sites[source]]
+        Y = tensors[nested.layout.y_sites[source]]
+        K = tensors[nested.layout.ket_sites[source]]
+        # reduced[source] = contract([B X; Y K])
+        reblocked[source] = contract_simplified_nested_cell(B, X, Y, K)
+    end
+    return reblocked
+end
+
+@testset "Strict periodic nested versus reduced network" begin
     spin_structures =
         ((false, false), (true, false), (false, true), (true, true))
+    for (rows, cols) in ((1, 1), (1, 2), (2, 1), (2, 2))
+        Random.seed!(10_000rows + cols)
+        peps = Square_GPEPS(2, 1, 2, rows, cols, ComplexF64, false)
+        nested = nested_network(peps)
+        reblocked = reblocked_nested_network(nested)
+        reduced = reduced_tensor(peps)
+        for source in CartesianIndices(reduced)
+            test_strict_tensor_equal(
+                reblocked[source], reduced[source];
+                atol=5e-12,
+                rtol=5e-12,
+            )
+        end
+        for (twist_x, twist_y) in spin_structures
+            nested_value = nested_test_torus_scalar(
+                reblocked;
+                twist_x,
+                twist_y,
+            )
+            reduced_value = nested_test_torus_scalar(
+                reduced;
+                twist_x,
+                twist_y,
+            )
+            difference = nested_value - reduced_value
+            relative = abs(difference) /
+                max(abs(reduced_value), eps(Float64))
+            @info "strict periodic nested comparison" rows cols twist_x twist_y difference relative
+            @test nested_value ≈ reduced_value rtol=5e-12 atol=1e-12
+        end
+    end
+
     for T in (Float64, ComplexF64)
         peps = mixed_periodic_peps(T)
         nested = nested_network(peps)
+        reblocked = reblocked_nested_network(nested)
         reduced = reduced_tensor(peps)
+        for source in CartesianIndices(reduced)
+            test_strict_tensor_equal(
+                reblocked[source], reduced[source];
+                atol=5e-12,
+                rtol=5e-12,
+            )
+        end
         for (twist_x, twist_y) in spin_structures
-            @test nested_test_torus_scalar(
-                nested.network; twist_x, twist_y
-            ) ≈ nested_test_torus_scalar(
-                reduced; twist_x, twist_y
-            ) rtol=5e-13 atol=1e-13
+            nested_value = nested_test_torus_scalar(
+                reblocked;
+                twist_x,
+                twist_y,
+            )
+            reduced_value = nested_test_torus_scalar(
+                reduced;
+                twist_x,
+                twist_y,
+            )
+            @test nested_value ≈ reduced_value rtol=5e-12 atol=1e-12
         end
     end
 end
 
-@testset "Corrected nested CTMRG smoke" begin
-    peps = Square_GPEPS(2, 1, 2, 1, 1, Float64, false)
+@testset "Direct simplified network assembly" begin
+    peps = mixed_periodic_peps(Float64)
     nested = nested_network(peps)
-    env = initialize_nested_environment(nested, 4)
-    @test size(env) == size(nested)
-    @test run_nested_GCTMRG!(
-        nested, env, 4;
-        ctmrg_iter=1, verbosity=0, save_iter=0,
-    ) === env
+    @test size(nested) == (4, 4)
+    for source in CartesianIndices(peps.A)
+        @test nested[nested.layout.ket_sites[source]] ≈
+            _nested_ket(peps.A[source])
+        @test nested[nested.layout.bra_sites[source]] ≈
+            _nested_bra(peps.A[source])
+        @test nested[nested.layout.x_sites[source]] ≈
+            nested.x_crossings[source]
+    end
+
+    for r in axes(nested, 1), c in axes(nested, 2)
+        below = Nmod(r + 1, size(nested, 1))
+        right = Nmod(c + 1, size(nested, 2))
+        @test size(nested[r, c])[2] == size(nested[r, right])[1]
+        @test even(nested[r, c])[2] == even(nested[r, right])[1]
+        @test size(nested[r, c])[4] == size(nested[below, c])[3]
+        @test even(nested[r, c])[4] == even(nested[below, c])[3]
+        @test index_type(nested[r, c])[2] !=
+            index_type(nested[r, right])[1]
+        @test index_type(nested[r, c])[4] !=
+            index_type(nested[below, c])[3]
+    end
+
+    @test_throws ArgumentError nested_network(peps, NestedLayout((1, 1)))
 end

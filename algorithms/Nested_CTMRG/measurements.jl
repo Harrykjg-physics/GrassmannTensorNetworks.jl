@@ -1,28 +1,22 @@
 _source_site(site::CartesianIndex{2}) = site
 _source_site(site::Tuple{Int, Int}) = CartesianIndex(site)
 
-function _nested_y_operator_raw(
+function _nested_x_operator_raw(
     nested::NestedNetwork,
     peps::Square_GPEPS,
     source::CartesianIndex{2},
     operator::Grassmann{T, 2},
 ) where {T}
-    rows, cols = size(peps)
-    east_source =
-        CartesianIndex(source[1], Nmod(source[2] + 1, cols))
-    north_source =
-        CartesianIndex(Nmod(source[1] - 1, rows), source[2])
-    east_ket = nested[nested.layout.ket_sites[east_source]]
-    north_bra = nested[nested.layout.bra_sites[north_source]]
-    raw = _nested_y(
+    A = peps.A[source]
+    # X_source(O)[L, r, u, D] = _nested_x(O, right(A), up(A))
+    return _nested_x(
         operator,
-        size(east_ket)[1], even(east_ket)[1],
-        size(north_bra)[4], even(north_bra)[4],
+        size(A)[3], even(A)[3],
+        size(A)[4], even(A)[4],
     )
-    return _nested_y_for_network(raw)
 end
 
-function nested_y_operator(
+function nested_x_operator(
     nested::NestedNetwork,
     peps::Square_GPEPS,
     site,
@@ -43,8 +37,11 @@ function nested_y_operator(
         ))
     index_type(operator) == (:out, :in) ||
         throw(ArgumentError("operator arrows must be (:out, :in)"))
-    return _nested_y_operator_raw(nested, peps, source, operator)
+    return _nested_x_operator_raw(nested, peps, source, operator)
 end
+
+# nested_y_operator(...) = nested_x_operator(...) preserves the former public API name.
+nested_y_operator(args...) = nested_x_operator(args...)
 
 function compute_nested_exp_site(
     nested::NestedNetwork,
@@ -54,12 +51,13 @@ function compute_nested_exp_site(
     site,
 )
     source = _source_site(site)
-    ysite = nested.layout.y_sites[source]
-    impurity = nested_y_operator(nested, peps, source, operator)
+    xsite = nested.layout.x_sites[source]
+    # impurity[xsite] = X_source(operator)
+    impurity = nested_x_operator(nested, peps, source, operator)
     return compute_exp_site(
-        nested[ysite], impurity,
-        env.El[ysite], env.Er[ysite], env.Eu[ysite], env.Ed[ysite],
-        env.Clu[ysite], env.Cru[ysite], env.Cld[ysite], env.Crd[ysite],
+        nested[xsite], impurity,
+        env.El[xsite], env.Er[xsite], env.Eu[xsite], env.Ed[xsite],
+        env.Clu[xsite], env.Cru[xsite], env.Cld[xsite], env.Crd[xsite],
     )
 end
 
@@ -135,11 +133,13 @@ function _check_nested_bond_operator(
 end
 
 function _operator_schmidt(operator::Grassmann{T, 4}) where {T}
+    # matrix_order[po1, pi1, po2, pi2] <-- operator[po1, po2, pi1, pi2]
     matrix_order = permutedims(
         operator, (1, 3, 2, 4); sign_function=global_sign
     )
     dense = convert(Array, matrix_order)
     dout1, dout2, din1, din2 = size(operator)
+    # matrix[(po1, pi1), (po2, pi2)] = matrix_order[po1, pi1, po2, pi2]
     matrix = reshape(
         dense,
         dout1 * din1, dout2 * din2,
@@ -188,6 +188,7 @@ function _operator_schmidt(operator::Grassmann{T, 4}) where {T}
                 (:out, :in);
                 parity=parity_symbol,
             )
+            # operator[po1, po2, pi1, pi2] += left[po1, pi1] * right[po2, pi2]
             push!(terms, (left, right))
         end
     end
@@ -272,22 +273,22 @@ function _contract_nested_hpatch3(
     nested::NestedNetwork,
     env::CTMRGEnv,
     source::CartesianIndex{2},
-    left_y::Grassmann,
-    right_y::Grassmann,
+    left_x::Grassmann,
+    right_x::Grassmann,
 )
-    y1 = nested.layout.y_sites[source]
+    x1 = nested.layout.x_sites[source]
     next_source = CartesianIndex(
         source[1],
         Nmod(source[2] + 1, nested.layout.source_size[2]),
     )
-    y2 = nested.layout.y_sites[next_source]
+    x2 = nested.layout.x_sites[next_source]
     middle = CartesianIndex(
-        y1[1], Nmod(y1[2] + 1, size(nested, 2))
+        x1[1], Nmod(x1[2] + 1, size(nested, 2))
     )
     return _contract_horizontal_strip(
-        (left_y, nested[middle], right_y),
+        (left_x, nested[middle], right_x),
         env,
-        (y1, middle, y2),
+        (x1, middle, x2),
     )
 end
 
@@ -295,22 +296,22 @@ function _contract_nested_vpatch3(
     nested::NestedNetwork,
     env::CTMRGEnv,
     source::CartesianIndex{2},
-    top_y::Grassmann,
-    bottom_y::Grassmann,
+    top_x::Grassmann,
+    bottom_x::Grassmann,
 )
-    y1 = nested.layout.y_sites[source]
+    x1 = nested.layout.x_sites[source]
     next_source = CartesianIndex(
         Nmod(source[1] + 1, nested.layout.source_size[1]),
         source[2],
     )
-    y2 = nested.layout.y_sites[next_source]
+    x2 = nested.layout.x_sites[next_source]
     middle = CartesianIndex(
-        Nmod(y1[1] + 1, size(nested, 1)), y1[2]
+        Nmod(x1[1] + 1, size(nested, 1)), x1[2]
     )
     return _contract_vertical_strip(
-        (top_y, nested[middle], bottom_y),
+        (top_x, nested[middle], bottom_x),
         env,
-        (y1, middle, y2),
+        (x1, middle, x2),
     )
 end
 
@@ -329,10 +330,9 @@ function compute_nested_exp_hbond(
         source[1], Nmod(source[2] + 1, size(peps)[2])
     )
     _check_nested_bond_operator(peps, operator, source, neighbor)
-    identity_left = _physical_identity(peps.A[source])
-    identity_right = _physical_identity(peps.A[neighbor])
-    closed_left = nested_y_operator(nested, peps, source, identity_left)
-    closed_right = nested_y_operator(nested, peps, neighbor, identity_right)
+    closed_left = nested[nested.layout.x_sites[source]]
+    closed_right = nested[nested.layout.x_sites[neighbor]]
+    # denominator = C_h[X_source(I), B, X_neighbor(I)]
     denominator = _contract_nested_hpatch3(
         nested, env, source, closed_left, closed_right
     )
@@ -342,14 +342,13 @@ function compute_nested_exp_hbond(
         promote_type(typeof(denominator_value), eltype(operator))
     numerator = zero(numerator_type)
     for (left_op, right_op) in terms
-        left_y = nested_y_operator(nested, peps, source, left_op)
-        right_y = nested_y_operator(nested, peps, neighbor, right_op)
-        term_sign =
-            (-one(eltype(operator)))^tensor_parity(left_op)
+        left_x = nested_x_operator(nested, peps, source, left_op)
+        right_x = nested_x_operator(nested, peps, neighbor, right_op)
         term = _contract_nested_hpatch3(
-            nested, env, source, left_y, right_y
+            nested, env, source, left_x, right_x
         )
-        numerator += term_sign * _nested_scalar_or_zero(term)
+        # numerator += C_h[X(left_op), B, X(right_op)]
+        numerator += _nested_scalar_or_zero(term)
     end
     return denominator, numerator / denominator_value
 end
@@ -366,10 +365,9 @@ function compute_nested_exp_vbond(
         Nmod(source[1] + 1, size(peps)[1]), source[2]
     )
     _check_nested_bond_operator(peps, operator, source, neighbor)
-    identity_top = _physical_identity(peps.A[source])
-    identity_bottom = _physical_identity(peps.A[neighbor])
-    closed_top = nested_y_operator(nested, peps, source, identity_top)
-    closed_bottom = nested_y_operator(nested, peps, neighbor, identity_bottom)
+    closed_top = nested[nested.layout.x_sites[source]]
+    closed_bottom = nested[nested.layout.x_sites[neighbor]]
+    # denominator = C_v[X_source(I), K, X_neighbor(I)]
     denominator = _contract_nested_vpatch3(
         nested, env, source, closed_top, closed_bottom
     )
@@ -379,12 +377,15 @@ function compute_nested_exp_vbond(
         promote_type(typeof(denominator_value), eltype(operator))
     numerator = zero(numerator_type)
     for (top_op, bottom_op) in terms
-        top_y = nested_y_operator(nested, peps, source, top_op)
-        bottom_y = nested_y_operator(nested, peps, neighbor, bottom_op)
+        top_x = nested_x_operator(nested, peps, source, top_op)
+        bottom_x = nested_x_operator(nested, peps, neighbor, bottom_op)
         term = _contract_nested_vpatch3(
-            nested, env, source, top_y, bottom_y
+            nested, env, source, top_x, bottom_x
         )
-        numerator += _nested_scalar_or_zero(term)
+        term_sign =
+            (-one(eltype(operator)))^tensor_parity(top_op)
+        # numerator += (-1)^|top_op| * C_v[X(top_op), K, X(bottom_op)]
+        numerator += term_sign * _nested_scalar_or_zero(term)
     end
     return denominator, numerator / denominator_value
 end

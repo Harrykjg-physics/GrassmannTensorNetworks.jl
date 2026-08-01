@@ -41,7 +41,7 @@ export CTMRGEnv, run_GCTMRG!, find_maxiter, read_CTMRG_env
 export compute_exp_site, compute_exp_hbond, compute_exp_vbond
 export NestedLayout, NestedNetwork
 export nested_network, initialize_nested_environment, run_nested_GCTMRG!
-export nested_y_operator
+export nested_x_operator, nested_y_operator
 export compute_nested_exp_site, compute_nested_exp_hbond, compute_nested_exp_vbond
 export Grassmann_SU
 

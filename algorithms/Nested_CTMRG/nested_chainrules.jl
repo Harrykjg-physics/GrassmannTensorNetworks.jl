@@ -1,199 +1,61 @@
-function ChainRulesCore.rrule(
-    ::typeof(_graded_pair_sign), t::Grassmann, i::Int, j::Int
-)
-    y = _graded_pair_sign(t, i, j)
-    function pullback(delta)
-        delta = unthunk(delta)
-        delta isa AbstractZero && return (
-            NoTangent(), ZeroTangent(), NoTangent(), NoTangent()
-        )
-        return (
-            NoTangent(),
-            _graded_pair_sign(delta, i, j),
-            NoTangent(),
-            NoTangent(),
-        )
-    end
-    return y, pullback
+function _nested_ket_explicit(A::Grassmann)
+    # A_perm[l, r, p, u, d] = A[p, l, r, u, d]
+    A_perm = permutedims(
+        A, (2, 3, 1, 4, 5);
+        sign_function=GrassmannTensorNetworks.global_sign,
+    )
+    # A_signed[l, r, p, u, d] = (-1)^p A_perm[l, r, p, u, d]
+    A_signed = add_parity_sign(
+        A_perm, 3;
+        sign_function=GrassmannTensorNetworks.global_sign,
+    )
+    # K0[l, r, U, d] = A_signed[l, r, (p, u), d]
+    K0 = fuse(A_signed, (3, 4); index_type_fused=:in)
+    # K1[l, r, U, d] = (-1)^l K0[l, r, U, d]
+    K1 = add_parity_sign(
+        K0, 1;
+        sign_function=GrassmannTensorNetworks.global_sign,
+    )
+    # K2[l, r, U, d] = (-1)^r K1[l, r, U, d]
+    K2 = add_parity_sign(
+        K1, 2;
+        sign_function=GrassmannTensorNetworks.global_sign,
+    )
+    # K[l, r, U, d] = (-1)^d K2[l, r, U, d]
+    return add_parity_sign(
+        K2, 4;
+        sign_function=GrassmannTensorNetworks.global_sign,
+    )
 end
 
-function _nested_hbond_from_prepared(
-    nested,
-    env,
-    source,
-    closed_left,
-    closed_right,
-    prepared_terms,
-    numerator_zero,
-)
-    denominator = _contract_nested_hpatch3(
-        nested, env, source, closed_left, closed_right
+function _nested_bra_explicit(A::Grassmann)
+    A_conj = conj(
+        A; sign_function=GrassmannTensorNetworks.global_sign
     )
-    denominator_value = _nested_scalar_or_zero(denominator)
-    numerator = numerator_zero
-    for (sign, left_y, right_y) in prepared_terms
-        term = _contract_nested_hpatch3(
-            nested, env, source, left_y, right_y
-        )
-        numerator += sign * _nested_scalar_or_zero(term)
-    end
-    return denominator, numerator / denominator_value
-end
-
-function _nested_vbond_from_prepared(
-    nested,
-    env,
-    source,
-    closed_top,
-    closed_bottom,
-    prepared_terms,
-    numerator_zero,
-)
-    denominator = _contract_nested_vpatch3(
-        nested, env, source, closed_top, closed_bottom
+    # A_perm[l, p, r, u, d] = conj(A)[p, l, r, u, d]
+    A_perm = permutedims(
+        A_conj, (2, 1, 3, 4, 5);
+        sign_function=GrassmannTensorNetworks.global_sign,
     )
-    denominator_value = _nested_scalar_or_zero(denominator)
-    numerator = numerator_zero
-    for (top_y, bottom_y) in prepared_terms
-        term = _contract_nested_vpatch3(
-            nested, env, source, top_y, bottom_y
-        )
-        numerator += _nested_scalar_or_zero(term)
-    end
-    return denominator, numerator / denominator_value
-end
-
-function ChainRulesCore.rrule(
-    config::RuleConfig{>:HasReverseMode},
-    ::typeof(compute_nested_exp_hbond),
-    nested::NestedNetwork,
-    peps::Square_GPEPS,
-    operator::Grassmann{<:Number, 4},
-    env::CTMRGEnv,
-    site,
-)
-    y = compute_nested_exp_hbond(
-        nested, peps, operator, env, site
+    # A_signed[l, p, r, u, d] = (-1)^d A_perm[l, p, r, u, d]
+    A_signed = add_parity_sign(
+        A_perm, 5;
+        sign_function=GrassmannTensorNetworks.global_sign,
     )
-    source = _source_site(site)
-    neighbor = CartesianIndex(
-        source[1], Nmod(source[2] + 1, size(peps)[2])
+    # B0[l, R, u, d] = A_signed[l, (p, r), u, d]
+    B0 = fuse(A_signed, (2, 3); index_type_fused=:in)
+    # B1[l, R, u, d] = conjugation(B0[l, R, u, d], (l, u, d))
+    B1 = index_conjugation(B0, (1, 3, 4))
+    # B2[l, R, u, d] = (-1)^l B1[l, R, u, d]
+    B2 = add_parity_sign(
+        B1, 1;
+        sign_function=GrassmannTensorNetworks.global_sign,
     )
-    identity_left = _physical_identity(peps.A[source])
-    identity_right = _physical_identity(peps.A[neighbor])
-    closed_left = nested_y_operator(
-        nested, peps, source, identity_left
+    # B[l, R, u, d] = (-1)^u B2[l, R, u, d]
+    return add_parity_sign(
+        B2, 3;
+        sign_function=GrassmannTensorNetworks.global_sign,
     )
-    closed_right = nested_y_operator(
-        nested, peps, neighbor, identity_right
-    )
-    prepared_terms = map(_operator_schmidt(operator)) do (left_op, right_op)
-        sign = (-one(eltype(operator)))^tensor_parity(left_op)
-        left_y = nested_y_operator(nested, peps, source, left_op)
-        right_y = nested_y_operator(nested, peps, neighbor, right_op)
-        return sign, left_y, right_y
-    end
-    denominator_value = _nested_scalar_or_zero(first(y))
-    numerator_type =
-        promote_type(typeof(denominator_value), eltype(operator))
-    numerator_zero = zero(numerator_type)
-    _, prepared_pullback = rrule_via_ad(
-        config,
-        (network, boundary) -> _nested_hbond_from_prepared(
-            network,
-            boundary,
-            source,
-            closed_left,
-            closed_right,
-            prepared_terms,
-            numerator_zero,
-        ),
-        nested,
-        env,
-    )
-
-    # Fixed-observable contract: the operator decomposition and direct PEPS
-    # geometry are static. This is not an operator-gradient API.
-    function pullback(delta)
-        delta = unthunk(delta)
-        delta isa AbstractZero && return (
-            NoTangent(), ZeroTangent(), NoTangent(),
-            NoTangent(), ZeroTangent(), NoTangent(),
-        )
-        _, delta_nested, delta_env = prepared_pullback(delta)
-        return (
-            NoTangent(), delta_nested, NoTangent(),
-            NoTangent(), delta_env, NoTangent(),
-        )
-    end
-    return y, pullback
-end
-
-function ChainRulesCore.rrule(
-    config::RuleConfig{>:HasReverseMode},
-    ::typeof(compute_nested_exp_vbond),
-    nested::NestedNetwork,
-    peps::Square_GPEPS,
-    operator::Grassmann{<:Number, 4},
-    env::CTMRGEnv,
-    site,
-)
-    y = compute_nested_exp_vbond(
-        nested, peps, operator, env, site
-    )
-    source = _source_site(site)
-    neighbor = CartesianIndex(
-        Nmod(source[1] + 1, size(peps)[1]), source[2]
-    )
-    identity_top = _physical_identity(peps.A[source])
-    identity_bottom = _physical_identity(peps.A[neighbor])
-    closed_top = nested_y_operator(
-        nested, peps, source, identity_top
-    )
-    closed_bottom = nested_y_operator(
-        nested, peps, neighbor, identity_bottom
-    )
-    prepared_terms = map(_operator_schmidt(operator)) do (top_op, bottom_op)
-        top_y = nested_y_operator(nested, peps, source, top_op)
-        bottom_y = nested_y_operator(
-            nested, peps, neighbor, bottom_op
-        )
-        return top_y, bottom_y
-    end
-    denominator_value = _nested_scalar_or_zero(first(y))
-    numerator_type =
-        promote_type(typeof(denominator_value), eltype(operator))
-    numerator_zero = zero(numerator_type)
-    _, prepared_pullback = rrule_via_ad(
-        config,
-        (network, boundary) -> _nested_vbond_from_prepared(
-            network,
-            boundary,
-            source,
-            closed_top,
-            closed_bottom,
-            prepared_terms,
-            numerator_zero,
-        ),
-        nested,
-        env,
-    )
-
-    # Fixed-observable contract: the operator decomposition and direct PEPS
-    # geometry are static. This is not an operator-gradient API.
-    function pullback(delta)
-        delta = unthunk(delta)
-        delta isa AbstractZero && return (
-            NoTangent(), ZeroTangent(), NoTangent(),
-            NoTangent(), ZeroTangent(), NoTangent(),
-        )
-        _, delta_nested, delta_env = prepared_pullback(delta)
-        return (
-            NoTangent(), delta_nested, NoTangent(),
-            NoTangent(), delta_env, NoTangent(),
-        )
-    end
-    return y, pullback
 end
 
 function ChainRulesCore.rrule(
@@ -201,7 +63,7 @@ function ChainRulesCore.rrule(
     ::typeof(_nested_ket),
     A::Grassmann,
 )
-    y, raw_pullback = rrule_via_ad(config, _nested_ket_raw, A)
+    y, raw_pullback = rrule_via_ad(config, _nested_ket_explicit, A)
     function pullback(delta)
         delta = unthunk(delta)
         delta isa AbstractZero && return NoTangent(), ZeroTangent()
@@ -209,21 +71,6 @@ function ChainRulesCore.rrule(
         return NoTangent(), delta_A
     end
     return y, pullback
-end
-
-function _nested_bra_explicit_bends(A::Grassmann)
-    bra = conj(
-        A; sign_function=GrassmannTensorNetworks.global_sign
-    )
-    signed = _graded_pair_sign(bra, 1, 4)
-    routed = permutedims(
-        signed, (2, 3, 1, 4, 5);
-        sign_function=GrassmannTensorNetworks.global_sign,
-    )
-    fused = fuse(routed, (3, 4); index_type_fused=:in)
-    bent_left = _bend_index(fused, 1)
-    bent_right = _bend_index(bent_left, 2)
-    return _bend_index(bent_right, 4)
 end
 
 function ChainRulesCore.rrule(
@@ -231,87 +78,12 @@ function ChainRulesCore.rrule(
     ::typeof(_nested_bra),
     A::Grassmann,
 )
-    y = _nested_bra_raw(A)
-    _, raw_pullback = rrule_via_ad(
-        config, _nested_bra_explicit_bends, A
-    )
+    y, raw_pullback = rrule_via_ad(config, _nested_bra_explicit, A)
     function pullback(delta)
         delta = unthunk(delta)
         delta isa AbstractZero && return NoTangent(), ZeroTangent()
         _, delta_A = raw_pullback(delta)
         return NoTangent(), delta_A
-    end
-    return y, pullback
-end
-
-function ChainRulesCore.rrule(
-    config::RuleConfig{>:HasReverseMode},
-    ::typeof(_nested_ket_for_network),
-    A::Grassmann,
-)
-    y, pullback_A = rrule_via_ad(
-        config,
-        input -> _nested_ket(
-            add_parity_sign(
-                input, 4;
-                sign_function=GrassmannTensorNetworks.global_sign,
-            )
-        ),
-        A,
-    )
-    function pullback(delta)
-        delta = unthunk(delta)
-        delta isa AbstractZero && return NoTangent(), ZeroTangent()
-        _, delta_A = pullback_A(delta)
-        return NoTangent(), delta_A
-    end
-    return y, pullback
-end
-
-function ChainRulesCore.rrule(
-    config::RuleConfig{>:HasReverseMode},
-    ::typeof(_nested_bra_for_network),
-    A::Grassmann,
-)
-    y, pullback_A = rrule_via_ad(
-        config,
-        input -> _nested_bra(
-            add_parity_sign(
-                input, 4;
-                sign_function=GrassmannTensorNetworks.global_sign,
-            )
-        ),
-        A,
-    )
-    function pullback(delta)
-        delta = unthunk(delta)
-        delta isa AbstractZero && return NoTangent(), ZeroTangent()
-        _, delta_A = pullback_A(delta)
-        return NoTangent(), delta_A
-    end
-    return y, pullback
-end
-
-function ChainRulesCore.rrule(
-    ::typeof(_nested_x_for_network), xraw::Grassmann
-)
-    y = _nested_x_for_network(xraw)
-    function pullback(delta)
-        delta = unthunk(delta)
-        delta isa AbstractZero && return NoTangent(), ZeroTangent()
-        return NoTangent(), _nested_x_for_network(delta)
-    end
-    return y, pullback
-end
-
-function ChainRulesCore.rrule(
-    ::typeof(_nested_y_for_network), yraw::Grassmann
-)
-    y = _nested_y_for_network(yraw)
-    function pullback(delta)
-        delta = unthunk(delta)
-        delta isa AbstractZero && return NoTangent(), ZeroTangent()
-        return NoTangent(), _nested_y_for_network(delta)
     end
     return y, pullback
 end
@@ -338,12 +110,8 @@ function ChainRulesCore.rrule(
     peps::Square_GPEPS,
     layout::NestedLayout,
 )
-    ket_rules = map(
-        A -> rrule_via_ad(config, _nested_ket_for_network, A), peps.A
-    )
-    bra_rules = map(
-        A -> rrule_via_ad(config, _nested_bra_for_network, A), peps.A
-    )
+    ket_rules = map(A -> rrule_via_ad(config, _nested_ket, A), peps.A)
+    bra_rules = map(A -> rrule_via_ad(config, _nested_bra, A), peps.A)
     nested = nested_network(peps, layout)
 
     function pullback(delta_nested)
@@ -354,25 +122,29 @@ function ChainRulesCore.rrule(
         delta_network isa AbstractZero &&
             return NoTangent(), ZeroTangent(), NoTangent()
         raw_gradients = map(CartesianIndices(peps.A)) do source
-            _, dket = last(ket_rules[source])(
+            _, delta_ket = last(ket_rules[source])(
                 delta_network[layout.ket_sites[source]]
             )
-            _, dbra = last(bra_rules[source])(
+            _, delta_bra = last(bra_rules[source])(
                 delta_network[layout.bra_sites[source]]
             )
             return _add_nested_cotangents(
-                unthunk(dket), unthunk(dbra), peps.A[source]
+                delta_ket,
+                delta_bra,
+                peps.A[source],
             )
         end
         Tensor = eltype(peps.A)
         gradients = map(CartesianIndices(peps.A)) do source
             gradient = raw_gradients[source]
             primal = peps.A[source]
-            gradient isa AbstractZero ? primal * zero(eltype(primal)) : gradient
+            gradient isa AbstractZero ?
+                primal * zero(eltype(primal)) : gradient
         end
         delta_peps = Tangent{typeof(peps)}(
             ; A=Matrix{Tensor}(gradients),
-              Λx=NoTangent(), Λy=NoTangent()
+              Λx=NoTangent(),
+              Λy=NoTangent(),
         )
         return NoTangent(), delta_peps, NoTangent()
     end
@@ -384,8 +156,9 @@ function ChainRulesCore.rrule(
     ::typeof(nested_network),
     peps::Square_GPEPS,
 )
-    nested, pullback =
-        rrule(config, nested_network, peps, NestedLayout(peps))
+    nested, pullback = rrule(
+        config, nested_network, peps, NestedLayout(peps)
+    )
     function two_argument_pullback(delta)
         _, delta_peps, _ = pullback(delta)
         return NoTangent(), delta_peps
@@ -393,47 +166,24 @@ function ChainRulesCore.rrule(
     return nested, two_argument_pullback
 end
 
-function _nested_y_operator_from_crossing(
-    operator::Grassmann,
-    crossing::Grassmann,
-)
-    product = contract(
-        operator, crossing;
-        sign_function=GrassmannTensorNetworks.global_sign,
-    )
-    routed = permutedims(
-        product, (1, 3, 4, 5, 2, 6);
-        sign_function=GrassmannTensorNetworks.global_sign,
-    )
-    west_fused = fuse(routed, (1, 2); index_type_fused=:out)
-    raw = fuse(west_fused, (4, 5); index_type_fused=:out)
-    return _nested_y_for_network(raw)
-end
-
 function ChainRulesCore.rrule(
     config::RuleConfig{>:HasReverseMode},
-    ::typeof(nested_y_operator),
+    ::typeof(nested_x_operator),
     nested::NestedNetwork,
     peps::Square_GPEPS,
     site,
     operator::Grassmann,
 )
-    y = nested_y_operator(nested, peps, site, operator)
+    y = nested_x_operator(nested, peps, site, operator)
     source = _source_site(site)
-    rows, cols = size(peps)
-    east_source = CartesianIndex(source[1], Nmod(source[2] + 1, cols))
-    north_source = CartesianIndex(Nmod(source[1] - 1, rows), source[2])
-    east_ket = nested[nested.layout.ket_sites[east_source]]
-    north_bra = nested[nested.layout.bra_sites[north_source]]
-    crossing = _nested_x(
-        size(east_ket)[1], even(east_ket)[1],
-        size(north_bra)[4], even(north_bra)[4],
-        eltype(operator),
-    )
-
+    A = peps.A[source]
     _, operator_pullback = rrule_via_ad(
         config,
-        op -> _nested_y_operator_from_crossing(op, crossing),
+        op -> _nested_x(
+            op,
+            size(A)[3], even(A)[3],
+            size(A)[4], even(A)[4],
+        ),
         operator,
     )
     function pullback(delta)
@@ -446,6 +196,179 @@ function ChainRulesCore.rrule(
         return (
             NoTangent(), NoTangent(), NoTangent(),
             NoTangent(), delta_operator,
+        )
+    end
+    return y, pullback
+end
+
+function ChainRulesCore.rrule(
+    config::RuleConfig{>:HasReverseMode},
+    ::typeof(nested_y_operator),
+    nested::NestedNetwork,
+    peps::Square_GPEPS,
+    site,
+    operator::Grassmann,
+)
+    return rrule(
+        config,
+        nested_x_operator,
+        nested,
+        peps,
+        site,
+        operator,
+    )
+end
+
+function _nested_hbond_from_prepared(
+    nested,
+    env,
+    source,
+    closed_left,
+    closed_right,
+    prepared_terms,
+    numerator_zero,
+)
+    denominator = _contract_nested_hpatch3(
+        nested, env, source, closed_left, closed_right
+    )
+    denominator_value = _nested_scalar_or_zero(denominator)
+    numerator = numerator_zero
+    for (left_x, right_x) in prepared_terms
+        term = _contract_nested_hpatch3(
+            nested, env, source, left_x, right_x
+        )
+        numerator += _nested_scalar_or_zero(term)
+    end
+    return denominator, numerator / denominator_value
+end
+
+function _nested_vbond_from_prepared(
+    nested,
+    env,
+    source,
+    closed_top,
+    closed_bottom,
+    prepared_terms,
+    numerator_zero,
+)
+    denominator = _contract_nested_vpatch3(
+        nested, env, source, closed_top, closed_bottom
+    )
+    denominator_value = _nested_scalar_or_zero(denominator)
+    numerator = numerator_zero
+    for (sign, top_x, bottom_x) in prepared_terms
+        term = _contract_nested_vpatch3(
+            nested, env, source, top_x, bottom_x
+        )
+        numerator += sign * _nested_scalar_or_zero(term)
+    end
+    return denominator, numerator / denominator_value
+end
+
+function ChainRulesCore.rrule(
+    config::RuleConfig{>:HasReverseMode},
+    ::typeof(compute_nested_exp_hbond),
+    nested::NestedNetwork,
+    peps::Square_GPEPS,
+    operator::Grassmann{<:Number, 4},
+    env::CTMRGEnv,
+    site,
+)
+    y = compute_nested_exp_hbond(nested, peps, operator, env, site)
+    source = _source_site(site)
+    neighbor = CartesianIndex(
+        source[1], Nmod(source[2] + 1, size(peps)[2])
+    )
+    closed_left = nested[nested.layout.x_sites[source]]
+    closed_right = nested[nested.layout.x_sites[neighbor]]
+    prepared_terms = map(_operator_schmidt(operator)) do (left_op, right_op)
+        left_x = nested_x_operator(nested, peps, source, left_op)
+        right_x = nested_x_operator(nested, peps, neighbor, right_op)
+        return left_x, right_x
+    end
+    denominator_value = _nested_scalar_or_zero(first(y))
+    numerator_zero = zero(promote_type(
+        typeof(denominator_value), eltype(operator)
+    ))
+    _, prepared_pullback = rrule_via_ad(
+        config,
+        (network, boundary) -> _nested_hbond_from_prepared(
+            network,
+            boundary,
+            source,
+            closed_left,
+            closed_right,
+            prepared_terms,
+            numerator_zero,
+        ),
+        nested,
+        env,
+    )
+    function pullback(delta)
+        delta = unthunk(delta)
+        delta isa AbstractZero && return (
+            NoTangent(), ZeroTangent(), NoTangent(),
+            NoTangent(), ZeroTangent(), NoTangent(),
+        )
+        _, delta_nested, delta_env = prepared_pullback(delta)
+        return (
+            NoTangent(), delta_nested, NoTangent(),
+            NoTangent(), delta_env, NoTangent(),
+        )
+    end
+    return y, pullback
+end
+
+function ChainRulesCore.rrule(
+    config::RuleConfig{>:HasReverseMode},
+    ::typeof(compute_nested_exp_vbond),
+    nested::NestedNetwork,
+    peps::Square_GPEPS,
+    operator::Grassmann{<:Number, 4},
+    env::CTMRGEnv,
+    site,
+)
+    y = compute_nested_exp_vbond(nested, peps, operator, env, site)
+    source = _source_site(site)
+    neighbor = CartesianIndex(
+        Nmod(source[1] + 1, size(peps)[1]), source[2]
+    )
+    closed_top = nested[nested.layout.x_sites[source]]
+    closed_bottom = nested[nested.layout.x_sites[neighbor]]
+    prepared_terms = map(_operator_schmidt(operator)) do (top_op, bottom_op)
+        sign = (-one(eltype(operator)))^tensor_parity(top_op)
+        top_x = nested_x_operator(nested, peps, source, top_op)
+        bottom_x = nested_x_operator(nested, peps, neighbor, bottom_op)
+        return sign, top_x, bottom_x
+    end
+    denominator_value = _nested_scalar_or_zero(first(y))
+    numerator_zero = zero(promote_type(
+        typeof(denominator_value), eltype(operator)
+    ))
+    _, prepared_pullback = rrule_via_ad(
+        config,
+        (network, boundary) -> _nested_vbond_from_prepared(
+            network,
+            boundary,
+            source,
+            closed_top,
+            closed_bottom,
+            prepared_terms,
+            numerator_zero,
+        ),
+        nested,
+        env,
+    )
+    function pullback(delta)
+        delta = unthunk(delta)
+        delta isa AbstractZero && return (
+            NoTangent(), ZeroTangent(), NoTangent(),
+            NoTangent(), ZeroTangent(), NoTangent(),
+        )
+        _, delta_nested, delta_env = prepared_pullback(delta)
+        return (
+            NoTangent(), delta_nested, NoTangent(),
+            NoTangent(), delta_env, NoTangent(),
         )
     end
     return y, pullback

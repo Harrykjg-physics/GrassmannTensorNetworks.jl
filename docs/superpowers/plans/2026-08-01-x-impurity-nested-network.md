@@ -201,9 +201,9 @@ errors through both names.
 
 Use finite torus closure only. Compare nested/reduced denominator, numerator,
 and normalized ratio for every spin structure. Place Schmidt factors at X
-sites. Lock horizontal `X-B-X` to no extra scalar sign and vertical `X-K-X` to
-`(-1)^tensor_parity(top_operator)`; if RED evidence contradicts this, change
-only the convention-level sign after tracing the exact contraction.
+sites. The RED audit ultimately fixes horizontal `X-B-X` to no extra scalar
+sign and vertical `X-K-X` to `(-1)^tensor_parity(top_operator)`, together
+with the local odd-X correction `(-1)^(q*(1+u))`.
 
 - [ ] **Step 3: Run measurement RED on the server**
 
