@@ -68,6 +68,110 @@ Useful helpers include:
 - `correlation_function_horizontal`
 - `correlation_function_vertical`
 
+## Nested CTMRG
+
+### Network layout and CTMRG reuse
+
+`NestedLayout` records the source and doubled unit-cell sizes and maps every
+source site to its K, Y, X, and B positions. `NestedNetwork` stores the
+resulting rank-4 tensor matrix, its layout, and the raw X crossings. The
+public constructors and main builder are:
+
+```julia
+layout = NestedLayout((Lx, Ly))
+layout = NestedLayout(peps)
+nested = NestedNetwork(network, layout, x_crossings)
+nested = nested_network(peps)
+nested = nested_network(peps, layout)
+```
+
+For an `Lx x Ly` `Square_GPEPS`, this constructs a `2Lx x 2Ly` K/Y/X/B
+checkerboard. `NestedNetwork` supports `size`, `axes`, and indexing like its
+underlying tensor matrix. The three-argument `NestedNetwork` constructor wraps
+an already assembled compatible network; `nested_network` performs the K/Y/X/B
+construction and link checks.
+
+The nested network uses the existing CTMRG environment and iteration code:
+
+```julia
+env = initialize_nested_environment(nested, chi)
+run_nested_GCTMRG!(nested, env, chi; ctmrg_iter=20, ctmrg_tol=1e-10)
+```
+
+`initialize_nested_environment` also accepts an optional `chi_even`, which
+defaults to `div(chi, 2)`. `run_nested_GCTMRG!` forwards keyword arguments to
+`run_GCTMRG!`, checks that the network and environment unit cells match, and
+updates and returns `env`.
+
+### Measurements
+
+`nested_y_operator(nested, peps, site, operator)` constructs the Y tensor with
+a rank-2 physical operator inserted at `site`. The operator must match the
+local physical dimension and parity split and have arrows `(:out, :in)`.
+
+The public expectation-value routines are:
+
+```julia
+compute_nested_exp_site(nested, peps, operator, env, site)
+compute_nested_exp_hbond(nested, peps, operator, env, site)
+compute_nested_exp_vbond(nested, peps, operator, env, site)
+
+compute_nested_exp_site(nested, peps, operators, env)
+compute_nested_exp_hbond(nested, peps, operators, env)
+compute_nested_exp_vbond(nested, peps, operators, env)
+```
+
+Each returns `(denominator, value)`, where `value` is the normalized
+expectation value. The site operator is rank 2. Bond operators are rank 4,
+have arrows `(:out, :out, :in, :in)`, and must have even total parity. In the
+no-`site` overloads, `operators` is a matrix matching the PEPS unit cell; the
+result is `(denominators, values)`, two matrices with that same unit-cell size.
+Horizontal and vertical bond routines use the periodic right and lower
+neighbor, respectively.
+
+The exact one-site and nearest-neighbor tests do not run CTMRG. They close the
+nested and reduced networks directly for all four boundary twists and compare
+their denominator, numerator, and ratio. A separate public multi-Schmidt-term
+aggregation regression uses a freshly initialized environment with zero
+CTMRG iterations; it is not a CTMRG convergence test.
+
+### Fermionic signs and representation
+
+The nested construction keeps all signs in the existing Grassmann operations:
+
+- K and B inputs receive the north-leg parity twist before their local
+  construction.
+- X and Y placement applies the graded permutation convention through
+  `add_perm_sign`; X placement also carries its required parity sign.
+- A horizontal odd operator-Schmidt term receives the endpoint-exchange
+  factor `(-1)^tensor_parity(left_operator)`. The corresponding vertical term
+  has no additional endpoint-exchange factor.
+- Conjugation, index bending, contraction, fusion, and permutation continue
+  to use the package `global_sign` convention.
+
+No MPO representation or new Grassmann tensor primitive is introduced.
+`NestedNetwork` is a lightweight layout wrapper around the existing rank-4
+`Grassmann` tensors, and the implementation uses `add_parity_sign`,
+`add_perm_sign`, conjugation, contraction, and fusion.
+
+### Automatic differentiation
+
+Nested reverse rules are defined in
+`algorithms/Nested_CTMRG/nested_chainrules.jl` and loaded only through
+`GrassmannChainRulesCoreExt`. Loading `ChainRulesCore` and `Zygote` activates
+them without adding either package to the core dependency path. The extension
+provides rules for `nested_network` and operator-dressed `nested_y_operator`
+construction.
+
+The public horizontal and vertical measurement rules use a fixed-observable
+contract: they preserve cotangents for `nested` and `env`, while `peps`, the
+bond operator, and the site are treated as static. Consequently these public
+bond rules do not support gradients with respect to the operator. For a site
+measurement with a fixed boundary and fixed nested network, the direct PEPS
+argument has a structural-zero derivative; the rank-2 operator derivative is
+supported and tested. Rebuild `nested_network(peps)` inside the differentiated
+objective when PEPS-tensor gradients are required.
+
 ## Dependency order
 
 The package loads these layers in the following order:
@@ -76,6 +180,7 @@ The package loads these layers in the following order:
 2. Utility and ansatz helpers from `auxiliary/`.
 3. Model builders from `auxiliary/models.jl`.
 4. CTMRG environment, iteration, and measurement routines.
-5. Simple-update PEPS evolution.
+5. Nested-network construction and measurement routines.
+6. Simple-update PEPS evolution.
 
 This order matters because the algorithms depend on both the core `Grassmann` operations and the auxiliary PEPS/model helpers.
