@@ -1701,6 +1701,9 @@ placed X/Y, `nested_network` (including a structured tangent whose `network`
 field alone is `ZeroTangent()`), and operator-dressed Y rules. Also assert
 that the Y rule primal exactly matches `nested_y_operator` and preserves the
 public validation error for an invalid operator.
+For a high-level Zygote objective that reads only constant crossing metadata,
+accept either `nothing` (Zygote's no-gradient representation) or an explicit
+numeric zero; keep the direct `rrule` structured-cotangent assertion strict.
 
 - [ ] **Step 7: Add one-site and bond-energy gradient tests**
 
