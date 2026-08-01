@@ -1990,8 +1990,8 @@ function _normalized_gradient_candidate(
 )
     inner_optim_iter >= 0 ||
         throw(ArgumentError("inner_optim_iter must be nonnegative"))
-    max_step_norm >= 0 ||
-        throw(ArgumentError("max_step_norm must be nonnegative"))
+    isfinite(max_step_norm) && max_step_norm >= 0 ||
+        throw(ArgumentError("max_step_norm must be finite and nonnegative"))
 
     origin = normalized_params(params)
     initial_value, gradient_tuple = Zygote.withgradient(objective, origin)
@@ -2107,6 +2107,11 @@ function run_Square_SpinlessFermion_AD_nested(
     average_trunc::Bool=true,
     verbosity::Int=0,
 )
+    ad_iter > 0 || throw(ArgumentError("ad_iter must be positive"))
+    isfinite(step_shrink) && 0 < step_shrink < 1 ||
+        throw(ArgumentError("step_shrink must be finite and in (0, 1)"))
+    isfinite(min_step) && min_step > 0 ||
+        throw(ArgumentError("min_step must be finite and positive"))
     Random.seed!(seed)
     started = time()
     parameter_count = square_gpeps_parameter_count(2, 1, D, Lx, Ly)
@@ -2290,6 +2295,9 @@ numeric objectives: deterministic repeatability, quadratic descent,
 normalization and total trust radius, constant-objective zero-gradient/no
 move, and nonfinite-objective no move. Check the smoke history contains finite
 candidate diagnostics and the Armijo status/trial counters.
+Add driver validation tests for nonpositive/nonfinite `min_step` and for
+`step_shrink` outside the finite open interval `(0, 1)`; these values must
+throw before CTMRG so the outer backtracking loop cannot become infinite.
 
 Do not add this CTMRG/AD smoke to `test/nested_measurements.jl`: those
 tests remain dedicated to the approved environment-free nested/reduced
