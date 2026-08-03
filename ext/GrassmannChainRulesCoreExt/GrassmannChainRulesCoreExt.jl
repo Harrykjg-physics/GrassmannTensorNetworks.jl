@@ -21,6 +21,8 @@ import GrassmannTensorNetworks:
     nested_network, nested_x_operator, nested_y_operator,
     compute_nested_exp_hbond, compute_nested_exp_vbond,
     _source_site,
+    _layout_down_source, _layout_right_source,
+    _layout_bra_site, _layout_ket_site, _layout_x_site,
     _nested_ket, _nested_bra,
     _nested_x,
     _operator_schmidt,

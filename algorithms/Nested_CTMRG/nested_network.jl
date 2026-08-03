@@ -1,3 +1,4 @@
+
 struct NestedLayout
     source_size::Tuple{Int, Int}
     nested_size::Tuple{Int, Int}
@@ -8,30 +9,53 @@ struct NestedLayout
 end
 
 function NestedLayout(source_size::Tuple{Int, Int})
+
     rows, cols = source_size
     rows > 0 && cols > 0 || throw(ArgumentError("source unit-cell dimensions must be positive"))
-    x = [CartesianIndex(2r, 2c - 1) for r in 1:rows, c in 1:cols]
-    bra = [
-        CartesianIndex(2r, 2Nmod(c - 1, cols))
-        for r in 1:rows, c in 1:cols
-    ]
-    ket = [
-        CartesianIndex(2Nmod(r + 1, rows) - 1, 2c - 1)
-        for r in 1:rows, c in 1:cols
-    ]
-    y = [
+
+    bra = [CartesianIndex(2Nmod(r + 1, rows) - 1, 2c - 1) for r in 1:rows, c in 1:cols]
+    # X[x, y] = (2 * mod(x + 1, Lx) - 1, 2 * mod(y - 1, Ly))
+    x = [
         CartesianIndex(
             2Nmod(r + 1, rows) - 1,
             2Nmod(c - 1, cols),
         )
         for r in 1:rows, c in 1:cols
     ]
+    # Y[x, y] = (2x, 2y - 1)
+    y = [CartesianIndex(2r, 2c - 1) for r in 1:rows, c in 1:cols]
+    # K[x, y] = (2x, 2 * mod(y - 1, Ly))
+    ket = [
+        CartesianIndex(2r, 2Nmod(c - 1, cols))
+        for r in 1:rows, c in 1:cols
+    ]
+
     return NestedLayout(source_size, (2rows, 2cols), ket, y, x, bra)
 end
 
 NestedLayout(peps::Square_GPEPS) = NestedLayout(size(peps))
 Base.size(layout::NestedLayout) = layout.nested_size
 Base.size(layout::NestedLayout, dim::Integer) = layout.nested_size[dim]
+
+_layout_right_source(layout::NestedLayout, source::CartesianIndex{2}) =
+    CartesianIndex(source[1], Nmod(source[2] + 1, layout.source_size[2]))
+
+_layout_down_source(layout::NestedLayout, source::CartesianIndex{2}) =
+    CartesianIndex(Nmod(source[1] + 1, layout.source_size[1]), source[2])
+
+_layout_x_site(layout::NestedLayout, source::CartesianIndex{2}) =
+    layout.x_sites[_layout_right_source(layout, source)]
+
+_layout_y_site(layout::NestedLayout, source::CartesianIndex{2}) =
+    layout.y_sites[_layout_down_source(layout, source)]
+
+_layout_ket_site(layout::NestedLayout, source::CartesianIndex{2}) =
+    layout.ket_sites[
+        _layout_down_source(layout, _layout_right_source(layout, source))
+    ]
+
+_layout_bra_site(layout::NestedLayout, source::CartesianIndex{2}) =
+    layout.bra_sites[source]
 
 struct NestedNetwork{T<:Number, X<:AbstractMatrix}
     network::Matrix{Grassmann{T, 4}}
@@ -216,10 +240,15 @@ function nested_network(
 
     tensors = Matrix{Grassmann{T, 4}}(undef, size(layout)...)
     for r in 1:rows, c in 1:cols
-        tensors[layout.ket_sites[r, c]] = ket[r, c]
-        tensors[layout.bra_sites[r, c]] = bra[r, c]
-        tensors[layout.x_sites[r, c]] = x[r, c]
-        tensors[layout.y_sites[r, c]] = y[r, c]
+        source = CartesianIndex(r, c)
+        # network[B_s] = B(A_s)
+        tensors[_layout_bra_site(layout, source)] = bra[source]
+        # network[X_s] = X(A_s), placed to the right of B_s.
+        tensors[_layout_x_site(layout, source)] = x[source]
+        # network[Y_s] = Y(A_s), placed below B_s.
+        tensors[_layout_y_site(layout, source)] = y[source]
+        # network[K_s] = K(A_s), placed below X_s.
+        tensors[_layout_ket_site(layout, source)] = ket[source]
     end
 
     nested = NestedNetwork(tensors, layout, x)

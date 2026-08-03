@@ -2,7 +2,11 @@ using Test
 using Random
 using GrassmannTensorNetworks
 
-import GrassmannTensorNetworks: _check_nested_operator_unit_cell
+import GrassmannTensorNetworks:
+    _check_nested_operator_unit_cell,
+    _layout_down_source,
+    _layout_right_source,
+    _layout_x_site
 
 function physical_identity(::Type{T}=Float64) where {T}
     return Grassmann(
@@ -73,7 +77,7 @@ function exact_site_networks(
 )
     nested = nested_network(peps)
     nested_impurity = copy(nested.network)
-    nested_impurity[nested.layout.x_sites[source]] =
+    nested_impurity[_layout_x_site(nested.layout, source)] =
         nested_x_operator(nested, peps, source, operator)
 
     T = eltype(peps)
@@ -119,7 +123,7 @@ end
     number = n_site(SpinlessFermionModel(1.0, 1.0, 3.0))
 
     @test nested_x_operator(nested, peps, source, identity) ≈
-        nested[nested.layout.x_sites[source]]
+        nested[_layout_x_site(nested.layout, source)]
     @test nested_y_operator(nested, peps, source, identity) ≈
         nested_x_operator(nested, peps, source, identity)
 
@@ -230,23 +234,19 @@ function exact_nested_bond_numerator(
     twist_y::Bool,
 )
     neighbor = orientation === :horizontal ?
-        CartesianIndex(
-            source[1], Nmod(source[2] + 1, size(peps)[2])
-        ) :
-        CartesianIndex(
-            Nmod(source[1] + 1, size(peps)[1]), source[2]
-        )
+        _layout_right_source(nested.layout, source) :
+        _layout_down_source(nested.layout, source)
     total = zero(nested_test_torus_scalar(
         nested.network; twist_x, twist_y
     ))
     for (left_operator, right_operator) in
         GrassmannTensorNetworks._operator_schmidt(operator)
         impurity = copy(nested.network)
-        impurity[nested.layout.x_sites[source]] =
+        impurity[_layout_x_site(nested.layout, source)] =
             nested_x_operator(
                 nested, peps, source, left_operator
             )
-        impurity[nested.layout.x_sites[neighbor]] =
+        impurity[_layout_x_site(nested.layout, neighbor)] =
             nested_x_operator(
                 nested, peps, neighbor, right_operator
             )

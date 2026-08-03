@@ -13,18 +13,38 @@ import GrassmannTensorNetworks:
     _nested_ket,
     _nested_bra,
     _nested_x,
-    _nested_y
+    _nested_y,
+    _layout_ket_site,
+    _layout_bra_site,
+    _layout_x_site,
+    _layout_y_site
 
-@testset "Nested layout follows the B-X/Y-K source cell" begin
-    layout = NestedLayout((2, 3))
-    @test size(layout) == (4, 6)
-    @test layout.source_size == (2, 3)
+@testset "Nested layout follows the CTMRG coordinate convention" begin
+    layout = NestedLayout((2, 2))
+    @test size(layout) == (4, 4)
+    @test layout.source_size == (2, 2)
 
-    # source[2, 3] = [B X; Y K] across the periodic row boundary.
-    @test layout.bra_sites[2, 3] == CartesianIndex(4, 4)
-    @test layout.x_sites[2, 3] == CartesianIndex(4, 5)
-    @test layout.y_sites[2, 3] == CartesianIndex(1, 4)
-    @test layout.ket_sites[2, 3] == CartesianIndex(1, 5)
+    expected_bra = [
+        CartesianIndex(3, 1) CartesianIndex(3, 3)
+        CartesianIndex(1, 1) CartesianIndex(1, 3)
+    ]
+    expected_x = [
+        CartesianIndex(3, 4) CartesianIndex(3, 2)
+        CartesianIndex(1, 4) CartesianIndex(1, 2)
+    ]
+    expected_y = [
+        CartesianIndex(2, 1) CartesianIndex(2, 3)
+        CartesianIndex(4, 1) CartesianIndex(4, 3)
+    ]
+    expected_ket = [
+        CartesianIndex(2, 4) CartesianIndex(2, 2)
+        CartesianIndex(4, 4) CartesianIndex(4, 2)
+    ]
+
+    @test layout.bra_sites == expected_bra
+    @test layout.x_sites == expected_x
+    @test layout.y_sites == expected_y
+    @test layout.ket_sites == expected_ket
     @test_throws ArgumentError NestedLayout((0, 3))
 
     peps = Square_GPEPS(2, 1, 2, 1, 2, Float64, false)
@@ -300,10 +320,10 @@ function reblocked_nested_network(
         undef, nested.layout.source_size...
     )
     for source in CartesianIndices(reblocked)
-        B = tensors[nested.layout.bra_sites[source]]
-        X = tensors[nested.layout.x_sites[source]]
-        Y = tensors[nested.layout.y_sites[source]]
-        K = tensors[nested.layout.ket_sites[source]]
+        B = tensors[_layout_bra_site(nested.layout, source)]
+        X = tensors[_layout_x_site(nested.layout, source)]
+        Y = tensors[_layout_y_site(nested.layout, source)]
+        K = tensors[_layout_ket_site(nested.layout, source)]
         # reduced[source] = contract([B X; Y K])
         reblocked[source] = contract_simplified_nested_cell(B, X, Y, K)
     end
@@ -378,12 +398,18 @@ end
     nested = nested_network(peps)
     @test size(nested) == (4, 4)
     for source in CartesianIndices(peps.A)
-        @test nested[nested.layout.ket_sites[source]] ≈
+        @test nested[_layout_ket_site(nested.layout, source)] ≈
             _nested_ket(peps.A[source])
-        @test nested[nested.layout.bra_sites[source]] ≈
+        @test nested[_layout_bra_site(nested.layout, source)] ≈
             _nested_bra(peps.A[source])
-        @test nested[nested.layout.x_sites[source]] ≈
+        @test nested[_layout_x_site(nested.layout, source)] ≈
             nested.x_crossings[source]
+        @test nested[_layout_y_site(nested.layout, source)] ≈
+            _nested_y(
+                size(peps.A[source])[2], even(peps.A[source])[2],
+                size(peps.A[source])[5], even(peps.A[source])[5],
+                eltype(peps.A[source]),
+            )
     end
 
     for r in axes(nested, 1), c in axes(nested, 2)
@@ -397,6 +423,13 @@ end
             index_type(nested[r, right])[1]
         @test index_type(nested[r, c])[4] !=
             index_type(nested[below, c])[3]
+
+        # horizontal_flow[right, left] = T_left[l, r, u, d] * T_right[l, r, u, d]
+        @test index_type(nested[r, c])[1] == :out
+        @test index_type(nested[r, c])[2] == :in
+        # vertical_flow[top, bottom] = T_top[l, r, u, d] * T_bottom[l, r, u, d]
+        @test index_type(nested[r, c])[3] == :in
+        @test index_type(nested[r, c])[4] == :out
     end
 
     @test_throws ArgumentError nested_network(peps, NestedLayout((1, 1)))

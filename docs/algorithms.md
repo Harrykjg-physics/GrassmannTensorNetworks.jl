@@ -86,8 +86,11 @@ nested = nested_network(peps, layout)
 ```
 
 For an `Lx x Ly` `Square_GPEPS`, this constructs a `2Lx x 2Ly` checkerboard.
-Each source tensor is represented by the periodic source-centred cell
-`[B X; Y K]`: X is to the right of B, and Y is to the left of K.
+The first source coordinate grows downward and the second grows rightward.
+Each physical source tensor is represented by the periodic source-centred cell
+`[B X; Y K]`: X is to the right of B, and Y is below B. The stored
+Grassmann arrows follow the CTMRG input convention: horizontally right-to-left
+and vertically top-to-bottom.
 `NestedNetwork` supports `size`, `axes`, and indexing like its
 underlying tensor matrix. The three-argument `NestedNetwork` constructor wraps
 an already assembled compatible network; `nested_network` performs the K/Y/X/B

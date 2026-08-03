@@ -51,7 +51,7 @@ function compute_nested_exp_site(
     site,
 )
     source = _source_site(site)
-    xsite = nested.layout.x_sites[source]
+    xsite = _layout_x_site(nested.layout, source)
     # impurity[xsite] = X_source(operator)
     impurity = nested_x_operator(nested, peps, source, operator)
     return compute_exp_site(
@@ -276,12 +276,9 @@ function _contract_nested_hpatch3(
     left_x::Grassmann,
     right_x::Grassmann,
 )
-    x1 = nested.layout.x_sites[source]
-    next_source = CartesianIndex(
-        source[1],
-        Nmod(source[2] + 1, nested.layout.source_size[2]),
-    )
-    x2 = nested.layout.x_sites[next_source]
+    x1 = _layout_x_site(nested.layout, source)
+    next_source = _layout_right_source(nested.layout, source)
+    x2 = _layout_x_site(nested.layout, next_source)
     middle = CartesianIndex(
         x1[1], Nmod(x1[2] + 1, size(nested, 2))
     )
@@ -299,12 +296,9 @@ function _contract_nested_vpatch3(
     top_x::Grassmann,
     bottom_x::Grassmann,
 )
-    x1 = nested.layout.x_sites[source]
-    next_source = CartesianIndex(
-        Nmod(source[1] + 1, nested.layout.source_size[1]),
-        source[2],
-    )
-    x2 = nested.layout.x_sites[next_source]
+    x1 = _layout_x_site(nested.layout, source)
+    next_source = _layout_down_source(nested.layout, source)
+    x2 = _layout_x_site(nested.layout, next_source)
     middle = CartesianIndex(
         Nmod(x1[1] + 1, size(nested, 1)), x1[2]
     )
@@ -326,12 +320,10 @@ function compute_nested_exp_hbond(
     site,
 )
     source = _source_site(site)
-    neighbor = CartesianIndex(
-        source[1], Nmod(source[2] + 1, size(peps)[2])
-    )
+    neighbor = _layout_right_source(nested.layout, source)
     _check_nested_bond_operator(peps, operator, source, neighbor)
-    closed_left = nested[nested.layout.x_sites[source]]
-    closed_right = nested[nested.layout.x_sites[neighbor]]
+    closed_left = nested[_layout_x_site(nested.layout, source)]
+    closed_right = nested[_layout_x_site(nested.layout, neighbor)]
     # denominator = C_h[X_source(I), B, X_neighbor(I)]
     denominator = _contract_nested_hpatch3(
         nested, env, source, closed_left, closed_right
@@ -361,12 +353,10 @@ function compute_nested_exp_vbond(
     site,
 )
     source = _source_site(site)
-    neighbor = CartesianIndex(
-        Nmod(source[1] + 1, size(peps)[1]), source[2]
-    )
+    neighbor = _layout_down_source(nested.layout, source)
     _check_nested_bond_operator(peps, operator, source, neighbor)
-    closed_top = nested[nested.layout.x_sites[source]]
-    closed_bottom = nested[nested.layout.x_sites[neighbor]]
+    closed_top = nested[_layout_x_site(nested.layout, source)]
+    closed_bottom = nested[_layout_x_site(nested.layout, neighbor)]
     # denominator = C_v[X_source(I), K, X_neighbor(I)]
     denominator = _contract_nested_vpatch3(
         nested, env, source, closed_top, closed_bottom

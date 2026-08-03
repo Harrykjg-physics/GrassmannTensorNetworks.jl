@@ -123,10 +123,10 @@ function ChainRulesCore.rrule(
             return NoTangent(), ZeroTangent(), NoTangent()
         raw_gradients = map(CartesianIndices(peps.A)) do source
             _, delta_ket = last(ket_rules[source])(
-                delta_network[layout.ket_sites[source]]
+                delta_network[_layout_ket_site(layout, source)]
             )
             _, delta_bra = last(bra_rules[source])(
-                delta_network[layout.bra_sites[source]]
+                delta_network[_layout_bra_site(layout, source)]
             )
             return _add_nested_cotangents(
                 delta_ket,
@@ -276,11 +276,9 @@ function ChainRulesCore.rrule(
 )
     y = compute_nested_exp_hbond(nested, peps, operator, env, site)
     source = _source_site(site)
-    neighbor = CartesianIndex(
-        source[1], Nmod(source[2] + 1, size(peps)[2])
-    )
-    closed_left = nested[nested.layout.x_sites[source]]
-    closed_right = nested[nested.layout.x_sites[neighbor]]
+    neighbor = _layout_right_source(nested.layout, source)
+    closed_left = nested[_layout_x_site(nested.layout, source)]
+    closed_right = nested[_layout_x_site(nested.layout, neighbor)]
     prepared_terms = map(_operator_schmidt(operator)) do (left_op, right_op)
         left_x = nested_x_operator(nested, peps, source, left_op)
         right_x = nested_x_operator(nested, peps, neighbor, right_op)
@@ -330,11 +328,9 @@ function ChainRulesCore.rrule(
 )
     y = compute_nested_exp_vbond(nested, peps, operator, env, site)
     source = _source_site(site)
-    neighbor = CartesianIndex(
-        Nmod(source[1] + 1, size(peps)[1]), source[2]
-    )
-    closed_top = nested[nested.layout.x_sites[source]]
-    closed_bottom = nested[nested.layout.x_sites[neighbor]]
+    neighbor = _layout_down_source(nested.layout, source)
+    closed_top = nested[_layout_x_site(nested.layout, source)]
+    closed_bottom = nested[_layout_x_site(nested.layout, neighbor)]
     prepared_terms = map(_operator_schmidt(operator)) do (top_op, bottom_op)
         sign = (-one(eltype(operator)))^tensor_parity(top_op)
         top_x = nested_x_operator(nested, peps, source, top_op)
