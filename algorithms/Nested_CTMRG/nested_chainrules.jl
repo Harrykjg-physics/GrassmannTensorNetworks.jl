@@ -1,61 +1,34 @@
 function _nested_ket_explicit(A::Grassmann)
-    # A_perm[l, r, p, u, d] = A[p, l, r, u, d]
+    # K_perm[l, r, p, u, d] <-- K[p, l, r, u, d]
     A_perm = permutedims(
         A, (2, 3, 1, 4, 5);
         sign_function=GrassmannTensorNetworks.global_sign,
     )
-    # A_signed[l, r, p, u, d] = (-1)^p A_perm[l, r, p, u, d]
+    # Ko1[l, r, p, u, d] = (-1)^p * K_perm[l, r, p, u, d]
     A_signed = add_parity_sign(
         A_perm, 3;
         sign_function=GrassmannTensorNetworks.global_sign,
     )
-    # K0[l, r, U, d] = A_signed[l, r, (p, u), d]
-    K0 = fuse(A_signed, (3, 4); index_type_fused=:in)
-    # K1[l, r, U, d] = (-1)^l K0[l, r, U, d]
-    K1 = add_parity_sign(
-        K0, 1;
-        sign_function=GrassmannTensorNetworks.global_sign,
-    )
-    # K2[l, r, U, d] = (-1)^r K1[l, r, U, d]
-    K2 = add_parity_sign(
-        K1, 2;
-        sign_function=GrassmannTensorNetworks.global_sign,
-    )
-    # K[l, r, U, d] = (-1)^d K2[l, r, U, d]
-    return add_parity_sign(
-        K2, 4;
-        sign_function=GrassmannTensorNetworks.global_sign,
-    )
+    # Ko2[l, r, U, d] = Ko1[l, r, (p, u), d]
+    return fuse(A_signed, (3, 4); index_type_fused=:in)
 end
 
 function _nested_bra_explicit(A::Grassmann)
     A_conj = conj(
         A; sign_function=GrassmannTensorNetworks.global_sign
     )
-    # A_perm[l, p, r, u, d] = conj(A)[p, l, r, u, d]
+    # B_perm[l, p, r, u, d] <-- B[p, l, r, u, d]
     A_perm = permutedims(
         A_conj, (2, 1, 3, 4, 5);
         sign_function=GrassmannTensorNetworks.global_sign,
     )
-    # A_signed[l, p, r, u, d] = (-1)^d A_perm[l, p, r, u, d]
+    # Bo1[l, p, r, u, d] = (-1)^r * B_perm[l, p, r, u, d]
     A_signed = add_parity_sign(
-        A_perm, 5;
+        A_perm, 3;
         sign_function=GrassmannTensorNetworks.global_sign,
     )
-    # B0[l, R, u, d] = A_signed[l, (p, r), u, d]
-    B0 = fuse(A_signed, (2, 3); index_type_fused=:in)
-    # B1[l, R, u, d] = conjugation(B0[l, R, u, d], (l, u, d))
-    B1 = index_conjugation(B0, (1, 3, 4))
-    # B2[l, R, u, d] = (-1)^l B1[l, R, u, d]
-    B2 = add_parity_sign(
-        B1, 1;
-        sign_function=GrassmannTensorNetworks.global_sign,
-    )
-    # B[l, R, u, d] = (-1)^u B2[l, R, u, d]
-    return add_parity_sign(
-        B2, 3;
-        sign_function=GrassmannTensorNetworks.global_sign,
-    )
+    # Bo2[l, R, u, d] = Bo1[l, (p, r), u, d]
+    return fuse(A_signed, (2, 3); index_type_fused=:in)
 end
 
 function ChainRulesCore.rrule(
@@ -225,20 +198,17 @@ function _nested_hbond_from_prepared(
     source,
     closed_left,
     closed_right,
-    prepared_terms,
-    numerator_zero,
+    left_x,
+    right_x,
 )
     denominator = _contract_nested_hpatch3(
         nested, env, source, closed_left, closed_right
     )
     denominator_value = _nested_scalar_or_zero(denominator)
-    numerator = numerator_zero
-    for (left_x, right_x) in prepared_terms
-        term = _contract_nested_hpatch3(
-            nested, env, source, left_x, right_x
-        )
-        numerator += _nested_scalar_or_zero(term)
-    end
+    numerator_tensor = _contract_nested_hpatch3_alpha(
+        nested, env, source, left_x, right_x
+    )
+    numerator = _nested_scalar_or_zero(numerator_tensor)
     return denominator, numerator / denominator_value
 end
 
@@ -248,20 +218,17 @@ function _nested_vbond_from_prepared(
     source,
     closed_top,
     closed_bottom,
-    prepared_terms,
-    numerator_zero,
+    top_x,
+    bottom_x,
 )
     denominator = _contract_nested_vpatch3(
         nested, env, source, closed_top, closed_bottom
     )
     denominator_value = _nested_scalar_or_zero(denominator)
-    numerator = numerator_zero
-    for (sign, top_x, bottom_x) in prepared_terms
-        term = _contract_nested_vpatch3(
-            nested, env, source, top_x, bottom_x
-        )
-        numerator += sign * _nested_scalar_or_zero(term)
-    end
+    numerator_tensor = _contract_nested_vpatch3_alpha(
+        nested, env, source, top_x, bottom_x
+    )
+    numerator = _nested_scalar_or_zero(numerator_tensor)
     return denominator, numerator / denominator_value
 end
 
@@ -279,15 +246,12 @@ function ChainRulesCore.rrule(
     neighbor = _layout_right_source(nested.layout, source)
     closed_left = nested[_layout_x_site(nested.layout, source)]
     closed_right = nested[_layout_x_site(nested.layout, neighbor)]
-    prepared_terms = map(_operator_schmidt(operator)) do (left_op, right_op)
-        left_x = nested_x_operator(nested, peps, source, left_op)
-        right_x = nested_x_operator(nested, peps, neighbor, right_op)
-        return left_x, right_x
-    end
-    denominator_value = _nested_scalar_or_zero(first(y))
-    numerator_zero = zero(promote_type(
-        typeof(denominator_value), eltype(operator)
-    ))
+    left_op, right_op = _bond_operator_gsvd(operator)
+    left_x = _nested_x_bond_operator(nested, peps, source, left_op)
+    right_x = _nested_x_bond_operator(nested, peps, neighbor, right_op)
+    right_x = add_parity_sign(
+        right_x, 5; sign_function=GrassmannTensorNetworks.global_sign
+    )
     _, prepared_pullback = rrule_via_ad(
         config,
         (network, boundary) -> _nested_hbond_from_prepared(
@@ -296,8 +260,8 @@ function ChainRulesCore.rrule(
             source,
             closed_left,
             closed_right,
-            prepared_terms,
-            numerator_zero,
+            left_x,
+            right_x,
         ),
         nested,
         env,
@@ -331,16 +295,12 @@ function ChainRulesCore.rrule(
     neighbor = _layout_down_source(nested.layout, source)
     closed_top = nested[_layout_x_site(nested.layout, source)]
     closed_bottom = nested[_layout_x_site(nested.layout, neighbor)]
-    prepared_terms = map(_operator_schmidt(operator)) do (top_op, bottom_op)
-        sign = (-one(eltype(operator)))^tensor_parity(top_op)
-        top_x = nested_x_operator(nested, peps, source, top_op)
-        bottom_x = nested_x_operator(nested, peps, neighbor, bottom_op)
-        return sign, top_x, bottom_x
-    end
-    denominator_value = _nested_scalar_or_zero(first(y))
-    numerator_zero = zero(promote_type(
-        typeof(denominator_value), eltype(operator)
-    ))
+    top_op, bottom_op = _bond_operator_gsvd(operator)
+    top_x = _nested_x_bond_operator(nested, peps, source, top_op)
+    bottom_x = _nested_x_bond_operator(nested, peps, neighbor, bottom_op)
+    top_x = add_parity_sign(
+        top_x, 5; sign_function=GrassmannTensorNetworks.global_sign
+    )
     _, prepared_pullback = rrule_via_ad(
         config,
         (network, boundary) -> _nested_vbond_from_prepared(
@@ -349,8 +309,8 @@ function ChainRulesCore.rrule(
             source,
             closed_top,
             closed_bottom,
-            prepared_terms,
-            numerator_zero,
+            top_x,
+            bottom_x,
         ),
         nested,
         env,

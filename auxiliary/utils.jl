@@ -37,15 +37,14 @@ function save(filename::String, param_str::String, args...)
 
     num = length(args)
     num > 0 && iseven(num) || throw(ArgumentError("args should be string-value pairs !"))
-    
-    "$filename.h5" in readdir() ? nothing : fid = h5open("$filename.h5", "cw")
-    param_str in keys(fid) ? nothing : create_group(fid, param_str)
 
-    for i in 1:2:num
-        args[i] isa String || throw(ArgumentError("args should be string-value pairs !"))
-        args[i] in keys(fid[param_str]) ? delete_object(fid[param_str], args[i]) : nothing
-        fid[param_str][args[i]] = args[i+1]
+    h5open("$filename.h5", "cw") do fid
+        param_str in keys(fid) ? nothing : create_group(fid, param_str)
+
+        for i in 1:2:num
+            args[i] isa String || throw(ArgumentError("args should be string-value pairs !"))
+            args[i] in keys(fid[param_str]) ? delete_object(fid[param_str], args[i]) : nothing
+            fid[param_str][args[i]] = args[i+1]
+        end
     end
-
-    close(fid)
 end

@@ -25,9 +25,11 @@ import GrassmannTensorNetworks:
     _layout_bra_site, _layout_ket_site, _layout_x_site,
     _nested_ket, _nested_bra,
     _nested_x,
-    _operator_schmidt,
+    _bond_operator_gsvd, _nested_x_bond_operator,
     _nested_scalar_or_zero,
-    _contract_nested_hpatch3, _contract_nested_vpatch3
+    _contract_nested_hpatch3, _contract_nested_vpatch3,
+    _contract_nested_hpatch3_alpha, _contract_nested_vpatch3_alpha,
+    global_sign
 
 # AD rules for grassmann.jl (constructors, convert, index_conjugation)
 include("grassmann.jl")

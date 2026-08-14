@@ -6,6 +6,7 @@ using GrassmannTensorNetworks
 @eval GrassmannTensorNetworks global global_sign = auto_sign
 
 @test isdefined(GrassmannTensorNetworks, :nested_network)
+@test isdefined(GrassmannTensorNetworks, :adapt_CTMRG)
 @test isdefined(GrassmannTensorNetworks, :initialize_nested_environment)
 @test isdefined(GrassmannTensorNetworks, :run_nested_GCTMRG!)
 
@@ -18,6 +19,28 @@ import GrassmannTensorNetworks:
     _layout_bra_site,
     _layout_x_site,
     _layout_y_site
+
+const CTMRG_INDEX_TYPE = (:out, :in, :in, :out)
+
+function reference_adapt_CTMRG_tensor(t::Grassmann{T, 4}) where {T}
+    adapted = t
+    for ind in 1:4
+        if index_type(adapted)[ind] != CTMRG_INDEX_TYPE[ind]
+            if ind in (1, 3)
+                # A_ctm[l, r, u, d] = (-1)^i * conjugation_i(A[l, r, u, d])
+                adapted = add_parity_sign(
+                    index_conjugation(adapted, ind),
+                    ind;
+                    sign_function=GrassmannTensorNetworks.global_sign,
+                )
+            else
+                # A_ctm[l, r, u, d] = conjugation_i(A[l, r, u, d])
+                adapted = index_conjugation(adapted, ind)
+            end
+        end
+    end
+    return adapted
+end
 
 @testset "Nested layout follows the CTMRG coordinate convention" begin
     layout = NestedLayout((2, 2))
@@ -190,6 +213,58 @@ function simplified_nested_cell(A)
     return contract_simplified_nested_cell(B, X, Y, K)
 end
 
+function reduced_tensor8(A)
+    sign = GrassmannTensorNetworks.global_sign
+    B = conj(A; sign_function=sign)
+    # T[l2, l1, r2, r1, u2, u1, d2, d1] <-- B[p, l2, r2, u2, d2] * A[p, l1, r1, u1, d1]
+    return contract(
+        B,
+        A,
+        (1, 1);
+        perm=(1, 5, 2, 6, 3, 7, 4, 8),
+        sign_function=sign,
+    )
+end
+
+function simplified_nested_cell8(A)
+    sign = GrassmannTensorNetworks.global_sign
+    K = _nested_ket(A)
+    B = _nested_bra(A)
+    X = _nested_x(
+        size(A)[3],
+        even(A)[3],
+        size(A)[4],
+        even(A)[4],
+        size(A)[1],
+        even(A)[1],
+        eltype(A),
+    )
+    Y = _nested_y(
+        size(A)[2],
+        even(A)[2],
+        size(A)[5],
+        even(A)[5],
+        eltype(A),
+    )
+    # BX[l2, u2, dB, r2, u1, dX] = B[l2, R, u2, dB] * X[R, r2, u1, dX]
+    BX = contract(B, X, (2, 1); sign_function=sign)
+    # BXY[l2, u2, r2, u1, dX, l1, rY, d2] = BX[l2, u2, dB, r2, u1, dX] * Y[l1, rY, dB, d2]
+    BXY = contract(BX, Y, (3, 3); sign_function=sign)
+    # cell[l2, u2, r2, u1, l1, d2, r1, d1] = BXY[l2, u2, r2, u1, dX, l1, lK, d2] * K[lK, r1, dX, d1]
+    cell = contract(
+        BXY,
+        K,
+        ((5, 7), (3, 1));
+        sign_function=sign,
+    )
+    # T[l2, l1, r2, r1, u2, u1, d2, d1] <-- cell[l2, u2, r2, u1, l1, d2, r1, d1]
+    return permutedims(
+        cell,
+        (1, 5, 3, 7, 2, 4, 6, 8);
+        sign_function=sign,
+    )
+end
+
 @testset "Simplified local tensors" begin
     A = deterministic_nested_tensor(
         Float64,
@@ -206,14 +281,59 @@ end
     @test size(X) == (4, 2, 2, 4)
     @test size(Y) == (2, 2, 2, 2)
     @test index_type(K) == (:out, :in, :in, :out)
-    @test index_type(B) == (:out, :in, :in, :out)
-    @test index_type(X) == (:out, :in, :in, :out)
-    @test index_type(Y) == (:out, :in, :in, :out)
+    @test index_type(B) == (:in, :in, :out, :in)
+    @test index_type(X) == (:out, :out, :in, :out)
+    @test index_type(Y) == (:out, :in, :out, :in)
 
     Xdense = convert(Array, X)
     Ydense = convert(Array, Y)
     @test count(!iszero, Xdense) == 8
     @test count(!iszero, Ydense) == 4
+end
+
+@testset "Strict eight-index nested versus reduced tensor" begin
+    cases = (
+        ((2, 2, 2, 2, 2), (1, 1, 1, 1, 1)),
+        ((3, 3, 4, 3, 4), (2, 1, 3, 2, 1)),
+        ((4, 3, 3, 4, 3), (1, 2, 1, 3, 2)),
+    )
+    for T in (Float64, ComplexF64), (sizes, evens) in cases
+        A = deterministic_nested_tensor(T, sizes, evens)
+        candidate = simplified_nested_cell8(A)
+        target = reduced_tensor8(A)
+        data = test_strict_tensor_equal(
+            candidate,
+            target;
+            atol=5e-12,
+            rtol=5e-12,
+        )
+        @info "strict eight-index nested comparison" T sizes data
+    end
+end
+
+@testset "Strict eight-index nested versus reduced tensor without fermionic signs" begin
+    cases = (
+        ((2, 2, 2, 2, 2), (1, 1, 1, 1, 1)),
+        ((3, 3, 4, 3, 4), (2, 1, 3, 2, 1)),
+        ((4, 3, 3, 4, 3), (1, 2, 1, 3, 2)),
+    )
+    try
+        @eval GrassmannTensorNetworks global global_sign = trivial_sign
+        for T in (Float64, ComplexF64), (sizes, evens) in cases
+            A = deterministic_nested_tensor(T, sizes, evens)
+            candidate = simplified_nested_cell8(A)
+            target = reduced_tensor8(A)
+            data = test_strict_tensor_equal(
+                candidate,
+                target;
+                atol=5e-12,
+                rtol=5e-12,
+            )
+            @info "strict eight-index nested comparison without fermionic signs" T sizes data
+        end
+    finally
+        @eval GrassmannTensorNetworks global global_sign = auto_sign
+    end
 end
 
 @testset "Strict local nested versus reduced tensor" begin
@@ -410,6 +530,18 @@ end
                 size(peps.A[source])[5], even(peps.A[source])[5],
                 eltype(peps.A[source]),
             )
+        # B[l, R, u, d] carries the bra tensor.
+        @test index_type(nested[_layout_bra_site(nested.layout, source)]) ==
+            (:in, :in, :out, :in)
+        # X[L, r, u, D] carries the physical identity/operator crossing.
+        @test index_type(nested[_layout_x_site(nested.layout, source)]) ==
+            (:out, :out, :in, :out)
+        # Y[l, r, u, d] carries the virtual Grassmann crossing.
+        @test index_type(nested[_layout_y_site(nested.layout, source)]) ==
+            (:out, :in, :out, :in)
+        # K[l, r, U, d] carries the ket tensor.
+        @test index_type(nested[_layout_ket_site(nested.layout, source)]) ==
+            (:out, :in, :in, :out)
     end
 
     for r in axes(nested, 1), c in axes(nested, 2)
@@ -424,13 +556,36 @@ end
         @test index_type(nested[r, c])[4] !=
             index_type(nested[below, c])[3]
 
-        # horizontal_flow[right, left] = T_left[l, r, u, d] * T_right[l, r, u, d]
-        @test index_type(nested[r, c])[1] == :out
-        @test index_type(nested[r, c])[2] == :in
-        # vertical_flow[top, bottom] = T_top[l, r, u, d] * T_bottom[l, r, u, d]
-        @test index_type(nested[r, c])[3] == :in
-        @test index_type(nested[r, c])[4] == :out
     end
 
     @test_throws ArgumentError nested_network(peps, NestedLayout((1, 1)))
+end
+
+@testset "CTMRG adaptation of nested network arrows" begin
+    peps = mixed_periodic_peps(Float64)
+    nested = nested_network(peps)
+    adapted = adapt_CTMRG(nested)
+
+    @test adapted !== nested
+    @test adapted.network !== nested.network
+    @test adapted.layout === nested.layout
+    @test adapted.x_crossings === nested.x_crossings
+    @test size(adapted) == size(nested)
+
+    for site in CartesianIndices(adapted.network)
+        # A_ctm[l, r, u, d] has CTMRG input arrows.
+        @test index_type(adapted[site]) == CTMRG_INDEX_TYPE
+        @test size(adapted[site]) == size(nested[site])
+        @test even(adapted[site]) == even(nested[site])
+        @test adapted[site] ≈ reference_adapt_CTMRG_tensor(nested[site])
+    end
+
+    for r in axes(adapted, 1), c in axes(adapted, 2)
+        below = Nmod(r + 1, size(adapted, 1))
+        right = Nmod(c + 1, size(adapted, 2))
+        @test index_type(adapted[r, c])[2] !=
+            index_type(adapted[r, right])[1]
+        @test index_type(adapted[r, c])[4] !=
+            index_type(adapted[below, c])[3]
+    end
 end

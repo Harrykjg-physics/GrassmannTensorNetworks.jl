@@ -1,4 +1,5 @@
 using ChainRulesCore
+using GrassmannTensorNetworks
 using LinearAlgebra
 using Random
 using Test
@@ -61,11 +62,10 @@ end
 
     nested = nested_network(peps)
     number = n_site(SpinlessFermionModel(1.0, 1.0, 3.0))
-    bond = nn_bond(SpinlessFermionModel(1.0, 1.0, 3.0))
-    odd_endpoint = first(
-        left for (left, _) in
-        GrassmannTensorNetworks._operator_schmidt(bond)
-        if tensor_parity(left) == 1
+    odd_endpoint = Grassmann(
+        [0.0 1.0; 0.0 0.0],
+        (2, 2), (1, 1), (:out, :in);
+        parity=:odd,
     )
     operator_transform(operator) =
         nested_x_operator(nested, peps, (1, 1), operator)
