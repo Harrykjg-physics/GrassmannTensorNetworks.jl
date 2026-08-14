@@ -1,6 +1,6 @@
 module GrassmannTensorNetworks
 
-using HDF5: create_group, h5open
+using HDF5: create_group, delete_object, h5open
 using LinearAlgebra
 using Printf
 using Random
@@ -12,6 +12,9 @@ using VectorInterface
 
 include("grassmann.jl")
 include("fermionsign.jl")
+
+global_sign = auto_sign
+
 include("base.jl")
 include("linalg.jl")
 include("contract.jl")
@@ -39,6 +42,10 @@ export SpinlessFermionModel, HubbardModel, n_site, nn_bond, gate
 export reduced_tensor, reduced_tensor_vbond, reduced_tensor_hbond
 export CTMRGEnv, run_GCTMRG!, find_maxiter, read_CTMRG_env
 export compute_exp_site, compute_exp_hbond, compute_exp_vbond
+export NestedLayout, NestedNetwork
+export nested_network, adapt_CTMRG, initialize_nested_environment, run_nested_GCTMRG!
+export nested_x_operator, nested_y_operator
+export compute_nested_exp_site, compute_nested_exp_hbond, compute_nested_exp_vbond
 export Grassmann_SU
 
 end

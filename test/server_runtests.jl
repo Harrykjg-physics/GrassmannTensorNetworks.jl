@@ -33,12 +33,18 @@ Random.seed!(1234567)
 start_time = time()
 
 @testset "GrassmannTensorNetworks" begin
+    @test isdefined(GrassmannTensorNetworks, :NestedLayout)
+    @test isdefined(GrassmannTensorNetworks, :NestedNetwork)
+
     include("grassmann.jl")
     include("fermionsign.jl")
     include("base.jl")
     include("fusion.jl")
     include("contract.jl")
     include("decomp.jl")
+    include("nested_network.jl")
+    include("nested_measurements.jl")
+    include("nested_chainrules.jl")
 end
 
 elapsed_minutes = round((time() - start_time) / 60; sigdigits=3)

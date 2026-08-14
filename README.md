@@ -49,3 +49,23 @@ Pkg.test()
 
 The ChainRules/Zygote rules are loaded from `ext/GrassmannChainRulesCoreExt` when `ChainRulesCore` and `Zygote` are available.
 CUDA support is loaded from `ext/GrassmannCUDAExt` when `CUDA` is available.
+
+## Examples
+
+- `examples/Spinless_Fermion_2D_Square_AD_nested/Spinless_Fermion_2D_Square_AD_nested.jl`:
+  Grassmann nested-CTMRG optimization for the square-lattice spinless fermion.
+
+Run the nested example from the repository root with, for example:
+
+```powershell
+$env:NESTED_CHI = "4"
+$env:NESTED_SEED = "1234"
+$env:NESTED_VERBOSITY = "0"
+julia --project=. examples/Spinless_Fermion_2D_Square_AD_nested/Spinless_Fermion_2D_Square_AD_nested.jl
+```
+
+The executable configuration fixes `D = 2`, `ctmrg_iter = 20`, and
+`ad_iter = 20`. The requested acceptance runs set `NESTED_CHI` to `4`, `8`,
+and `12` with a common seed. Their finite, error-free energies should show an
+overall trend toward the exact value `-6.170521774015...` as `chi` increases;
+there is no fixed one-percent error threshold at `chi = 12`.
