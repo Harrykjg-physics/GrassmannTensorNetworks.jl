@@ -66,10 +66,7 @@ function run_nested_CTMRG_Square_SpinlessFermion(
     _, Ev = compute_nested_exp_vbond(nested, peps, H_nn_bonds, env)
     Es_avg = (sum(Eh) + sum(Ev)) / length(Eh)
 
-    @printf("chi=%d nested energy/site %.12f density %.12f at t=%.6g gamma=%.6g lambda=%.6g\n", 
-    chi, Es_avg, ns_avg, t, gamma, lambda)
-    flush(stdout)
-
+    println("Average ground energy per site: $Es_avg at t = $t, γ = $γ, λ = $λ")
     save("exp_nested_ctmrg", "chi$chi", "ns", ns, "ns_avg", ns_avg, "Eh", Eh, "Ev", Ev, "Es_avg", Es_avg)
 end
 
@@ -77,7 +74,7 @@ t = -1.0
 gamma = 1.0
 lambda = 3.0  
 ctmrg_iter = 100
-peps_filename = "tensor_file"
+peps_filename = "iter4000"*"_δτ0.0001"
 peps_param_str = "D2_final"
 load_env = "random"
 verbosity = 1
