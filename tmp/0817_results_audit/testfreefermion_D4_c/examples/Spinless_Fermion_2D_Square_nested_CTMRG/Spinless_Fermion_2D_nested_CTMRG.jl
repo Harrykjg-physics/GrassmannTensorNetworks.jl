@@ -4,7 +4,6 @@ using .GrassmannTensorNetworks
 using Printf
 using Random
 
-"""
 function spinless_exact_energy(t::Real, gamma::Real, lambda::Real; nk::Int=1024)
 
     nk > 0 || throw(ArgumentError("nk must be positive"))
@@ -19,7 +18,6 @@ function spinless_exact_energy(t::Real, gamma::Real, lambda::Real; nk::Int=1024)
     end
     return -lambda - integral / nk^2
 end
-"""
 
 function run_nested_CTMRG_Square_SpinlessFermion(
     t::Float64,
@@ -74,11 +72,11 @@ function run_nested_CTMRG_Square_SpinlessFermion(
 end
 
 t = -1.0
-gamma = 1.0
+gamma = 2.0
 lambda = 3.0  
 ctmrg_iter = 100
 peps_filename = "tensor_file"
-peps_param_str = "D2_final"
+peps_param_str = "iter4000"*"_δτ0.0001"
 load_env = "random"
 verbosity = 1
 seed = 1234

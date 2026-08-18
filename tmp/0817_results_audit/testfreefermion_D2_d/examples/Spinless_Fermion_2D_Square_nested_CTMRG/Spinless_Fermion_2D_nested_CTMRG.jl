@@ -4,7 +4,6 @@ using .GrassmannTensorNetworks
 using Printf
 using Random
 
-"""
 function spinless_exact_energy(t::Real, gamma::Real, lambda::Real; nk::Int=1024)
 
     nk > 0 || throw(ArgumentError("nk must be positive"))
@@ -19,7 +18,6 @@ function spinless_exact_energy(t::Real, gamma::Real, lambda::Real; nk::Int=1024)
     end
     return -lambda - integral / nk^2
 end
-"""
 
 function run_nested_CTMRG_Square_SpinlessFermion(
     t::Float64,
@@ -66,19 +64,16 @@ function run_nested_CTMRG_Square_SpinlessFermion(
     _, Ev = compute_nested_exp_vbond(nested, peps, H_nn_bonds, env)
     Es_avg = (sum(Eh) + sum(Ev)) / length(Eh)
 
-    @printf("chi=%d nested energy/site %.12f density %.12f at t=%.6g gamma=%.6g lambda=%.6g\n", 
-    chi, Es_avg, ns_avg, t, gamma, lambda)
-    flush(stdout)
-
+    println("Average ground energy per site: $Es_avg at t = $t, gamma = $gamma, λ = $lambda")
     save("exp_nested_ctmrg", "chi$chi", "ns", ns, "ns_avg", ns_avg, "Eh", Eh, "Ev", Ev, "Es_avg", Es_avg)
 end
 
 t = -1.0
-gamma = 1.0
-lambda = 3.0  
+gamma = 4.0
+lambda = 5.0  
 ctmrg_iter = 100
 peps_filename = "tensor_file"
-peps_param_str = "D2_final"
+peps_param_str = "iter4000"*"_δτ0.0001"
 load_env = "random"
 verbosity = 1
 seed = 1234

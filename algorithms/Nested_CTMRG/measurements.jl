@@ -454,8 +454,6 @@ function compute_nested_exp_hbond(
     left_op, right_op = _bond_operator_gsvd(operator)
     left_x = _nested_x_bond_operator(nested, peps, source, left_op)
     right_x = _nested_x_bond_operator(nested, peps, neighbor, right_op)
-    # X_right[..., a] = (-1)^a X_right[..., a]
-    right_x = add_parity_sign(right_x, 5; sign_function=global_sign)
     # numerator = C_h[X_left(a), B, X_right(a)]
     numerator_tensor = _contract_nested_hpatch3_alpha(nested, env, source, left_x, right_x)
     numerator = _nested_scalar_or_zero(numerator_tensor)
@@ -493,12 +491,10 @@ function compute_nested_exp_vbond(
     # denominator = C_v[X_source(I), K, X_neighbor(I)]
     denominator = _contract_nested_vpatch3(nested, env, source, closed_top, closed_bottom)
     denominator_value = _nested_scalar_or_zero(denominator)
-    top_op, bottom_op = _bond_operator_gsvd(operator)
+    bottom_op, top_op = _bond_operator_gsvd(operator)
     top_x = _nested_x_bond_operator(nested, peps, source, top_op)
     bottom_x = _nested_x_bond_operator(nested, peps, neighbor, bottom_op)
-    # X_top[..., a] = (-1)^a X_top[..., a]
-    top_x = add_parity_sign(top_x, 5; sign_function=global_sign)
-    # numerator = C_v[(-1)^a X_top(a), K, X_bottom(a)]
+    # numerator = C_v[X_top(a), K, X_bottom(a)]
     numerator_tensor = _contract_nested_vpatch3_alpha(nested, env, source, top_x, bottom_x)
     numerator = _nested_scalar_or_zero(numerator_tensor)
 

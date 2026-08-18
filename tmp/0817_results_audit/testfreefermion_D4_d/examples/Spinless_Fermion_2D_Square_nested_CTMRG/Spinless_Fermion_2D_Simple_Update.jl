@@ -39,19 +39,19 @@ function run_SU_Square_SpinlessFermion(
 end
 
 t = -1.0
-gamma = 1.0
-lambda = 3.0
+gamma = 4.0
+lambda = 5.0
 Dbond = 2
 Lx = 2
 Ly = 2
 iter_vec = [600, 2000, 4000]
 tol_vec = [1e-6, 1e-10, 1e-12]
 dt_vec = [1e-2, 1e-3, 1e-4]
-save_key = "D$(Dbond)_final"
+save_key = 
 save_iter = 100
+seed = 1234
 
-Random.seed!(1234)
-GrassmannTensorNetworks.global_sign = auto_sign
+Random.seed!(seed)
+Main.GrassmannTensorNetworks.global_sign = auto_sign
 
-run_SU_Square_SpinlessFermion(t, gamma, lambda, Dbond, Lx, Ly, iter_vec, tol_vec, dt_vec;
-save_key=save_key, save_iter=save_iter)
+run_SU_Square_SpinlessFermion(t, gamma, lambda, Dbond, Lx, Ly, iter_vec, tol_vec, dt_vec; save_key=save_key, save_iter=save_iter)

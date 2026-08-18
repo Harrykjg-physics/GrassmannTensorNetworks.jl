@@ -1,0 +1,3115 @@
+--------- Results --------
+  Activating project at `~/work/2026/0817/testfreefermion_D2_c`
+┌ Info:  Down move of CTMRG Iterations 1 ==>  
+└             max_trunc_err_d :  1.052151e-09   max_Λ_err_d : 9.800633e-01  
+┌ Info:  Up move of CTMRG Iterations 1 ==>  
+└             max_trunc_err_u :  2.365853e-10   max_Λ_err_u : 9.733834e-01  
+┌ Info:  Left move of CTMRG Iterations 1 ==>  
+└             max_trunc_err_l :  1.938883e-10   max_Λ_err_l : 9.898420e-01  
+┌ Info:  Right move of CTMRG Iterations 1 ==>  
+└             max_trunc_err_r :  5.911494e-12   max_Λ_err_r : 9.868595e-01  
+[ Info:         
+┌ Info:  CTMRG Iterations 1 ==>  Δt : 17.3682   
+└         max_coef_err :  1.120563e+04   max_trunc_err : 1.052151e-09  max_Λ_err : 9.898420e-01  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 2 ==>  
+└             max_trunc_err_d :  2.730038e-13   max_Λ_err_d : 6.075985e-01  
+┌ Info:  Up move of CTMRG Iterations 2 ==>  
+└             max_trunc_err_u :  5.395684e-14   max_Λ_err_u : 6.858796e-01  
+┌ Info:  Left move of CTMRG Iterations 2 ==>  
+└             max_trunc_err_l :  5.773160e-15   max_Λ_err_l : 5.938558e-01  
+┌ Info:  Right move of CTMRG Iterations 2 ==>  
+└             max_trunc_err_r :  2.331468e-15   max_Λ_err_r : 4.539271e-01  
+[ Info:         
+┌ Info:  CTMRG Iterations 2 ==>  Δt : 0.1787   
+└         max_coef_err :  9.999650e-01   max_trunc_err : 2.730038e-13  max_Λ_err : 6.858796e-01  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 3 ==>  
+└             max_trunc_err_d :  2.220446e-15   max_Λ_err_d : 1.697066e-01  
+┌ Info:  Up move of CTMRG Iterations 3 ==>  
+└             max_trunc_err_u :  2.331468e-15   max_Λ_err_u : 1.300710e-01  
+┌ Info:  Left move of CTMRG Iterations 3 ==>  
+└             max_trunc_err_l :  2.442491e-15   max_Λ_err_l : 1.242581e-01  
+┌ Info:  Right move of CTMRG Iterations 3 ==>  
+└             max_trunc_err_r :  2.442491e-15   max_Λ_err_r : 1.035938e-01  
+[ Info:         
+┌ Info:  CTMRG Iterations 3 ==>  Δt : 0.0823   
+└         max_coef_err :  7.520006e-01   max_trunc_err : 2.442491e-15  max_Λ_err : 1.697066e-01  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 4 ==>  
+└             max_trunc_err_d :  2.442491e-15   max_Λ_err_d : 8.422152e-02  
+┌ Info:  Up move of CTMRG Iterations 4 ==>  
+└             max_trunc_err_u :  2.220446e-15   max_Λ_err_u : 8.281862e-02  
+┌ Info:  Left move of CTMRG Iterations 4 ==>  
+└             max_trunc_err_l :  2.331468e-15   max_Λ_err_l : 7.532302e-02  
+┌ Info:  Right move of CTMRG Iterations 4 ==>  
+└             max_trunc_err_r :  2.331468e-15   max_Λ_err_r : 6.503616e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 4 ==>  Δt : 0.0813   
+└         max_coef_err :  1.782052e+00   max_trunc_err : 2.442491e-15  max_Λ_err : 8.422152e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 5 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 5.756184e-02  
+┌ Info:  Up move of CTMRG Iterations 5 ==>  
+└             max_trunc_err_u :  2.331468e-15   max_Λ_err_u : 5.209870e-02  
+┌ Info:  Left move of CTMRG Iterations 5 ==>  
+└             max_trunc_err_l :  2.442491e-15   max_Λ_err_l : 4.651769e-02  
+┌ Info:  Right move of CTMRG Iterations 5 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 4.087514e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 5 ==>  Δt : 0.0823   
+└         max_coef_err :  3.794413e-01   max_trunc_err : 2.553513e-15  max_Λ_err : 5.756184e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 6 ==>  
+└             max_trunc_err_d :  2.442491e-15   max_Λ_err_d : 3.668842e-02  
+┌ Info:  Up move of CTMRG Iterations 6 ==>  
+└             max_trunc_err_u :  2.220446e-15   max_Λ_err_u : 3.273425e-02  
+┌ Info:  Left move of CTMRG Iterations 6 ==>  
+└             max_trunc_err_l :  2.220446e-15   max_Λ_err_l : 2.899816e-02  
+┌ Info:  Right move of CTMRG Iterations 6 ==>  
+└             max_trunc_err_r :  2.442491e-15   max_Λ_err_r : 2.568130e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 6 ==>  Δt : 0.1195   
+└         max_coef_err :  1.013176e-01   max_trunc_err : 2.442491e-15  max_Λ_err : 3.668842e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 7 ==>  
+└             max_trunc_err_d :  2.220446e-15   max_Λ_err_d : 2.298233e-02  
+┌ Info:  Up move of CTMRG Iterations 7 ==>  
+└             max_trunc_err_u :  2.220446e-15   max_Λ_err_u : 2.056639e-02  
+┌ Info:  Left move of CTMRG Iterations 7 ==>  
+└             max_trunc_err_l :  2.109424e-15   max_Λ_err_l : 1.821656e-02  
+┌ Info:  Right move of CTMRG Iterations 7 ==>  
+└             max_trunc_err_r :  2.664535e-15   max_Λ_err_r : 1.613513e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 7 ==>  Δt : 0.0809   
+└         max_coef_err :  1.611642e-01   max_trunc_err : 2.664535e-15  max_Λ_err : 2.298233e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 8 ==>  
+└             max_trunc_err_d :  2.664535e-15   max_Λ_err_d : 1.443920e-02  
+┌ Info:  Up move of CTMRG Iterations 8 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 1.292152e-02  
+┌ Info:  Left move of CTMRG Iterations 8 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 1.144513e-02  
+┌ Info:  Right move of CTMRG Iterations 8 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 1.013743e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 8 ==>  Δt : 0.0806   
+└         max_coef_err :  8.454884e-03   max_trunc_err : 2.775558e-15  max_Λ_err : 1.443920e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 9 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 9.071904e-03  
+┌ Info:  Up move of CTMRG Iterations 9 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 8.118374e-03  
+┌ Info:  Left move of CTMRG Iterations 9 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 7.190783e-03  
+┌ Info:  Right move of CTMRG Iterations 9 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 6.369178e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 9 ==>  Δt : 0.2388   
+└         max_coef_err :  8.103777e-03   max_trunc_err : 2.775558e-15  max_Λ_err : 9.071904e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 10 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 5.699725e-03  
+┌ Info:  Up move of CTMRG Iterations 10 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 5.100638e-03  
+┌ Info:  Left move of CTMRG Iterations 10 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 4.517849e-03  
+┌ Info:  Right move of CTMRG Iterations 10 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 4.001648e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 10 ==>  Δt : 0.0838   
+└         max_coef_err :  1.186893e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 5.699725e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 11 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 3.581042e-03  
+┌ Info:  Up move of CTMRG Iterations 11 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 3.204645e-03  
+┌ Info:  Left move of CTMRG Iterations 11 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 2.838489e-03  
+┌ Info:  Right move of CTMRG Iterations 11 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 2.514168e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 11 ==>  Δt : 0.0856   
+└         max_coef_err :  1.388614e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 3.581042e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 12 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 2.249909e-03  
+┌ Info:  Up move of CTMRG Iterations 12 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 2.013425e-03  
+┌ Info:  Left move of CTMRG Iterations 12 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 1.783375e-03  
+┌ Info:  Right move of CTMRG Iterations 12 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 1.579610e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 12 ==>  Δt : 0.5154   
+└         max_coef_err :  9.050727e-03   max_trunc_err : 2.775558e-15  max_Λ_err : 2.249909e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 13 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 1.413580e-03  
+┌ Info:  Up move of CTMRG Iterations 13 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 1.265001e-03  
+┌ Info:  Left move of CTMRG Iterations 13 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 1.120465e-03  
+┌ Info:  Right move of CTMRG Iterations 13 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 9.924423e-04  
+[ Info:         
+┌ Info:  CTMRG Iterations 13 ==>  Δt : 0.0813   
+└         max_coef_err :  1.355675e-04   max_trunc_err : 2.775558e-15  max_Λ_err : 1.413580e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 14 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 8.881286e-04  
+┌ Info:  Up move of CTMRG Iterations 14 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 7.947791e-04  
+┌ Info:  Left move of CTMRG Iterations 14 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 7.039691e-04  
+┌ Info:  Right move of CTMRG Iterations 14 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 6.235349e-04  
+[ Info:         
+┌ Info:  CTMRG Iterations 14 ==>  Δt : 0.0806   
+└         max_coef_err :  2.398143e-05   max_trunc_err : 2.775558e-15  max_Λ_err : 8.881286e-04  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 15 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 5.579963e-04  
+┌ Info:  Up move of CTMRG Iterations 15 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 4.993464e-04  
+┌ Info:  Left move of CTMRG Iterations 15 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 4.422920e-04  
+┌ Info:  Right move of CTMRG Iterations 15 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 3.917565e-04  
+[ Info:         
+┌ Info:  CTMRG Iterations 15 ==>  Δt : 0.0807   
+└         max_coef_err :  3.995336e-05   max_trunc_err : 2.775558e-15  max_Λ_err : 5.579963e-04  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 16 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 3.505797e-04  
+┌ Info:  Up move of CTMRG Iterations 16 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 3.137310e-04  
+┌ Info:  Left move of CTMRG Iterations 16 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 2.778847e-04  
+┌ Info:  Right move of CTMRG Iterations 16 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 2.461341e-04  
+[ Info:         
+┌ Info:  CTMRG Iterations 16 ==>  Δt : 0.0831   
+└         max_coef_err :  3.437647e-05   max_trunc_err : 2.775558e-15  max_Λ_err : 3.505797e-04  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 17 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 2.202634e-04  
+┌ Info:  Up move of CTMRG Iterations 17 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 1.971119e-04  
+┌ Info:  Left move of CTMRG Iterations 17 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 1.745903e-04  
+┌ Info:  Right move of CTMRG Iterations 17 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 1.546419e-04  
+[ Info:         
+┌ Info:  CTMRG Iterations 17 ==>  Δt : 0.0855   
+└         max_coef_err :  4.073867e-05   max_trunc_err : 2.775558e-15  max_Λ_err : 2.202634e-04  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 18 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 1.383878e-04  
+┌ Info:  Up move of CTMRG Iterations 18 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 1.238421e-04  
+┌ Info:  Left move of CTMRG Iterations 18 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 1.096921e-04  
+┌ Info:  Right move of CTMRG Iterations 18 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 9.715892e-05  
+[ Info:         
+┌ Info:  CTMRG Iterations 18 ==>  Δt : 0.0861   
+└         max_coef_err :  1.354436e-05   max_trunc_err : 2.775558e-15  max_Λ_err : 1.383878e-04  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 19 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 8.694673e-05  
+┌ Info:  Up move of CTMRG Iterations 19 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 7.780793e-05  
+┌ Info:  Left move of CTMRG Iterations 19 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 6.891774e-05  
+┌ Info:  Right move of CTMRG Iterations 19 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 6.104332e-05  
+[ Info:         
+┌ Info:  CTMRG Iterations 19 ==>  Δt : 0.1192   
+└         max_coef_err :  8.844520e-06   max_trunc_err : 2.775558e-15  max_Λ_err : 8.694673e-05  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 20 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 5.462718e-05  
+┌ Info:  Up move of CTMRG Iterations 20 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 4.888542e-05  
+┌ Info:  Left move of CTMRG Iterations 20 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 4.329986e-05  
+┌ Info:  Right move of CTMRG Iterations 20 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 3.835250e-05  
+[ Info:         
+┌ Info:  CTMRG Iterations 20 ==>  Δt : 0.0802   
+└         max_coef_err :  1.146088e-05   max_trunc_err : 2.775558e-15  max_Λ_err : 5.462718e-05  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 21 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 3.432134e-05  
+┌ Info:  Up move of CTMRG Iterations 21 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 3.071389e-05  
+┌ Info:  Left move of CTMRG Iterations 21 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 2.720458e-05  
+┌ Info:  Right move of CTMRG Iterations 21 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 2.409623e-05  
+[ Info:         
+┌ Info:  CTMRG Iterations 21 ==>  Δt : 0.0801   
+└         max_coef_err :  4.092386e-05   max_trunc_err : 2.775558e-15  max_Λ_err : 3.432134e-05  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 22 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 2.156352e-05  
+┌ Info:  Up move of CTMRG Iterations 22 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 1.929702e-05  
+┌ Info:  Left move of CTMRG Iterations 22 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 1.709218e-05  
+┌ Info:  Right move of CTMRG Iterations 22 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 1.513926e-05  
+[ Info:         
+┌ Info:  CTMRG Iterations 22 ==>  Δt : 0.0800   
+└         max_coef_err :  6.276114e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 2.156352e-05  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 23 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 1.354800e-05  
+┌ Info:  Up move of CTMRG Iterations 23 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 1.212400e-05  
+┌ Info:  Left move of CTMRG Iterations 23 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 1.073873e-05  
+┌ Info:  Right move of CTMRG Iterations 23 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 9.511743e-06  
+[ Info:         
+┌ Info:  CTMRG Iterations 23 ==>  Δt : 0.0801   
+└         max_coef_err :  3.613531e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 1.354800e-05  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 24 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 7.167491e-06  
+┌ Info:  Up move of CTMRG Iterations 24 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 4.760610e-06  
+┌ Info:  Left move of CTMRG Iterations 24 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 5.741927e-06  
+┌ Info:  Right move of CTMRG Iterations 24 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 5.738595e-06  
+[ Info:         
+┌ Info:  CTMRG Iterations 24 ==>  Δt : 0.1181   
+└         max_coef_err :  6.978934e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 7.167491e-06  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 25 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 5.347936e-06  
+┌ Info:  Up move of CTMRG Iterations 25 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 4.785824e-06  
+┌ Info:  Left move of CTMRG Iterations 25 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 4.239005e-06  
+┌ Info:  Right move of CTMRG Iterations 25 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 3.754664e-06  
+[ Info:         
+┌ Info:  CTMRG Iterations 25 ==>  Δt : 0.0813   
+└         max_coef_err :  9.762602e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 5.347936e-06  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 26 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 3.360018e-06  
+┌ Info:  Up move of CTMRG Iterations 26 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 3.006853e-06  
+┌ Info:  Left move of CTMRG Iterations 26 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 2.663296e-06  
+┌ Info:  Right move of CTMRG Iterations 26 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 2.358992e-06  
+[ Info:         
+┌ Info:  CTMRG Iterations 26 ==>  Δt : 0.0798   
+└         max_coef_err :  4.556809e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 3.360018e-06  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 27 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 2.111043e-06  
+┌ Info:  Up move of CTMRG Iterations 27 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 1.889156e-06  
+┌ Info:  Left move of CTMRG Iterations 27 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 1.673304e-06  
+┌ Info:  Right move of CTMRG Iterations 27 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 1.482115e-06  
+[ Info:         
+┌ Info:  CTMRG Iterations 27 ==>  Δt : 0.0828   
+└         max_coef_err :  3.550879e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 2.111043e-06  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 28 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 1.326333e-06  
+┌ Info:  Up move of CTMRG Iterations 28 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 1.186925e-06  
+┌ Info:  Left move of CTMRG Iterations 28 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 1.051309e-06  
+┌ Info:  Right move of CTMRG Iterations 28 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 9.311883e-07  
+[ Info:         
+┌ Info:  CTMRG Iterations 28 ==>  Δt : 0.1295   
+└         max_coef_err :  6.048545e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 1.326333e-06  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 29 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 8.333129e-07  
+┌ Info:  Up move of CTMRG Iterations 29 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 7.457249e-07  
+┌ Info:  Left move of CTMRG Iterations 29 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 6.605198e-07  
+┌ Info:  Right move of CTMRG Iterations 29 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 5.850500e-07  
+[ Info:         
+┌ Info:  CTMRG Iterations 29 ==>  Δt : 0.0806   
+└         max_coef_err :  6.230134e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 8.333129e-07  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 30 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 5.235565e-07  
+┌ Info:  Up move of CTMRG Iterations 30 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 4.685265e-07  
+┌ Info:  Left move of CTMRG Iterations 30 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 4.149935e-07  
+┌ Info:  Right move of CTMRG Iterations 30 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 3.675771e-07  
+[ Info:         
+┌ Info:  CTMRG Iterations 30 ==>  Δt : 0.0806   
+└         max_coef_err :  5.787242e-02   max_trunc_err : 2.553513e-15  max_Λ_err : 5.235565e-07  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 31 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 3.289418e-07  
+┌ Info:  Up move of CTMRG Iterations 31 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 2.943673e-07  
+┌ Info:  Left move of CTMRG Iterations 31 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 2.607335e-07  
+┌ Info:  Right move of CTMRG Iterations 31 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 2.309426e-07  
+[ Info:         
+┌ Info:  CTMRG Iterations 31 ==>  Δt : 0.0802   
+└         max_coef_err :  1.215550e-01   max_trunc_err : 2.775558e-15  max_Λ_err : 3.289418e-07  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 32 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 2.066686e-07  
+┌ Info:  Up move of CTMRG Iterations 32 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 1.849461e-07  
+┌ Info:  Left move of CTMRG Iterations 32 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 1.638145e-07  
+┌ Info:  Right move of CTMRG Iterations 32 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 1.450973e-07  
+[ Info:         
+┌ Info:  CTMRG Iterations 32 ==>  Δt : 0.1065   
+└         max_coef_err :  7.130535e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 2.066686e-07  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 33 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 1.298464e-07  
+┌ Info:  Up move of CTMRG Iterations 33 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 1.161985e-07  
+┌ Info:  Left move of CTMRG Iterations 33 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 1.029219e-07  
+┌ Info:  Right move of CTMRG Iterations 33 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 9.116223e-08  
+[ Info:         
+┌ Info:  CTMRG Iterations 33 ==>  Δt : 0.0802   
+└         max_coef_err :  7.421897e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 1.298464e-07  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 34 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 8.158034e-08  
+┌ Info:  Up move of CTMRG Iterations 34 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 7.300558e-08  
+┌ Info:  Left move of CTMRG Iterations 34 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 6.466410e-08  
+┌ Info:  Right move of CTMRG Iterations 34 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 5.727570e-08  
+[ Info:         
+┌ Info:  CTMRG Iterations 34 ==>  Δt : 0.0801   
+└         max_coef_err :  6.242782e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 8.158034e-08  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 35 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 5.125556e-08  
+┌ Info:  Up move of CTMRG Iterations 35 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 4.586819e-08  
+┌ Info:  Left move of CTMRG Iterations 35 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 4.062737e-08  
+┌ Info:  Right move of CTMRG Iterations 35 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 3.598536e-08  
+[ Info:         
+┌ Info:  CTMRG Iterations 35 ==>  Δt : 0.1008   
+└         max_coef_err :  4.895978e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 5.125556e-08  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 36 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 3.220301e-08  
+┌ Info:  Up move of CTMRG Iterations 36 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 2.881821e-08  
+┌ Info:  Left move of CTMRG Iterations 36 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 2.552550e-08  
+┌ Info:  Right move of CTMRG Iterations 36 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 2.260900e-08  
+[ Info:         
+┌ Info:  CTMRG Iterations 36 ==>  Δt : 0.0812   
+└         max_coef_err :  5.472328e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 3.220301e-08  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 37 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 2.023261e-08  
+┌ Info:  Up move of CTMRG Iterations 37 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 1.810600e-08  
+┌ Info:  Left move of CTMRG Iterations 37 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 1.603724e-08  
+┌ Info:  Right move of CTMRG Iterations 37 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 1.420486e-08  
+[ Info:         
+┌ Info:  CTMRG Iterations 37 ==>  Δt : 0.0984   
+└         max_coef_err :  7.095832e-02   max_trunc_err : 2.553513e-15  max_Λ_err : 2.023261e-08  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 38 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 1.271181e-08  
+┌ Info:  Up move of CTMRG Iterations 38 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 1.137570e-08  
+┌ Info:  Left move of CTMRG Iterations 38 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 1.007593e-08  
+┌ Info:  Right move of CTMRG Iterations 38 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 8.924674e-09  
+[ Info:         
+┌ Info:  CTMRG Iterations 38 ==>  Δt : 0.0814   
+└         max_coef_err :  5.456270e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 1.271181e-08  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 39 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 7.986618e-09  
+┌ Info:  Up move of CTMRG Iterations 39 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 7.147160e-09  
+┌ Info:  Left move of CTMRG Iterations 39 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 6.330539e-09  
+┌ Info:  Right move of CTMRG Iterations 39 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 5.607223e-09  
+[ Info:         
+┌ Info:  CTMRG Iterations 39 ==>  Δt : 0.0800   
+└         max_coef_err :  6.908349e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 7.986618e-09  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 40 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 5.017858e-09  
+┌ Info:  Up move of CTMRG Iterations 40 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 4.490441e-09  
+┌ Info:  Left move of CTMRG Iterations 40 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 3.977371e-09  
+┌ Info:  Right move of CTMRG Iterations 40 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 3.522924e-09  
+[ Info:         
+┌ Info:  CTMRG Iterations 40 ==>  Δt : 0.0978   
+└         max_coef_err :  6.173005e-02   max_trunc_err : 2.553513e-15  max_Λ_err : 5.017858e-09  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 41 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 3.152636e-09  
+┌ Info:  Up move of CTMRG Iterations 41 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 2.821269e-09  
+┌ Info:  Left move of CTMRG Iterations 41 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 2.498916e-09  
+┌ Info:  Right move of CTMRG Iterations 41 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 2.213394e-09  
+[ Info:         
+┌ Info:  CTMRG Iterations 41 ==>  Δt : 0.0815   
+└         max_coef_err :  6.110989e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 3.152636e-09  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 42 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 1.980749e-09  
+┌ Info:  Up move of CTMRG Iterations 42 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 1.772556e-09  
+┌ Info:  Left move of CTMRG Iterations 42 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 1.570027e-09  
+┌ Info:  Right move of CTMRG Iterations 42 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 1.390639e-09  
+[ Info:         
+┌ Info:  CTMRG Iterations 42 ==>  Δt : 0.1055   
+└         max_coef_err :  6.430725e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 1.980749e-09  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 43 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 1.244471e-09  
+┌ Info:  Up move of CTMRG Iterations 43 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 1.113667e-09  
+┌ Info:  Left move of CTMRG Iterations 43 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 9.864216e-10  
+┌ Info:  Right move of CTMRG Iterations 43 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 8.737149e-10  
+[ Info:         
+┌ Info:  CTMRG Iterations 43 ==>  Δt : 0.0822   
+└         max_coef_err :  7.849171e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 1.244471e-09  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 44 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 7.818804e-10  
+┌ Info:  Up move of CTMRG Iterations 44 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 6.996984e-10  
+┌ Info:  Left move of CTMRG Iterations 44 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 6.197522e-10  
+┌ Info:  Right move of CTMRG Iterations 44 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 5.489405e-10  
+[ Info:         
+┌ Info:  CTMRG Iterations 44 ==>  Δt : 0.0800   
+└         max_coef_err :  8.517753e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 7.818804e-10  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 45 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 4.912424e-10  
+┌ Info:  Up move of CTMRG Iterations 45 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 4.396088e-10  
+┌ Info:  Left move of CTMRG Iterations 45 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 3.893799e-10  
+┌ Info:  Right move of CTMRG Iterations 45 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 3.448901e-10  
+[ Info:         
+┌ Info:  CTMRG Iterations 45 ==>  Δt : 0.1044   
+└         max_coef_err :  7.957266e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 4.912424e-10  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 46 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 3.086394e-10  
+┌ Info:  Up move of CTMRG Iterations 46 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 2.761989e-10  
+┌ Info:  Left move of CTMRG Iterations 46 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 2.446409e-10  
+┌ Info:  Right move of CTMRG Iterations 46 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 2.166887e-10  
+[ Info:         
+┌ Info:  CTMRG Iterations 46 ==>  Δt : 0.0806   
+└         max_coef_err :  9.772900e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 3.086394e-10  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 47 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 1.939130e-10  
+┌ Info:  Up move of CTMRG Iterations 47 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 1.735312e-10  
+┌ Info:  Left move of CTMRG Iterations 47 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 1.537038e-10  
+┌ Info:  Right move of CTMRG Iterations 47 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 1.361419e-10  
+[ Info:         
+┌ Info:  CTMRG Iterations 47 ==>  Δt : 0.0989   
+└         max_coef_err :  1.093893e-01   max_trunc_err : 2.553513e-15  max_Λ_err : 1.939130e-10  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 48 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 1.218324e-10  
+┌ Info:  Up move of CTMRG Iterations 48 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 1.090269e-10  
+┌ Info:  Left move of CTMRG Iterations 48 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 9.656970e-11  
+┌ Info:  Right move of CTMRG Iterations 48 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 8.553585e-11  
+[ Info:         
+┌ Info:  CTMRG Iterations 48 ==>  Δt : 0.0811   
+└         max_coef_err :  6.985182e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 1.218324e-10  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 49 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 7.654538e-11  
+┌ Info:  Up move of CTMRG Iterations 49 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 6.849988e-11  
+┌ Info:  Left move of CTMRG Iterations 49 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 6.067324e-11  
+┌ Info:  Right move of CTMRG Iterations 49 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 5.374088e-11  
+[ Info:         
+┌ Info:  CTMRG Iterations 49 ==>  Δt : 0.0800   
+└         max_coef_err :  5.940245e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 7.654538e-11  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 50 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 4.809235e-11  
+┌ Info:  Up move of CTMRG Iterations 50 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 4.303750e-11  
+┌ Info:  Left move of CTMRG Iterations 50 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 3.812007e-11  
+┌ Info:  Right move of CTMRG Iterations 50 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 3.376472e-11  
+[ Info:         
+┌ Info:  CTMRG Iterations 50 ==>  Δt : 0.0990   
+└         max_coef_err :  8.174060e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 4.809235e-11  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 51 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 3.021564e-11  
+┌ Info:  Up move of CTMRG Iterations 51 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 2.703979e-11  
+┌ Info:  Left move of CTMRG Iterations 51 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 2.395051e-11  
+┌ Info:  Right move of CTMRG Iterations 51 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 2.121410e-11  
+[ Info:         
+┌ Info:  CTMRG Iterations 51 ==>  Δt : 0.0804   
+└         max_coef_err :  8.344156e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 3.021564e-11  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 52 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 1.898435e-11  
+┌ Info:  Up move of CTMRG Iterations 52 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 1.698914e-11  
+┌ Info:  Left move of CTMRG Iterations 52 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 1.504810e-11  
+┌ Info:  Right move of CTMRG Iterations 52 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 1.332907e-11  
+[ Info:         
+┌ Info:  CTMRG Iterations 52 ==>  Δt : 0.0993   
+└         max_coef_err :  6.973823e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 1.898435e-11  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 53 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 1.192866e-11  
+┌ Info:  Up move of CTMRG Iterations 53 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 1.067486e-11  
+┌ Info:  Left move of CTMRG Iterations 53 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 9.455264e-12  
+┌ Info:  Right move of CTMRG Iterations 53 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 8.374015e-12  
+[ Info:         
+┌ Info:  CTMRG Iterations 53 ==>  Δt : 0.0805   
+└         max_coef_err :  2.083759e-01   max_trunc_err : 2.775558e-15  max_Λ_err : 1.192866e-11  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 54 ==>  
+└             max_trunc_err_d :  2.553513e-15   max_Λ_err_d : 7.496378e-12  
+┌ Info:  Up move of CTMRG Iterations 54 ==>  
+└             max_trunc_err_u :  2.553513e-15   max_Λ_err_u : 6.710161e-12  
+┌ Info:  Left move of CTMRG Iterations 54 ==>  
+└             max_trunc_err_l :  2.553513e-15   max_Λ_err_l : 5.942374e-12  
+┌ Info:  Right move of CTMRG Iterations 54 ==>  
+└             max_trunc_err_r :  2.553513e-15   max_Λ_err_r : 5.263063e-12  
+[ Info:         
+┌ Info:  CTMRG Iterations 54 ==>  Δt : 0.0800   
+└         max_coef_err :  9.854288e-02   max_trunc_err : 2.553513e-15  max_Λ_err : 7.496378e-12  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 55 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 4.707310e-12  
+┌ Info:  Up move of CTMRG Iterations 55 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 4.211996e-12  
+┌ Info:  Left move of CTMRG Iterations 55 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 3.734550e-12  
+┌ Info:  Right move of CTMRG Iterations 55 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 3.308503e-12  
+[ Info:         
+┌ Info:  CTMRG Iterations 55 ==>  Δt : 0.0992   
+└         max_coef_err :  5.682144e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 4.707310e-12  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 56 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 2.962587e-12  
+┌ Info:  Up move of CTMRG Iterations 56 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 2.651776e-12  
+┌ Info:  Left move of CTMRG Iterations 56 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 2.346300e-12  
+┌ Info:  Right move of CTMRG Iterations 56 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 2.078919e-12  
+[ Info:         
+┌ Info:  CTMRG Iterations 56 ==>  Δt : 0.0803   
+└         max_coef_err :  2.838346e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 2.962587e-12  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 57 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 1.860045e-12  
+┌ Info:  Up move of CTMRG Iterations 57 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 1.663992e-12  
+┌ Info:  Left move of CTMRG Iterations 57 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 1.475505e-12  
+┌ Info:  Right move of CTMRG Iterations 57 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 1.305992e-12  
+[ Info:         
+┌ Info:  CTMRG Iterations 57 ==>  Δt : 0.0993   
+└         max_coef_err :  2.822414e-02   max_trunc_err : 2.775558e-15  max_Λ_err : 1.860045e-12  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 58 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 1.168560e-12  
+┌ Info:  Up move of CTMRG Iterations 58 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 1.045493e-12  
+┌ Info:  Left move of CTMRG Iterations 58 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 9.261307e-13  
+┌ Info:  Right move of CTMRG Iterations 58 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 8.203548e-13  
+[ Info:         
+┌ Info:  CTMRG Iterations 58 ==>  Δt : 0.0816   
+└         max_coef_err :  3.347492e-04   max_trunc_err : 2.775558e-15  max_Λ_err : 1.168560e-12  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 59 ==>  
+└             max_trunc_err_d :  2.775558e-15   max_Λ_err_d : 7.339191e-13  
+┌ Info:  Up move of CTMRG Iterations 59 ==>  
+└             max_trunc_err_u :  2.775558e-15   max_Λ_err_u : 6.565976e-13  
+┌ Info:  Left move of CTMRG Iterations 59 ==>  
+└             max_trunc_err_l :  2.775558e-15   max_Λ_err_l : 5.814510e-13  
+┌ Info:  Right move of CTMRG Iterations 59 ==>  
+└             max_trunc_err_r :  2.775558e-15   max_Λ_err_r : 5.148122e-13  
+[ Info:         
+┌ Info:  CTMRG Iterations 59 ==>  Δt : 0.0799   
+└         max_coef_err :  6.038364e-05   max_trunc_err : 2.775558e-15  max_Λ_err : 7.339191e-13  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 1 ==>  
+└             max_trunc_err_d :  1.081035e-11   max_Λ_err_d : 9.944788e-01  
+┌ Info:  Up move of CTMRG Iterations 1 ==>  
+└             max_trunc_err_u :  6.583623e-14   max_Λ_err_u : 9.984258e-01  
+┌ Info:  Left move of CTMRG Iterations 1 ==>  
+└             max_trunc_err_l :  1.187939e-14   max_Λ_err_l : 9.989201e-01  
+┌ Info:  Right move of CTMRG Iterations 1 ==>  
+└             max_trunc_err_r :  4.329870e-15   max_Λ_err_r : 9.902278e-01  
+[ Info:         
+┌ Info:  CTMRG Iterations 1 ==>  Δt : 0.1635   
+└         max_coef_err :  1.262141e+05   max_trunc_err : 1.081035e-11  max_Λ_err : 9.989201e-01  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 2 ==>  
+└             max_trunc_err_d :  4.329870e-15   max_Λ_err_d : 4.614952e-01  
+┌ Info:  Up move of CTMRG Iterations 2 ==>  
+└             max_trunc_err_u :  4.551914e-15   max_Λ_err_u : 3.409735e-01  
+┌ Info:  Left move of CTMRG Iterations 2 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 4.393612e-01  
+┌ Info:  Right move of CTMRG Iterations 2 ==>  
+└             max_trunc_err_r :  4.551914e-15   max_Λ_err_r : 3.384778e-01  
+[ Info:         
+┌ Info:  CTMRG Iterations 2 ==>  Δt : 0.1535   
+└         max_coef_err :  9.999921e-01   max_trunc_err : 4.551914e-15  max_Λ_err : 4.614952e-01  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 3 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 1.039354e-01  
+┌ Info:  Up move of CTMRG Iterations 3 ==>  
+└             max_trunc_err_u :  4.329870e-15   max_Λ_err_u : 1.312615e-01  
+┌ Info:  Left move of CTMRG Iterations 3 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 1.235709e-01  
+┌ Info:  Right move of CTMRG Iterations 3 ==>  
+└             max_trunc_err_r :  4.329870e-15   max_Λ_err_r : 1.065376e-01  
+[ Info:         
+┌ Info:  CTMRG Iterations 3 ==>  Δt : 0.1533   
+└         max_coef_err :  9.171562e-01   max_trunc_err : 4.440892e-15  max_Λ_err : 1.312615e-01  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 4 ==>  
+└             max_trunc_err_d :  4.329870e-15   max_Λ_err_d : 1.071067e-01  
+┌ Info:  Up move of CTMRG Iterations 4 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 1.126152e-01  
+┌ Info:  Left move of CTMRG Iterations 4 ==>  
+└             max_trunc_err_l :  4.329870e-15   max_Λ_err_l : 1.013338e-01  
+┌ Info:  Right move of CTMRG Iterations 4 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 8.754132e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 4 ==>  Δt : 0.1549   
+└         max_coef_err :  6.033330e-01   max_trunc_err : 4.440892e-15  max_Λ_err : 1.126152e-01  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 5 ==>  
+└             max_trunc_err_d :  4.551914e-15   max_Λ_err_d : 8.756963e-02  
+┌ Info:  Up move of CTMRG Iterations 5 ==>  
+└             max_trunc_err_u :  4.329870e-15   max_Λ_err_u : 9.192497e-02  
+┌ Info:  Left move of CTMRG Iterations 5 ==>  
+└             max_trunc_err_l :  4.329870e-15   max_Λ_err_l : 8.325568e-02  
+┌ Info:  Right move of CTMRG Iterations 5 ==>  
+└             max_trunc_err_r :  4.329870e-15   max_Λ_err_r : 7.192309e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 5 ==>  Δt : 0.1566   
+└         max_coef_err :  2.172903e-01   max_trunc_err : 4.551914e-15  max_Λ_err : 9.192497e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 6 ==>  
+└             max_trunc_err_d :  4.107825e-15   max_Λ_err_d : 7.192652e-02  
+┌ Info:  Up move of CTMRG Iterations 6 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 7.546495e-02  
+┌ Info:  Left move of CTMRG Iterations 6 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 6.840223e-02  
+┌ Info:  Right move of CTMRG Iterations 6 ==>  
+└             max_trunc_err_r :  4.329870e-15   max_Λ_err_r : 5.909145e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 6 ==>  Δt : 0.1676   
+└         max_coef_err :  1.282534e-01   max_trunc_err : 4.329870e-15  max_Λ_err : 7.546495e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 7 ==>  
+└             max_trunc_err_d :  4.329870e-15   max_Λ_err_d : 5.909155e-02  
+┌ Info:  Up move of CTMRG Iterations 7 ==>  
+└             max_trunc_err_u :  4.329870e-15   max_Λ_err_u : 6.200097e-02  
+┌ Info:  Left move of CTMRG Iterations 7 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 5.619874e-02  
+┌ Info:  Right move of CTMRG Iterations 7 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 4.854907e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 7 ==>  Δt : 0.1527   
+└         max_coef_err :  9.448745e-02   max_trunc_err : 4.329870e-15  max_Λ_err : 6.200097e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 8 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 4.854907e-02  
+┌ Info:  Up move of CTMRG Iterations 8 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 5.093950e-02  
+┌ Info:  Left move of CTMRG Iterations 8 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 4.617244e-02  
+┌ Info:  Right move of CTMRG Iterations 8 ==>  
+└             max_trunc_err_r :  4.329870e-15   max_Λ_err_r : 3.988753e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 8 ==>  Δt : 0.1508   
+└         max_coef_err :  2.036817e-04   max_trunc_err : 4.440892e-15  max_Λ_err : 5.093950e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 9 ==>  
+└             max_trunc_err_d :  4.329870e-15   max_Λ_err_d : 3.988753e-02  
+┌ Info:  Up move of CTMRG Iterations 9 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 4.185149e-02  
+┌ Info:  Left move of CTMRG Iterations 9 ==>  
+└             max_trunc_err_l :  4.329870e-15   max_Λ_err_l : 3.793491e-02  
+┌ Info:  Right move of CTMRG Iterations 9 ==>  
+└             max_trunc_err_r :  4.107825e-15   max_Λ_err_r : 3.277128e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 9 ==>  Δt : 0.1542   
+└         max_coef_err :  5.515117e-04   max_trunc_err : 4.329870e-15  max_Λ_err : 4.185149e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 10 ==>  
+└             max_trunc_err_d :  4.107825e-15   max_Λ_err_d : 3.277128e-02  
+┌ Info:  Up move of CTMRG Iterations 10 ==>  
+└             max_trunc_err_u :  4.107825e-15   max_Λ_err_u : 3.438486e-02  
+┌ Info:  Left move of CTMRG Iterations 10 ==>  
+└             max_trunc_err_l :  4.107825e-15   max_Λ_err_l : 3.116702e-02  
+┌ Info:  Right move of CTMRG Iterations 10 ==>  
+└             max_trunc_err_r :  4.329870e-15   max_Λ_err_r : 2.692463e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 10 ==>  Δt : 0.1530   
+└         max_coef_err :  8.343931e-04   max_trunc_err : 4.329870e-15  max_Λ_err : 3.438486e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 11 ==>  
+└             max_trunc_err_d :  4.329870e-15   max_Λ_err_d : 2.692463e-02  
+┌ Info:  Up move of CTMRG Iterations 11 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 2.825033e-02  
+┌ Info:  Left move of CTMRG Iterations 11 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 2.560658e-02  
+┌ Info:  Right move of CTMRG Iterations 11 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 2.212106e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 11 ==>  Δt : 0.1560   
+└         max_coef_err :  1.739853e-02   max_trunc_err : 4.329870e-15  max_Λ_err : 2.825033e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 12 ==>  
+└             max_trunc_err_d :  4.107825e-15   max_Λ_err_d : 2.212106e-02  
+┌ Info:  Up move of CTMRG Iterations 12 ==>  
+└             max_trunc_err_u :  4.107825e-15   max_Λ_err_u : 2.321025e-02  
+┌ Info:  Left move of CTMRG Iterations 12 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 2.103817e-02  
+┌ Info:  Right move of CTMRG Iterations 12 ==>  
+└             max_trunc_err_r :  3.996803e-15   max_Λ_err_r : 1.817449e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 12 ==>  Δt : 0.1677   
+└         max_coef_err :  1.470518e-02   max_trunc_err : 4.218847e-15  max_Λ_err : 2.321025e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 13 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 1.817449e-02  
+┌ Info:  Up move of CTMRG Iterations 13 ==>  
+└             max_trunc_err_u :  3.996803e-15   max_Λ_err_u : 1.906935e-02  
+┌ Info:  Left move of CTMRG Iterations 13 ==>  
+└             max_trunc_err_l :  4.107825e-15   max_Λ_err_l : 1.728479e-02  
+┌ Info:  Right move of CTMRG Iterations 13 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 1.493202e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 13 ==>  Δt : 0.1557   
+└         max_coef_err :  3.433254e-02   max_trunc_err : 4.218847e-15  max_Λ_err : 1.906935e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 14 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 1.493202e-02  
+┌ Info:  Up move of CTMRG Iterations 14 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 1.566723e-02  
+┌ Info:  Left move of CTMRG Iterations 14 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 1.420105e-02  
+┌ Info:  Right move of CTMRG Iterations 14 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 1.226803e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 14 ==>  Δt : 0.1717   
+└         max_coef_err :  5.629257e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 1.566723e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 15 ==>  
+└             max_trunc_err_d :  4.107825e-15   max_Λ_err_d : 1.226803e-02  
+┌ Info:  Up move of CTMRG Iterations 15 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 1.287207e-02  
+┌ Info:  Left move of CTMRG Iterations 15 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 1.166747e-02  
+┌ Info:  Right move of CTMRG Iterations 15 ==>  
+└             max_trunc_err_r :  4.107825e-15   max_Λ_err_r : 1.007931e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 15 ==>  Δt : 0.1675   
+└         max_coef_err :  2.574136e-02   max_trunc_err : 4.218847e-15  max_Λ_err : 1.287207e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 16 ==>  
+└             max_trunc_err_d :  4.107825e-15   max_Λ_err_d : 1.007931e-02  
+┌ Info:  Up move of CTMRG Iterations 16 ==>  
+└             max_trunc_err_u :  4.329870e-15   max_Λ_err_u : 1.057559e-02  
+┌ Info:  Left move of CTMRG Iterations 16 ==>  
+└             max_trunc_err_l :  4.329870e-15   max_Λ_err_l : 9.585900e-03  
+┌ Info:  Right move of CTMRG Iterations 16 ==>  
+└             max_trunc_err_r :  4.107825e-15   max_Λ_err_r : 8.281085e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 16 ==>  Δt : 0.1578   
+└         max_coef_err :  2.716211e-02   max_trunc_err : 4.329870e-15  max_Λ_err : 1.057559e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 17 ==>  
+└             max_trunc_err_d :  4.107825e-15   max_Λ_err_d : 8.281085e-03  
+┌ Info:  Up move of CTMRG Iterations 17 ==>  
+└             max_trunc_err_u :  4.107825e-15   max_Λ_err_u : 8.688825e-03  
+┌ Info:  Left move of CTMRG Iterations 17 ==>  
+└             max_trunc_err_l :  4.329870e-15   max_Λ_err_l : 7.875700e-03  
+┌ Info:  Right move of CTMRG Iterations 17 ==>  
+└             max_trunc_err_r :  4.107825e-15   max_Λ_err_r : 6.803674e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 17 ==>  Δt : 0.1640   
+└         max_coef_err :  3.434803e-02   max_trunc_err : 4.329870e-15  max_Λ_err : 8.688825e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 18 ==>  
+└             max_trunc_err_d :  3.885781e-15   max_Λ_err_d : 6.803674e-03  
+┌ Info:  Up move of CTMRG Iterations 18 ==>  
+└             max_trunc_err_u :  4.107825e-15   max_Λ_err_u : 7.138670e-03  
+┌ Info:  Left move of CTMRG Iterations 18 ==>  
+└             max_trunc_err_l :  3.885781e-15   max_Λ_err_l : 6.470613e-03  
+┌ Info:  Right move of CTMRG Iterations 18 ==>  
+└             max_trunc_err_r :  4.329870e-15   max_Λ_err_r : 5.589845e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 18 ==>  Δt : 0.1690   
+└         max_coef_err :  2.948141e-02   max_trunc_err : 4.329870e-15  max_Λ_err : 7.138670e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 19 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 5.589845e-03  
+┌ Info:  Up move of CTMRG Iterations 19 ==>  
+└             max_trunc_err_u :  4.329870e-15   max_Λ_err_u : 5.865075e-03  
+┌ Info:  Left move of CTMRG Iterations 19 ==>  
+└             max_trunc_err_l :  4.329870e-15   max_Λ_err_l : 5.316205e-03  
+┌ Info:  Right move of CTMRG Iterations 19 ==>  
+└             max_trunc_err_r :  4.551914e-15   max_Λ_err_r : 4.592573e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 19 ==>  Δt : 0.1742   
+└         max_coef_err :  3.202356e-02   max_trunc_err : 4.551914e-15  max_Λ_err : 5.865075e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 20 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 4.592573e-03  
+┌ Info:  Up move of CTMRG Iterations 20 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 4.818699e-03  
+┌ Info:  Left move of CTMRG Iterations 20 ==>  
+└             max_trunc_err_l :  4.551914e-15   max_Λ_err_l : 4.367752e-03  
+┌ Info:  Right move of CTMRG Iterations 20 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 3.773221e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 20 ==>  Δt : 0.1570   
+└         max_coef_err :  5.658522e-02   max_trunc_err : 4.551914e-15  max_Λ_err : 4.818699e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 21 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 3.773221e-03  
+┌ Info:  Up move of CTMRG Iterations 21 ==>  
+└             max_trunc_err_u :  4.551914e-15   max_Λ_err_u : 3.959005e-03  
+┌ Info:  Left move of CTMRG Iterations 21 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 3.588511e-03  
+┌ Info:  Right move of CTMRG Iterations 21 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 3.100049e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 21 ==>  Δt : 0.1721   
+└         max_coef_err :  8.166570e-02   max_trunc_err : 4.551914e-15  max_Λ_err : 3.959005e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 22 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 3.100049e-03  
+┌ Info:  Up move of CTMRG Iterations 22 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 3.252688e-03  
+┌ Info:  Left move of CTMRG Iterations 22 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 2.948292e-03  
+┌ Info:  Right move of CTMRG Iterations 22 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 2.546976e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 22 ==>  Δt : 0.1569   
+└         max_coef_err :  2.544186e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 3.252688e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 23 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 2.546976e-03  
+┌ Info:  Up move of CTMRG Iterations 23 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 2.672383e-03  
+┌ Info:  Left move of CTMRG Iterations 23 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 2.422293e-03  
+┌ Info:  Right move of CTMRG Iterations 23 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 2.092575e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 23 ==>  Δt : 0.1645   
+└         max_coef_err :  1.251505e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 2.672383e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 24 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 2.092575e-03  
+┌ Info:  Up move of CTMRG Iterations 24 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 2.195608e-03  
+┌ Info:  Left move of CTMRG Iterations 24 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 1.990137e-03  
+┌ Info:  Right move of CTMRG Iterations 24 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 1.719243e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 24 ==>  Δt : 0.1636   
+└         max_coef_err :  1.363016e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 2.195608e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 25 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 1.719243e-03  
+┌ Info:  Up move of CTMRG Iterations 25 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 1.803895e-03  
+┌ Info:  Left move of CTMRG Iterations 25 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 1.635081e-03  
+┌ Info:  Right move of CTMRG Iterations 25 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 1.412517e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 25 ==>  Δt : 0.1698   
+└         max_coef_err :  7.546068e-03   max_trunc_err : 4.440892e-15  max_Λ_err : 1.803895e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 26 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 1.412517e-03  
+┌ Info:  Up move of CTMRG Iterations 26 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 1.482066e-03  
+┌ Info:  Left move of CTMRG Iterations 26 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 1.343370e-03  
+┌ Info:  Right move of CTMRG Iterations 26 ==>  
+└             max_trunc_err_r :  4.662937e-15   max_Λ_err_r : 1.160513e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 26 ==>  Δt : 0.1743   
+└         max_coef_err :  3.628316e-03   max_trunc_err : 4.662937e-15  max_Λ_err : 1.482066e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 27 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 1.160513e-03  
+┌ Info:  Up move of CTMRG Iterations 27 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 1.217653e-03  
+┌ Info:  Left move of CTMRG Iterations 27 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 1.103702e-03  
+┌ Info:  Right move of CTMRG Iterations 27 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 9.534680e-04  
+[ Info:         
+┌ Info:  CTMRG Iterations 27 ==>  Δt : 0.1571   
+└         max_coef_err :  2.688278e-03   max_trunc_err : 4.440892e-15  max_Λ_err : 1.217653e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 28 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 9.534680e-04  
+┌ Info:  Up move of CTMRG Iterations 28 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 1.000414e-03  
+┌ Info:  Left move of CTMRG Iterations 28 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 9.067928e-04  
+┌ Info:  Right move of CTMRG Iterations 28 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 7.833618e-04  
+[ Info:         
+┌ Info:  CTMRG Iterations 28 ==>  Δt : 0.1546   
+└         max_coef_err :  2.300357e-03   max_trunc_err : 4.440892e-15  max_Λ_err : 1.000414e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 29 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 7.833618e-04  
+┌ Info:  Up move of CTMRG Iterations 29 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 8.219326e-04  
+┌ Info:  Left move of CTMRG Iterations 29 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 7.450138e-04  
+┌ Info:  Right move of CTMRG Iterations 29 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 6.436039e-04  
+[ Info:         
+┌ Info:  CTMRG Iterations 29 ==>  Δt : 0.1704   
+└         max_coef_err :  3.607868e-04   max_trunc_err : 4.440892e-15  max_Λ_err : 8.219326e-04  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 30 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 6.436039e-04  
+┌ Info:  Up move of CTMRG Iterations 30 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 6.752933e-04  
+┌ Info:  Left move of CTMRG Iterations 30 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 6.120975e-04  
+┌ Info:  Right move of CTMRG Iterations 30 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 5.287799e-04  
+[ Info:         
+┌ Info:  CTMRG Iterations 30 ==>  Δt : 0.1656   
+└         max_coef_err :  1.378941e-04   max_trunc_err : 4.440892e-15  max_Λ_err : 6.752933e-04  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 31 ==>  
+└             max_trunc_err_d :  4.662937e-15   max_Λ_err_d : 5.287799e-04  
+┌ Info:  Up move of CTMRG Iterations 31 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 5.548157e-04  
+┌ Info:  Left move of CTMRG Iterations 31 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 5.028945e-04  
+┌ Info:  Right move of CTMRG Iterations 31 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 4.344414e-04  
+[ Info:         
+┌ Info:  CTMRG Iterations 31 ==>  Δt : 0.1556   
+└         max_coef_err :  1.961469e-05   max_trunc_err : 4.662937e-15  max_Λ_err : 5.548157e-04  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 32 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 4.344414e-04  
+┌ Info:  Up move of CTMRG Iterations 32 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 4.558322e-04  
+┌ Info:  Left move of CTMRG Iterations 32 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 4.131741e-04  
+┌ Info:  Right move of CTMRG Iterations 32 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 3.569336e-04  
+[ Info:         
+┌ Info:  CTMRG Iterations 32 ==>  Δt : 0.1694   
+└         max_coef_err :  2.582927e-05   max_trunc_err : 4.440892e-15  max_Λ_err : 4.558322e-04  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 33 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 3.569336e-04  
+┌ Info:  Up move of CTMRG Iterations 33 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 3.745081e-04  
+┌ Info:  Left move of CTMRG Iterations 33 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 3.394606e-04  
+┌ Info:  Right move of CTMRG Iterations 33 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 2.932538e-04  
+[ Info:         
+┌ Info:  CTMRG Iterations 33 ==>  Δt : 0.1687   
+└         max_coef_err :  3.770984e-05   max_trunc_err : 4.440892e-15  max_Λ_err : 3.745081e-04  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 34 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 2.932538e-04  
+┌ Info:  Up move of CTMRG Iterations 34 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 3.076929e-04  
+┌ Info:  Left move of CTMRG Iterations 34 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 2.788982e-04  
+┌ Info:  Right move of CTMRG Iterations 34 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 2.409350e-04  
+[ Info:         
+┌ Info:  CTMRG Iterations 34 ==>  Δt : 0.1726   
+└         max_coef_err :  2.320412e-05   max_trunc_err : 4.440892e-15  max_Λ_err : 3.076929e-04  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 35 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 2.409350e-04  
+┌ Info:  Up move of CTMRG Iterations 35 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 2.527981e-04  
+┌ Info:  Left move of CTMRG Iterations 35 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 2.291405e-04  
+┌ Info:  Right move of CTMRG Iterations 35 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 1.979503e-04  
+[ Info:         
+┌ Info:  CTMRG Iterations 35 ==>  Δt : 0.1543   
+└         max_coef_err :  2.496532e-05   max_trunc_err : 4.440892e-15  max_Λ_err : 2.527981e-04  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 36 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 1.979503e-04  
+┌ Info:  Up move of CTMRG Iterations 36 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 2.076969e-04  
+┌ Info:  Left move of CTMRG Iterations 36 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 1.882600e-04  
+┌ Info:  Right move of CTMRG Iterations 36 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 1.626344e-04  
+[ Info:         
+┌ Info:  CTMRG Iterations 36 ==>  Δt : 0.1529   
+└         max_coef_err :  3.858222e-05   max_trunc_err : 4.440892e-15  max_Λ_err : 2.076969e-04  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 37 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 1.626344e-04  
+┌ Info:  Up move of CTMRG Iterations 37 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 1.706421e-04  
+┌ Info:  Left move of CTMRG Iterations 37 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 1.546730e-04  
+┌ Info:  Right move of CTMRG Iterations 37 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 1.336192e-04  
+[ Info:         
+┌ Info:  CTMRG Iterations 37 ==>  Δt : 0.1496   
+└         max_coef_err :  6.916644e-05   max_trunc_err : 4.440892e-15  max_Λ_err : 1.706421e-04  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 38 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 1.336192e-04  
+┌ Info:  Up move of CTMRG Iterations 38 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 1.401982e-04  
+┌ Info:  Left move of CTMRG Iterations 38 ==>  
+└             max_trunc_err_l :  4.662937e-15   max_Λ_err_l : 1.270781e-04  
+┌ Info:  Right move of CTMRG Iterations 38 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 1.097805e-04  
+[ Info:         
+┌ Info:  CTMRG Iterations 38 ==>  Δt : 0.1761   
+└         max_coef_err :  3.709778e-05   max_trunc_err : 4.662937e-15  max_Λ_err : 1.401982e-04  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 39 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 1.097805e-04  
+┌ Info:  Up move of CTMRG Iterations 39 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 1.151858e-04  
+┌ Info:  Left move of CTMRG Iterations 39 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 1.044064e-04  
+┌ Info:  Right move of CTMRG Iterations 39 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 9.019476e-05  
+[ Info:         
+┌ Info:  CTMRG Iterations 39 ==>  Δt : 0.3760   
+└         max_coef_err :  1.388896e-05   max_trunc_err : 4.440892e-15  max_Λ_err : 1.151858e-04  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 40 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 9.019476e-05  
+┌ Info:  Up move of CTMRG Iterations 40 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 9.463572e-05  
+┌ Info:  Left move of CTMRG Iterations 40 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 8.577944e-05  
+┌ Info:  Right move of CTMRG Iterations 40 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 7.410330e-05  
+[ Info:         
+┌ Info:  CTMRG Iterations 40 ==>  Δt : 0.4970   
+└         max_coef_err :  1.532123e-05   max_trunc_err : 4.440892e-15  max_Λ_err : 9.463572e-05  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 41 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 7.410330e-05  
+┌ Info:  Up move of CTMRG Iterations 41 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 7.775196e-05  
+┌ Info:  Left move of CTMRG Iterations 41 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 7.047571e-05  
+┌ Info:  Right move of CTMRG Iterations 41 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 6.088269e-05  
+[ Info:         
+┌ Info:  CTMRG Iterations 41 ==>  Δt : 0.1593   
+└         max_coef_err :  9.930332e-06   max_trunc_err : 4.440892e-15  max_Λ_err : 7.775196e-05  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 42 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 6.088269e-05  
+┌ Info:  Up move of CTMRG Iterations 42 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 6.388040e-05  
+┌ Info:  Left move of CTMRG Iterations 42 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 5.790229e-05  
+┌ Info:  Right move of CTMRG Iterations 42 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 5.002074e-05  
+[ Info:         
+┌ Info:  CTMRG Iterations 42 ==>  Δt : 0.1625   
+└         max_coef_err :  1.409300e-05   max_trunc_err : 4.440892e-15  max_Λ_err : 6.388040e-05  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 43 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 5.002074e-05  
+┌ Info:  Up move of CTMRG Iterations 43 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 5.248363e-05  
+┌ Info:  Left move of CTMRG Iterations 43 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 4.757207e-05  
+┌ Info:  Right move of CTMRG Iterations 43 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 4.109664e-05  
+[ Info:         
+┌ Info:  CTMRG Iterations 43 ==>  Δt : 0.1698   
+└         max_coef_err :  1.284467e-05   max_trunc_err : 4.440892e-15  max_Λ_err : 5.248363e-05  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 44 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 4.109664e-05  
+┌ Info:  Up move of CTMRG Iterations 44 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 4.312014e-05  
+┌ Info:  Left move of CTMRG Iterations 44 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 3.908483e-05  
+┌ Info:  Right move of CTMRG Iterations 44 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 3.376468e-05  
+[ Info:         
+┌ Info:  CTMRG Iterations 44 ==>  Δt : 0.1864   
+└         max_coef_err :  2.002712e-05   max_trunc_err : 4.440892e-15  max_Λ_err : 4.312014e-05  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 45 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 3.376468e-05  
+┌ Info:  Up move of CTMRG Iterations 45 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 3.542717e-05  
+┌ Info:  Left move of CTMRG Iterations 45 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 3.211179e-05  
+┌ Info:  Right move of CTMRG Iterations 45 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 2.774079e-05  
+[ Info:         
+┌ Info:  CTMRG Iterations 45 ==>  Δt : 0.1303   
+└         max_coef_err :  2.841490e-05   max_trunc_err : 4.440892e-15  max_Λ_err : 3.542717e-05  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 46 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 2.774079e-05  
+┌ Info:  Up move of CTMRG Iterations 46 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 2.910668e-05  
+┌ Info:  Left move of CTMRG Iterations 46 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 2.638279e-05  
+┌ Info:  Right move of CTMRG Iterations 46 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 2.279162e-05  
+[ Info:         
+┌ Info:  CTMRG Iterations 46 ==>  Δt : 0.1288   
+└         max_coef_err :  1.208973e-05   max_trunc_err : 4.440892e-15  max_Λ_err : 2.910668e-05  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 47 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 2.279162e-05  
+┌ Info:  Up move of CTMRG Iterations 47 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 2.391382e-05  
+┌ Info:  Left move of CTMRG Iterations 47 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 2.167590e-05  
+┌ Info:  Right move of CTMRG Iterations 47 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 1.872541e-05  
+[ Info:         
+┌ Info:  CTMRG Iterations 47 ==>  Δt : 0.1803   
+└         max_coef_err :  1.113535e-05   max_trunc_err : 4.440892e-15  max_Λ_err : 2.391382e-05  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 48 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 1.872541e-05  
+┌ Info:  Up move of CTMRG Iterations 48 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 1.964740e-05  
+┌ Info:  Left move of CTMRG Iterations 48 ==>  
+└             max_trunc_err_l :  4.662937e-15   max_Λ_err_l : 1.780875e-05  
+┌ Info:  Right move of CTMRG Iterations 48 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 1.538465e-05  
+[ Info:         
+┌ Info:  CTMRG Iterations 48 ==>  Δt : 0.1232   
+└         max_coef_err :  1.459181e-05   max_trunc_err : 4.662937e-15  max_Λ_err : 1.964740e-05  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 49 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 1.538465e-05  
+┌ Info:  Up move of CTMRG Iterations 49 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 1.614215e-05  
+┌ Info:  Left move of CTMRG Iterations 49 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 1.463152e-05  
+┌ Info:  Right move of CTMRG Iterations 49 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 1.263991e-05  
+[ Info:         
+┌ Info:  CTMRG Iterations 49 ==>  Δt : 0.1449   
+└         max_coef_err :  1.646448e-05   max_trunc_err : 4.440892e-15  max_Λ_err : 1.614215e-05  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 50 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 1.263991e-05  
+┌ Info:  Up move of CTMRG Iterations 50 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 1.326227e-05  
+┌ Info:  Left move of CTMRG Iterations 50 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 1.202115e-05  
+┌ Info:  Right move of CTMRG Iterations 50 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 1.038485e-05  
+[ Info:         
+┌ Info:  CTMRG Iterations 50 ==>  Δt : 0.1476   
+└         max_coef_err :  1.039687e-05   max_trunc_err : 4.218847e-15  max_Λ_err : 1.326227e-05  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 51 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 1.038485e-05  
+┌ Info:  Up move of CTMRG Iterations 51 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 1.089617e-05  
+┌ Info:  Left move of CTMRG Iterations 51 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 9.876478e-06  
+┌ Info:  Right move of CTMRG Iterations 51 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 8.532110e-06  
+[ Info:         
+┌ Info:  CTMRG Iterations 51 ==>  Δt : 0.1395   
+└         max_coef_err :  2.267197e-05   max_trunc_err : 4.440892e-15  max_Λ_err : 1.089617e-05  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 52 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 8.532110e-06  
+┌ Info:  Up move of CTMRG Iterations 52 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 8.952210e-06  
+┌ Info:  Left move of CTMRG Iterations 52 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 8.114437e-06  
+┌ Info:  Right move of CTMRG Iterations 52 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 7.009914e-06  
+[ Info:         
+┌ Info:  CTMRG Iterations 52 ==>  Δt : 0.1541   
+└         max_coef_err :  2.305690e-05   max_trunc_err : 4.440892e-15  max_Λ_err : 8.952210e-06  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 53 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 7.009914e-06  
+┌ Info:  Up move of CTMRG Iterations 53 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 7.355065e-06  
+┌ Info:  Left move of CTMRG Iterations 53 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 6.666757e-06  
+┌ Info:  Right move of CTMRG Iterations 53 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 5.759290e-06  
+[ Info:         
+┌ Info:  CTMRG Iterations 53 ==>  Δt : 0.1516   
+└         max_coef_err :  1.200214e-04   max_trunc_err : 4.440892e-15  max_Λ_err : 7.355065e-06  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 54 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 5.759290e-06  
+┌ Info:  Up move of CTMRG Iterations 54 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 6.042863e-06  
+┌ Info:  Left move of CTMRG Iterations 54 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 5.477355e-06  
+┌ Info:  Right move of CTMRG Iterations 54 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 4.731788e-06  
+[ Info:         
+┌ Info:  CTMRG Iterations 54 ==>  Δt : 0.1666   
+└         max_coef_err :  9.046669e-04   max_trunc_err : 4.440892e-15  max_Λ_err : 6.042863e-06  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 55 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 4.731788e-06  
+┌ Info:  Up move of CTMRG Iterations 55 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 4.964769e-06  
+┌ Info:  Left move of CTMRG Iterations 55 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 4.500152e-06  
+┌ Info:  Right move of CTMRG Iterations 55 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 3.887599e-06  
+[ Info:         
+┌ Info:  CTMRG Iterations 55 ==>  Δt : 0.1528   
+└         max_coef_err :  8.913615e-04   max_trunc_err : 4.440892e-15  max_Λ_err : 4.964769e-06  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 56 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 3.887599e-06  
+┌ Info:  Up move of CTMRG Iterations 56 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 4.079015e-06  
+┌ Info:  Left move of CTMRG Iterations 56 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 3.697289e-06  
+┌ Info:  Right move of CTMRG Iterations 56 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 2.063438e-06  
+[ Info:         
+┌ Info:  CTMRG Iterations 56 ==>  Δt : 0.1536   
+└         max_coef_err :  6.923271e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 4.079015e-06  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 57 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 2.759257e-06  
+┌ Info:  Up move of CTMRG Iterations 57 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 3.052792e-06  
+┌ Info:  Left move of CTMRG Iterations 57 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 2.507075e-06  
+┌ Info:  Right move of CTMRG Iterations 57 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 2.624182e-06  
+[ Info:         
+┌ Info:  CTMRG Iterations 57 ==>  Δt : 0.1638   
+└         max_coef_err :  4.912068e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 3.052792e-06  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 58 ==>  
+└             max_trunc_err_d :  4.662937e-15   max_Λ_err_d : 2.624182e-06  
+┌ Info:  Up move of CTMRG Iterations 58 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 2.753391e-06  
+┌ Info:  Left move of CTMRG Iterations 58 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 2.495721e-06  
+┌ Info:  Right move of CTMRG Iterations 58 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 2.156008e-06  
+[ Info:         
+┌ Info:  CTMRG Iterations 58 ==>  Δt : 0.1545   
+└         max_coef_err :  6.738908e-02   max_trunc_err : 4.662937e-15  max_Λ_err : 2.753391e-06  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 59 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 2.156008e-06  
+┌ Info:  Up move of CTMRG Iterations 59 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 2.262164e-06  
+┌ Info:  Left move of CTMRG Iterations 59 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 2.050464e-06  
+┌ Info:  Right move of CTMRG Iterations 59 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 1.771359e-06  
+[ Info:         
+┌ Info:  CTMRG Iterations 59 ==>  Δt : 0.1589   
+└         max_coef_err :  3.371955e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 2.262164e-06  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 60 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 1.771359e-06  
+┌ Info:  Up move of CTMRG Iterations 60 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 1.858576e-06  
+┌ Info:  Left move of CTMRG Iterations 60 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 1.684645e-06  
+┌ Info:  Right move of CTMRG Iterations 60 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 1.455334e-06  
+[ Info:         
+┌ Info:  CTMRG Iterations 60 ==>  Δt : 0.1822   
+└         max_coef_err :  8.842934e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 1.858576e-06  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 61 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 1.455334e-06  
+┌ Info:  Up move of CTMRG Iterations 61 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 1.526991e-06  
+┌ Info:  Left move of CTMRG Iterations 61 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 1.384091e-06  
+┌ Info:  Right move of CTMRG Iterations 61 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 1.195691e-06  
+[ Info:         
+┌ Info:  CTMRG Iterations 61 ==>  Δt : 0.1547   
+└         max_coef_err :  8.105494e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 1.526991e-06  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 62 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 1.195691e-06  
+┌ Info:  Up move of CTMRG Iterations 62 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 1.254564e-06  
+┌ Info:  Left move of CTMRG Iterations 62 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 1.137158e-06  
+┌ Info:  Right move of CTMRG Iterations 62 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 9.823706e-07  
+[ Info:         
+┌ Info:  CTMRG Iterations 62 ==>  Δt : 0.1506   
+└         max_coef_err :  1.058156e-01   max_trunc_err : 4.440892e-15  max_Λ_err : 1.254564e-06  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 63 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 9.823706e-07  
+┌ Info:  Up move of CTMRG Iterations 63 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 1.030740e-06  
+┌ Info:  Left move of CTMRG Iterations 63 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 9.342805e-07  
+┌ Info:  Right move of CTMRG Iterations 63 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 8.071079e-07  
+[ Info:         
+┌ Info:  CTMRG Iterations 63 ==>  Δt : 0.1563   
+└         max_coef_err :  1.510337e-01   max_trunc_err : 4.440892e-15  max_Λ_err : 1.030740e-06  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 64 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 8.071079e-07  
+┌ Info:  Up move of CTMRG Iterations 64 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 8.468479e-07  
+┌ Info:  Left move of CTMRG Iterations 64 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 7.675975e-07  
+┌ Info:  Right move of CTMRG Iterations 64 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 6.631135e-07  
+[ Info:         
+┌ Info:  CTMRG Iterations 64 ==>  Δt : 0.1528   
+└         max_coef_err :  1.410293e-01   max_trunc_err : 4.440892e-15  max_Λ_err : 8.468479e-07  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 65 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 6.631135e-07  
+┌ Info:  Up move of CTMRG Iterations 65 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 6.957635e-07  
+┌ Info:  Left move of CTMRG Iterations 65 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 6.306520e-07  
+┌ Info:  Right move of CTMRG Iterations 65 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 5.448088e-07  
+[ Info:         
+┌ Info:  CTMRG Iterations 65 ==>  Δt : 0.1711   
+└         max_coef_err :  7.719434e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 6.957635e-07  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 66 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 5.448088e-07  
+┌ Info:  Up move of CTMRG Iterations 66 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 5.716338e-07  
+┌ Info:  Left move of CTMRG Iterations 66 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 5.181387e-07  
+┌ Info:  Right move of CTMRG Iterations 66 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 4.476106e-07  
+[ Info:         
+┌ Info:  CTMRG Iterations 66 ==>  Δt : 0.1763   
+└         max_coef_err :  2.909665e-03   max_trunc_err : 4.440892e-15  max_Λ_err : 5.716338e-07  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 67 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 4.476106e-07  
+┌ Info:  Up move of CTMRG Iterations 67 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 4.696498e-07  
+┌ Info:  Left move of CTMRG Iterations 67 ==>  
+└             max_trunc_err_l :  4.662937e-15   max_Λ_err_l : 4.256987e-07  
+┌ Info:  Right move of CTMRG Iterations 67 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 3.677534e-07  
+[ Info:         
+┌ Info:  CTMRG Iterations 67 ==>  Δt : 0.1686   
+└         max_coef_err :  6.952508e-02   max_trunc_err : 4.662937e-15  max_Λ_err : 4.696498e-07  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 68 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 3.677534e-07  
+┌ Info:  Up move of CTMRG Iterations 68 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 3.858606e-07  
+┌ Info:  Left move of CTMRG Iterations 68 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 3.497507e-07  
+┌ Info:  Right move of CTMRG Iterations 68 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 3.021433e-07  
+[ Info:         
+┌ Info:  CTMRG Iterations 68 ==>  Δt : 0.1637   
+└         max_coef_err :  6.958482e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 3.858606e-07  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 69 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 3.021433e-07  
+┌ Info:  Up move of CTMRG Iterations 69 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 3.170200e-07  
+┌ Info:  Left move of CTMRG Iterations 69 ==>  
+└             max_trunc_err_l :  4.662937e-15   max_Λ_err_l : 2.873524e-07  
+┌ Info:  Right move of CTMRG Iterations 69 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 2.482385e-07  
+[ Info:         
+┌ Info:  CTMRG Iterations 69 ==>  Δt : 0.1659   
+└         max_coef_err :  1.207567e-01   max_trunc_err : 4.662937e-15  max_Λ_err : 3.170200e-07  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 70 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 2.482385e-07  
+┌ Info:  Up move of CTMRG Iterations 70 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 2.604612e-07  
+┌ Info:  Left move of CTMRG Iterations 70 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 2.360865e-07  
+┌ Info:  Right move of CTMRG Iterations 70 ==>  
+└             max_trunc_err_r :  3.996803e-15   max_Λ_err_r : 2.039508e-07  
+[ Info:         
+┌ Info:  CTMRG Iterations 70 ==>  Δt : 0.1533   
+└         max_coef_err :  1.140812e-01   max_trunc_err : 4.440892e-15  max_Λ_err : 2.604612e-07  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 71 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 2.039508e-07  
+┌ Info:  Up move of CTMRG Iterations 71 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 2.139928e-07  
+┌ Info:  Left move of CTMRG Iterations 71 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 1.939668e-07  
+┌ Info:  Right move of CTMRG Iterations 71 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 1.675644e-07  
+[ Info:         
+┌ Info:  CTMRG Iterations 71 ==>  Δt : 0.1591   
+└         max_coef_err :  1.256859e-01   max_trunc_err : 4.440892e-15  max_Λ_err : 2.139928e-07  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 72 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 1.675644e-07  
+┌ Info:  Up move of CTMRG Iterations 72 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 1.758148e-07  
+┌ Info:  Left move of CTMRG Iterations 72 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 1.593616e-07  
+┌ Info:  Right move of CTMRG Iterations 72 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 1.376696e-07  
+[ Info:         
+┌ Info:  CTMRG Iterations 72 ==>  Δt : 0.1567   
+└         max_coef_err :  7.014434e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 1.758148e-07  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 73 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 1.376696e-07  
+┌ Info:  Up move of CTMRG Iterations 73 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 1.444481e-07  
+┌ Info:  Left move of CTMRG Iterations 73 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 1.309302e-07  
+┌ Info:  Right move of CTMRG Iterations 73 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 1.131082e-07  
+[ Info:         
+┌ Info:  CTMRG Iterations 73 ==>  Δt : 0.1681   
+└         max_coef_err :  9.618411e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 1.444481e-07  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 74 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 1.131082e-07  
+┌ Info:  Up move of CTMRG Iterations 74 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 1.186774e-07  
+┌ Info:  Left move of CTMRG Iterations 74 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 1.075712e-07  
+┌ Info:  Right move of CTMRG Iterations 74 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 9.292883e-08  
+[ Info:         
+┌ Info:  CTMRG Iterations 74 ==>  Δt : 0.1566   
+└         max_coef_err :  4.943520e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 1.186774e-07  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 75 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 9.292883e-08  
+┌ Info:  Up move of CTMRG Iterations 75 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 9.750442e-08  
+┌ Info:  Left move of CTMRG Iterations 75 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 8.837968e-08  
+┌ Info:  Right move of CTMRG Iterations 75 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 7.634960e-08  
+[ Info:         
+┌ Info:  CTMRG Iterations 75 ==>  Δt : 0.1712   
+└         max_coef_err :  3.790683e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 9.750442e-08  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 76 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 7.634960e-08  
+┌ Info:  Up move of CTMRG Iterations 76 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 8.010886e-08  
+┌ Info:  Left move of CTMRG Iterations 76 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 7.261205e-08  
+┌ Info:  Right move of CTMRG Iterations 76 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 6.272823e-08  
+[ Info:         
+┌ Info:  CTMRG Iterations 76 ==>  Δt : 0.1668   
+└         max_coef_err :  9.283957e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 8.010886e-08  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 77 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 6.272823e-08  
+┌ Info:  Up move of CTMRG Iterations 77 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 6.581681e-08  
+┌ Info:  Left move of CTMRG Iterations 77 ==>  
+└             max_trunc_err_l :  4.662937e-15   max_Λ_err_l : 5.965749e-08  
+┌ Info:  Right move of CTMRG Iterations 77 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 5.153702e-08  
+[ Info:         
+┌ Info:  CTMRG Iterations 77 ==>  Δt : 0.1658   
+└         max_coef_err :  6.521171e-02   max_trunc_err : 4.662937e-15  max_Λ_err : 6.581681e-08  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 78 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 5.153702e-08  
+┌ Info:  Up move of CTMRG Iterations 78 ==>  
+└             max_trunc_err_u :  4.662937e-15   max_Λ_err_u : 5.407457e-08  
+┌ Info:  Left move of CTMRG Iterations 78 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 4.901412e-08  
+┌ Info:  Right move of CTMRG Iterations 78 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 4.234241e-08  
+[ Info:         
+┌ Info:  CTMRG Iterations 78 ==>  Δt : 0.1686   
+└         max_coef_err :  7.396326e-02   max_trunc_err : 4.662937e-15  max_Λ_err : 5.407457e-08  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 79 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 4.234241e-08  
+┌ Info:  Up move of CTMRG Iterations 79 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 4.442724e-08  
+┌ Info:  Left move of CTMRG Iterations 79 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 4.026961e-08  
+┌ Info:  Right move of CTMRG Iterations 79 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 3.478819e-08  
+[ Info:         
+┌ Info:  CTMRG Iterations 79 ==>  Δt : 0.1591   
+└         max_coef_err :  1.046568e-01   max_trunc_err : 4.440892e-15  max_Λ_err : 4.442724e-08  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 80 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 3.478819e-08  
+┌ Info:  Up move of CTMRG Iterations 80 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 3.650107e-08  
+┌ Info:  Left move of CTMRG Iterations 80 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 3.308520e-08  
+┌ Info:  Right move of CTMRG Iterations 80 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 2.858170e-08  
+[ Info:         
+┌ Info:  CTMRG Iterations 80 ==>  Δt : 0.1719   
+└         max_coef_err :  1.369434e-01   max_trunc_err : 4.440892e-15  max_Λ_err : 3.650107e-08  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 81 ==>  
+└             max_trunc_err_d :  4.662937e-15   max_Λ_err_d : 2.858170e-08  
+┌ Info:  Up move of CTMRG Iterations 81 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 2.998899e-08  
+┌ Info:  Left move of CTMRG Iterations 81 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 2.718254e-08  
+┌ Info:  Right move of CTMRG Iterations 81 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 2.348250e-08  
+[ Info:         
+┌ Info:  CTMRG Iterations 81 ==>  Δt : 0.1547   
+└         max_coef_err :  5.678023e-02   max_trunc_err : 4.662937e-15  max_Λ_err : 2.998899e-08  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 82 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 2.348250e-08  
+┌ Info:  Up move of CTMRG Iterations 82 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 2.463872e-08  
+┌ Info:  Left move of CTMRG Iterations 82 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 2.233296e-08  
+┌ Info:  Right move of CTMRG Iterations 82 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 1.929304e-08  
+[ Info:         
+┌ Info:  CTMRG Iterations 82 ==>  Δt : 0.1539   
+└         max_coef_err :  7.252086e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 2.463872e-08  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 83 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 1.929304e-08  
+┌ Info:  Up move of CTMRG Iterations 83 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 2.024298e-08  
+┌ Info:  Left move of CTMRG Iterations 83 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 1.834858e-08  
+┌ Info:  Right move of CTMRG Iterations 83 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 1.585101e-08  
+[ Info:         
+┌ Info:  CTMRG Iterations 83 ==>  Δt : 0.1588   
+└         max_coef_err :  7.396396e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 2.024298e-08  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 84 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 1.585101e-08  
+┌ Info:  Up move of CTMRG Iterations 84 ==>  
+└             max_trunc_err_u :  4.662937e-15   max_Λ_err_u : 1.663147e-08  
+┌ Info:  Left move of CTMRG Iterations 84 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 1.507505e-08  
+┌ Info:  Right move of CTMRG Iterations 84 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 1.302306e-08  
+[ Info:         
+┌ Info:  CTMRG Iterations 84 ==>  Δt : 0.1664   
+└         max_coef_err :  1.173091e-01   max_trunc_err : 4.662937e-15  max_Λ_err : 1.663147e-08  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 85 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 1.302306e-08  
+┌ Info:  Up move of CTMRG Iterations 85 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 1.366429e-08  
+┌ Info:  Left move of CTMRG Iterations 85 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 1.238554e-08  
+┌ Info:  Right move of CTMRG Iterations 85 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 1.069965e-08  
+[ Info:         
+┌ Info:  CTMRG Iterations 85 ==>  Δt : 0.1688   
+└         max_coef_err :  7.823417e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 1.366429e-08  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 86 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 1.069965e-08  
+┌ Info:  Up move of CTMRG Iterations 86 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 1.122647e-08  
+┌ Info:  Left move of CTMRG Iterations 86 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 1.017586e-08  
+┌ Info:  Right move of CTMRG Iterations 86 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 8.790744e-09  
+[ Info:         
+┌ Info:  CTMRG Iterations 86 ==>  Δt : 0.1690   
+└         max_coef_err :  8.578045e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 1.122647e-08  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 87 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 8.790744e-09  
+┌ Info:  Up move of CTMRG Iterations 87 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 9.223578e-09  
+┌ Info:  Left move of CTMRG Iterations 87 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 8.360410e-09  
+┌ Info:  Right move of CTMRG Iterations 87 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 7.222406e-09  
+[ Info:         
+┌ Info:  CTMRG Iterations 87 ==>  Δt : 0.1578   
+└         max_coef_err :  7.083961e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 9.223578e-09  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 88 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 7.222406e-09  
+┌ Info:  Up move of CTMRG Iterations 88 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 7.578019e-09  
+┌ Info:  Left move of CTMRG Iterations 88 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 6.868847e-09  
+┌ Info:  Right move of CTMRG Iterations 88 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 5.933872e-09  
+[ Info:         
+┌ Info:  CTMRG Iterations 88 ==>  Δt : 0.1774   
+└         max_coef_err :  7.650479e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 7.578019e-09  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 89 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 5.933872e-09  
+┌ Info:  Up move of CTMRG Iterations 89 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 6.226041e-09  
+┌ Info:  Left move of CTMRG Iterations 89 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 5.643390e-09  
+┌ Info:  Right move of CTMRG Iterations 89 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 4.875222e-09  
+[ Info:         
+┌ Info:  CTMRG Iterations 89 ==>  Δt : 0.1523   
+└         max_coef_err :  5.886624e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 6.226041e-09  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 90 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 4.875222e-09  
+┌ Info:  Up move of CTMRG Iterations 90 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 5.115266e-09  
+┌ Info:  Left move of CTMRG Iterations 90 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 4.636565e-09  
+┌ Info:  Right move of CTMRG Iterations 90 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 4.005444e-09  
+[ Info:         
+┌ Info:  CTMRG Iterations 90 ==>  Δt : 0.1508   
+└         max_coef_err :  5.694925e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 5.115266e-09  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 91 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 4.005444e-09  
+┌ Info:  Up move of CTMRG Iterations 91 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 4.202662e-09  
+┌ Info:  Left move of CTMRG Iterations 91 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 3.809365e-09  
+┌ Info:  Right move of CTMRG Iterations 91 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 3.290841e-09  
+[ Info:         
+┌ Info:  CTMRG Iterations 91 ==>  Δt : 0.1520   
+└         max_coef_err :  6.177050e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 4.202662e-09  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 92 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 3.290841e-09  
+┌ Info:  Up move of CTMRG Iterations 92 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 3.452874e-09  
+┌ Info:  Left move of CTMRG Iterations 92 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 3.129745e-09  
+┌ Info:  Right move of CTMRG Iterations 92 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 2.703729e-09  
+[ Info:         
+┌ Info:  CTMRG Iterations 92 ==>  Δt : 0.1525   
+└         max_coef_err :  6.511818e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 3.452874e-09  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 93 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 2.703729e-09  
+┌ Info:  Up move of CTMRG Iterations 93 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 2.836854e-09  
+┌ Info:  Left move of CTMRG Iterations 93 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 2.571373e-09  
+┌ Info:  Right move of CTMRG Iterations 93 ==>  
+└             max_trunc_err_r :  4.662937e-15   max_Λ_err_r : 2.221363e-09  
+[ Info:         
+┌ Info:  CTMRG Iterations 93 ==>  Δt : 0.1532   
+└         max_coef_err :  4.857836e-02   max_trunc_err : 4.662937e-15  max_Λ_err : 2.836854e-09  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 94 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 2.221363e-09  
+┌ Info:  Up move of CTMRG Iterations 94 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 2.330737e-09  
+┌ Info:  Left move of CTMRG Iterations 94 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 2.112620e-09  
+┌ Info:  Right move of CTMRG Iterations 94 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 1.825054e-09  
+[ Info:         
+┌ Info:  CTMRG Iterations 94 ==>  Δt : 0.1565   
+└         max_coef_err :  8.925402e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 2.330737e-09  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 95 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 1.825054e-09  
+┌ Info:  Up move of CTMRG Iterations 95 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 1.914915e-09  
+┌ Info:  Left move of CTMRG Iterations 95 ==>  
+└             max_trunc_err_l :  4.218847e-15   max_Λ_err_l : 1.735712e-09  
+┌ Info:  Right move of CTMRG Iterations 95 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 1.499450e-09  
+[ Info:         
+┌ Info:  CTMRG Iterations 95 ==>  Δt : 0.1695   
+└         max_coef_err :  6.496954e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 1.914915e-09  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 96 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 1.499450e-09  
+┌ Info:  Up move of CTMRG Iterations 96 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 1.573279e-09  
+┌ Info:  Left move of CTMRG Iterations 96 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 1.426047e-09  
+┌ Info:  Right move of CTMRG Iterations 96 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 1.231936e-09  
+[ Info:         
+┌ Info:  CTMRG Iterations 96 ==>  Δt : 0.1558   
+└         max_coef_err :  5.548733e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 1.573279e-09  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 97 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 1.231936e-09  
+┌ Info:  Up move of CTMRG Iterations 97 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 1.292594e-09  
+┌ Info:  Left move of CTMRG Iterations 97 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 1.171629e-09  
+┌ Info:  Right move of CTMRG Iterations 97 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 1.012149e-09  
+[ Info:         
+┌ Info:  CTMRG Iterations 97 ==>  Δt : 0.1526   
+└         max_coef_err :  1.235596e-01   max_trunc_err : 4.440892e-15  max_Λ_err : 1.292594e-09  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 98 ==>  
+└             max_trunc_err_d :  4.218847e-15   max_Λ_err_d : 1.012149e-09  
+┌ Info:  Up move of CTMRG Iterations 98 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 1.061985e-09  
+┌ Info:  Left move of CTMRG Iterations 98 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 9.626013e-10  
+┌ Info:  Right move of CTMRG Iterations 98 ==>  
+└             max_trunc_err_r :  4.218847e-15   max_Λ_err_r : 8.315738e-10  
+[ Info:         
+┌ Info:  CTMRG Iterations 98 ==>  Δt : 0.4392   
+└         max_coef_err :  1.148113e-01   max_trunc_err : 4.440892e-15  max_Λ_err : 1.061985e-09  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 99 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 8.315738e-10  
+┌ Info:  Up move of CTMRG Iterations 99 ==>  
+└             max_trunc_err_u :  4.440892e-15   max_Λ_err_u : 8.725184e-10  
+┌ Info:  Left move of CTMRG Iterations 99 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 7.908657e-10  
+┌ Info:  Right move of CTMRG Iterations 99 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 6.832145e-10  
+[ Info:         
+┌ Info:  CTMRG Iterations 99 ==>  Δt : 0.6068   
+└         max_coef_err :  6.289172e-02   max_trunc_err : 4.440892e-15  max_Λ_err : 8.725184e-10  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 100 ==>  
+└             max_trunc_err_d :  4.440892e-15   max_Λ_err_d : 6.832145e-10  
+┌ Info:  Up move of CTMRG Iterations 100 ==>  
+└             max_trunc_err_u :  4.218847e-15   max_Λ_err_u : 7.168542e-10  
+┌ Info:  Left move of CTMRG Iterations 100 ==>  
+└             max_trunc_err_l :  4.440892e-15   max_Λ_err_l : 6.497690e-10  
+┌ Info:  Right move of CTMRG Iterations 100 ==>  
+└             max_trunc_err_r :  4.440892e-15   max_Λ_err_r : 5.613236e-10  
+[ Info:         
+┌ Info:  CTMRG Iterations 100 ==>  Δt : 0.1775   
+└         max_coef_err :  1.143434e-01   max_trunc_err : 4.440892e-15  max_Λ_err : 7.168542e-10  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 1 ==>  
+└             max_trunc_err_d :  9.090506e-13   max_Λ_err_d : 9.986762e-01  
+┌ Info:  Up move of CTMRG Iterations 1 ==>  
+└             max_trunc_err_u :  6.772360e-15   max_Λ_err_u : 9.958213e-01  
+┌ Info:  Left move of CTMRG Iterations 1 ==>  
+└             max_trunc_err_l :  7.105427e-15   max_Λ_err_l : 9.953237e-01  
+┌ Info:  Right move of CTMRG Iterations 1 ==>  
+└             max_trunc_err_r :  7.216450e-15   max_Λ_err_r : 9.946723e-01  
+[ Info:         
+┌ Info:  CTMRG Iterations 1 ==>  Δt : 0.4462   
+└         max_coef_err :  5.266254e+05   max_trunc_err : 9.090506e-13  max_Λ_err : 9.986762e-01  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 2 ==>  
+└             max_trunc_err_d :  7.438494e-15   max_Λ_err_d : 2.584692e-01  
+┌ Info:  Up move of CTMRG Iterations 2 ==>  
+└             max_trunc_err_u :  7.438494e-15   max_Λ_err_u : 2.932785e-01  
+┌ Info:  Left move of CTMRG Iterations 2 ==>  
+└             max_trunc_err_l :  7.105427e-15   max_Λ_err_l : 1.905687e-01  
+┌ Info:  Right move of CTMRG Iterations 2 ==>  
+└             max_trunc_err_r :  7.105427e-15   max_Λ_err_r : 1.518942e-01  
+[ Info:         
+┌ Info:  CTMRG Iterations 2 ==>  Δt : 0.3187   
+└         max_coef_err :  9.999973e-01   max_trunc_err : 7.438494e-15  max_Λ_err : 2.932785e-01  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 3 ==>  
+└             max_trunc_err_d :  7.438494e-15   max_Λ_err_d : 1.703911e-01  
+┌ Info:  Up move of CTMRG Iterations 3 ==>  
+└             max_trunc_err_u :  7.327472e-15   max_Λ_err_u : 3.958557e-02  
+┌ Info:  Left move of CTMRG Iterations 3 ==>  
+└             max_trunc_err_l :  7.105427e-15   max_Λ_err_l : 3.381056e-02  
+┌ Info:  Right move of CTMRG Iterations 3 ==>  
+└             max_trunc_err_r :  7.327472e-15   max_Λ_err_r : 3.750330e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 3 ==>  Δt : 0.3135   
+└         max_coef_err :  9.676991e-01   max_trunc_err : 7.438494e-15  max_Λ_err : 1.703911e-01  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 4 ==>  
+└             max_trunc_err_d :  7.327472e-15   max_Λ_err_d : 7.300304e-02  
+┌ Info:  Up move of CTMRG Iterations 4 ==>  
+└             max_trunc_err_u :  7.216450e-15   max_Λ_err_u : 3.495966e-02  
+┌ Info:  Left move of CTMRG Iterations 4 ==>  
+└             max_trunc_err_l :  7.105427e-15   max_Λ_err_l : 3.511048e-02  
+┌ Info:  Right move of CTMRG Iterations 4 ==>  
+└             max_trunc_err_r :  7.327472e-15   max_Λ_err_r : 3.670729e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 4 ==>  Δt : 0.3313   
+└         max_coef_err :  4.318169e-01   max_trunc_err : 7.327472e-15  max_Λ_err : 7.300304e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 5 ==>  
+└             max_trunc_err_d :  7.660539e-15   max_Λ_err_d : 4.231362e-02  
+┌ Info:  Up move of CTMRG Iterations 5 ==>  
+└             max_trunc_err_u :  7.549517e-15   max_Λ_err_u : 3.641368e-02  
+┌ Info:  Left move of CTMRG Iterations 5 ==>  
+└             max_trunc_err_l :  7.327472e-15   max_Λ_err_l : 3.643761e-02  
+┌ Info:  Right move of CTMRG Iterations 5 ==>  
+└             max_trunc_err_r :  7.216450e-15   max_Λ_err_r : 3.825297e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 5 ==>  Δt : 1.0052   
+└         max_coef_err :  1.987988e-01   max_trunc_err : 7.660539e-15  max_Λ_err : 4.231362e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 6 ==>  
+└             max_trunc_err_d :  7.882583e-15   max_Λ_err_d : 3.904254e-02  
+┌ Info:  Up move of CTMRG Iterations 6 ==>  
+└             max_trunc_err_u :  7.882583e-15   max_Λ_err_u : 3.792395e-02  
+┌ Info:  Left move of CTMRG Iterations 6 ==>  
+└             max_trunc_err_l :  7.327472e-15   max_Λ_err_l : 3.792427e-02  
+┌ Info:  Right move of CTMRG Iterations 6 ==>  
+└             max_trunc_err_r :  7.327472e-15   max_Λ_err_r : 3.943190e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 6 ==>  Δt : 0.3629   
+└         max_coef_err :  2.049503e-01   max_trunc_err : 7.882583e-15  max_Λ_err : 3.943190e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 7 ==>  
+└             max_trunc_err_d :  7.660539e-15   max_Λ_err_d : 3.870397e-02  
+┌ Info:  Up move of CTMRG Iterations 7 ==>  
+└             max_trunc_err_u :  7.660539e-15   max_Λ_err_u : 3.949684e-02  
+┌ Info:  Left move of CTMRG Iterations 7 ==>  
+└             max_trunc_err_l :  7.216450e-15   max_Λ_err_l : 3.949685e-02  
+┌ Info:  Right move of CTMRG Iterations 7 ==>  
+└             max_trunc_err_r :  7.105427e-15   max_Λ_err_r : 3.980711e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 7 ==>  Δt : 0.2006   
+└         max_coef_err :  1.002209e-01   max_trunc_err : 7.660539e-15  max_Λ_err : 3.980711e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 8 ==>  
+└             max_trunc_err_d :  7.771561e-15   max_Λ_err_d : 3.900643e-02  
+┌ Info:  Up move of CTMRG Iterations 8 ==>  
+└             max_trunc_err_u :  7.771561e-15   max_Λ_err_u : 3.915706e-02  
+┌ Info:  Left move of CTMRG Iterations 8 ==>  
+└             max_trunc_err_l :  7.216450e-15   max_Λ_err_l : 3.650819e-02  
+┌ Info:  Right move of CTMRG Iterations 8 ==>  
+└             max_trunc_err_r :  7.216450e-15   max_Λ_err_r : 3.934490e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 8 ==>  Δt : 0.2688   
+└         max_coef_err :  1.767669e-02   max_trunc_err : 7.771561e-15  max_Λ_err : 3.934490e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 9 ==>  
+└             max_trunc_err_d :  7.882583e-15   max_Λ_err_d : 3.934490e-02  
+┌ Info:  Up move of CTMRG Iterations 9 ==>  
+└             max_trunc_err_u :  7.882583e-15   max_Λ_err_u : 3.855352e-02  
+┌ Info:  Left move of CTMRG Iterations 9 ==>  
+└             max_trunc_err_l :  7.216450e-15   max_Λ_err_l : 3.968631e-02  
+┌ Info:  Right move of CTMRG Iterations 9 ==>  
+└             max_trunc_err_r :  6.883383e-15   max_Λ_err_r : 3.777806e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 9 ==>  Δt : 0.2411   
+└         max_coef_err :  1.707518e-02   max_trunc_err : 7.882583e-15  max_Λ_err : 3.968631e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 10 ==>  
+└             max_trunc_err_d :  7.660539e-15   max_Λ_err_d : 3.777806e-02  
+┌ Info:  Up move of CTMRG Iterations 10 ==>  
+└             max_trunc_err_u :  7.549517e-15   max_Λ_err_u : 3.888807e-02  
+┌ Info:  Left move of CTMRG Iterations 10 ==>  
+└             max_trunc_err_l :  7.327472e-15   max_Λ_err_l : 3.810587e-02  
+┌ Info:  Right move of CTMRG Iterations 10 ==>  
+└             max_trunc_err_r :  7.105427e-15   max_Λ_err_r : 3.627361e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 10 ==>  Δt : 0.2709   
+└         max_coef_err :  1.688594e-02   max_trunc_err : 7.660539e-15  max_Λ_err : 3.888807e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 11 ==>  
+└             max_trunc_err_d :  7.549517e-15   max_Λ_err_d : 3.627361e-02  
+┌ Info:  Up move of CTMRG Iterations 11 ==>  
+└             max_trunc_err_u :  6.661338e-15   max_Λ_err_u : 3.733941e-02  
+┌ Info:  Left move of CTMRG Iterations 11 ==>  
+└             max_trunc_err_l :  6.883383e-15   max_Λ_err_l : 3.658837e-02  
+┌ Info:  Right move of CTMRG Iterations 11 ==>  
+└             max_trunc_err_r :  7.216450e-15   max_Λ_err_r : 3.482907e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 11 ==>  Δt : 0.2734   
+└         max_coef_err :  1.672452e-02   max_trunc_err : 7.549517e-15  max_Λ_err : 3.733941e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 12 ==>  
+└             max_trunc_err_d :  6.883383e-15   max_Λ_err_d : 3.482907e-02  
+┌ Info:  Up move of CTMRG Iterations 12 ==>  
+└             max_trunc_err_u :  7.549517e-15   max_Λ_err_u : 3.585243e-02  
+┌ Info:  Left move of CTMRG Iterations 12 ==>  
+└             max_trunc_err_l :  7.105427e-15   max_Λ_err_l : 3.513130e-02  
+┌ Info:  Right move of CTMRG Iterations 12 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 3.344206e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 12 ==>  Δt : 0.9950   
+└         max_coef_err :  1.652429e-02   max_trunc_err : 7.549517e-15  max_Λ_err : 3.585243e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 13 ==>  
+└             max_trunc_err_d :  6.883383e-15   max_Λ_err_d : 3.344206e-02  
+┌ Info:  Up move of CTMRG Iterations 13 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 3.442467e-02  
+┌ Info:  Left move of CTMRG Iterations 13 ==>  
+└             max_trunc_err_l :  6.994405e-15   max_Λ_err_l : 3.373225e-02  
+┌ Info:  Right move of CTMRG Iterations 13 ==>  
+└             max_trunc_err_r :  6.883383e-15   max_Λ_err_r : 3.211029e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 13 ==>  Δt : 0.3327   
+└         max_coef_err :  1.621562e-02   max_trunc_err : 6.994405e-15  max_Λ_err : 3.442467e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 14 ==>  
+└             max_trunc_err_d :  6.883383e-15   max_Λ_err_d : 3.211029e-02  
+┌ Info:  Up move of CTMRG Iterations 14 ==>  
+└             max_trunc_err_u :  6.883383e-15   max_Λ_err_u : 3.305376e-02  
+┌ Info:  Left move of CTMRG Iterations 14 ==>  
+└             max_trunc_err_l :  6.883383e-15   max_Λ_err_l : 3.238892e-02  
+┌ Info:  Right move of CTMRG Iterations 14 ==>  
+└             max_trunc_err_r :  6.661338e-15   max_Λ_err_r : 3.083155e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 14 ==>  Δt : 0.3634   
+└         max_coef_err :  1.568928e-02   max_trunc_err : 6.883383e-15  max_Λ_err : 3.305376e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 15 ==>  
+└             max_trunc_err_d :  6.772360e-15   max_Λ_err_d : 3.083155e-02  
+┌ Info:  Up move of CTMRG Iterations 15 ==>  
+└             max_trunc_err_u :  6.772360e-15   max_Λ_err_u : 3.173745e-02  
+┌ Info:  Left move of CTMRG Iterations 15 ==>  
+└             max_trunc_err_l :  6.772360e-15   max_Λ_err_l : 3.109909e-02  
+┌ Info:  Right move of CTMRG Iterations 15 ==>  
+└             max_trunc_err_r :  6.550316e-15   max_Λ_err_r : 2.960374e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 15 ==>  Δt : 0.2832   
+└         max_coef_err :  1.523379e-02   max_trunc_err : 6.772360e-15  max_Λ_err : 3.173745e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 16 ==>  
+└             max_trunc_err_d :  6.772360e-15   max_Λ_err_d : 2.960374e-02  
+┌ Info:  Up move of CTMRG Iterations 16 ==>  
+└             max_trunc_err_u :  6.883383e-15   max_Λ_err_u : 3.047356e-02  
+┌ Info:  Left move of CTMRG Iterations 16 ==>  
+└             max_trunc_err_l :  6.772360e-15   max_Λ_err_l : 2.986062e-02  
+┌ Info:  Right move of CTMRG Iterations 16 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 2.842482e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 16 ==>  Δt : 0.2992   
+└         max_coef_err :  1.479393e-02   max_trunc_err : 6.883383e-15  max_Λ_err : 3.047356e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 17 ==>  
+└             max_trunc_err_d :  7.105427e-15   max_Λ_err_d : 2.842482e-02  
+┌ Info:  Up move of CTMRG Iterations 17 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 2.926000e-02  
+┌ Info:  Left move of CTMRG Iterations 17 ==>  
+└             max_trunc_err_l :  6.772360e-15   max_Λ_err_l : 2.867147e-02  
+┌ Info:  Right move of CTMRG Iterations 17 ==>  
+└             max_trunc_err_r :  6.661338e-15   max_Λ_err_r : 2.729284e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 17 ==>  Δt : 0.3017   
+└         max_coef_err :  1.431542e-02   max_trunc_err : 7.105427e-15  max_Λ_err : 2.926000e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 18 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 2.729284e-02  
+┌ Info:  Up move of CTMRG Iterations 18 ==>  
+└             max_trunc_err_u :  7.216450e-15   max_Λ_err_u : 2.809477e-02  
+┌ Info:  Left move of CTMRG Iterations 18 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 2.752968e-02  
+┌ Info:  Right move of CTMRG Iterations 18 ==>  
+└             max_trunc_err_r :  6.883383e-15   max_Λ_err_r : 2.620595e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 18 ==>  Δt : 0.3224   
+└         max_coef_err :  1.411021e-02   max_trunc_err : 7.216450e-15  max_Λ_err : 2.809477e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 19 ==>  
+└             max_trunc_err_d :  7.327472e-15   max_Λ_err_d : 2.620595e-02  
+┌ Info:  Up move of CTMRG Iterations 19 ==>  
+└             max_trunc_err_u :  7.105427e-15   max_Λ_err_u : 2.697594e-02  
+┌ Info:  Left move of CTMRG Iterations 19 ==>  
+└             max_trunc_err_l :  6.772360e-15   max_Λ_err_l : 2.643335e-02  
+┌ Info:  Right move of CTMRG Iterations 19 ==>  
+└             max_trunc_err_r :  6.883383e-15   max_Λ_err_r : 2.516234e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 19 ==>  Δt : 0.9109   
+└         max_coef_err :  1.310047e-02   max_trunc_err : 7.327472e-15  max_Λ_err : 2.697594e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 20 ==>  
+└             max_trunc_err_d :  7.105427e-15   max_Λ_err_d : 2.516234e-02  
+┌ Info:  Up move of CTMRG Iterations 20 ==>  
+└             max_trunc_err_u :  7.216450e-15   max_Λ_err_u : 2.590167e-02  
+┌ Info:  Left move of CTMRG Iterations 20 ==>  
+└             max_trunc_err_l :  6.772360e-15   max_Λ_err_l : 2.538069e-02  
+┌ Info:  Right move of CTMRG Iterations 20 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 2.416030e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 20 ==>  Δt : 0.3195   
+└         max_coef_err :  8.933790e-03   max_trunc_err : 7.216450e-15  max_Λ_err : 2.590167e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 21 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 2.416030e-02  
+┌ Info:  Up move of CTMRG Iterations 21 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 2.487018e-02  
+┌ Info:  Left move of CTMRG Iterations 21 ==>  
+└             max_trunc_err_l :  6.994405e-15   max_Λ_err_l : 2.436994e-02  
+┌ Info:  Right move of CTMRG Iterations 21 ==>  
+└             max_trunc_err_r :  6.883383e-15   max_Λ_err_r : 2.319815e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 21 ==>  Δt : 0.2994   
+└         max_coef_err :  8.970529e-03   max_trunc_err : 6.994405e-15  max_Λ_err : 2.487018e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 22 ==>  
+└             max_trunc_err_d :  7.105427e-15   max_Λ_err_d : 2.319815e-02  
+┌ Info:  Up move of CTMRG Iterations 22 ==>  
+└             max_trunc_err_u :  7.105427e-15   max_Λ_err_u : 2.387977e-02  
+┌ Info:  Left move of CTMRG Iterations 22 ==>  
+└             max_trunc_err_l :  6.772360e-15   max_Λ_err_l : 2.339945e-02  
+┌ Info:  Right move of CTMRG Iterations 22 ==>  
+└             max_trunc_err_r :  6.550316e-15   max_Λ_err_r : 2.227432e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 22 ==>  Δt : 0.2978   
+└         max_coef_err :  8.889342e-03   max_trunc_err : 7.105427e-15  max_Λ_err : 2.387977e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 23 ==>  
+└             max_trunc_err_d :  7.216450e-15   max_Λ_err_d : 2.227432e-02  
+┌ Info:  Up move of CTMRG Iterations 23 ==>  
+└             max_trunc_err_u :  7.105427e-15   max_Λ_err_u : 2.292880e-02  
+┌ Info:  Left move of CTMRG Iterations 23 ==>  
+└             max_trunc_err_l :  6.772360e-15   max_Λ_err_l : 2.246761e-02  
+┌ Info:  Right move of CTMRG Iterations 23 ==>  
+└             max_trunc_err_r :  6.439294e-15   max_Λ_err_r : 2.138729e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 23 ==>  Δt : 0.3100   
+└         max_coef_err :  9.348297e-03   max_trunc_err : 7.216450e-15  max_Λ_err : 2.292880e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 24 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 2.138729e-02  
+┌ Info:  Up move of CTMRG Iterations 24 ==>  
+└             max_trunc_err_u :  7.216450e-15   max_Λ_err_u : 2.201569e-02  
+┌ Info:  Left move of CTMRG Iterations 24 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 2.157287e-02  
+┌ Info:  Right move of CTMRG Iterations 24 ==>  
+└             max_trunc_err_r :  6.439294e-15   max_Λ_err_r : 2.053557e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 24 ==>  Δt : 0.2561   
+└         max_coef_err :  8.556282e-03   max_trunc_err : 7.216450e-15  max_Λ_err : 2.201569e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 25 ==>  
+└             max_trunc_err_d :  6.883383e-15   max_Λ_err_d : 2.053557e-02  
+┌ Info:  Up move of CTMRG Iterations 25 ==>  
+└             max_trunc_err_u :  7.105427e-15   max_Λ_err_u : 2.113896e-02  
+┌ Info:  Left move of CTMRG Iterations 25 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 2.071377e-02  
+┌ Info:  Right move of CTMRG Iterations 25 ==>  
+└             max_trunc_err_r :  6.661338e-15   max_Λ_err_r : 1.971778e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 25 ==>  Δt : 0.3183   
+└         max_coef_err :  8.503537e-03   max_trunc_err : 7.105427e-15  max_Λ_err : 2.113896e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 26 ==>  
+└             max_trunc_err_d :  7.216450e-15   max_Λ_err_d : 1.971778e-02  
+┌ Info:  Up move of CTMRG Iterations 26 ==>  
+└             max_trunc_err_u :  7.105427e-15   max_Λ_err_u : 2.029713e-02  
+┌ Info:  Left move of CTMRG Iterations 26 ==>  
+└             max_trunc_err_l :  6.550316e-15   max_Λ_err_l : 1.988888e-02  
+┌ Info:  Right move of CTMRG Iterations 26 ==>  
+└             max_trunc_err_r :  6.439294e-15   max_Λ_err_r : 1.893255e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 26 ==>  Δt : 0.9209   
+└         max_coef_err :  8.452970e-03   max_trunc_err : 7.216450e-15  max_Λ_err : 2.029713e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 27 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 1.893255e-02  
+┌ Info:  Up move of CTMRG Iterations 27 ==>  
+└             max_trunc_err_u :  7.216450e-15   max_Λ_err_u : 1.948883e-02  
+┌ Info:  Left move of CTMRG Iterations 27 ==>  
+└             max_trunc_err_l :  6.550316e-15   max_Λ_err_l : 1.909684e-02  
+┌ Info:  Right move of CTMRG Iterations 27 ==>  
+└             max_trunc_err_r :  6.550316e-15   max_Λ_err_r : 1.817859e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 27 ==>  Δt : 0.2942   
+└         max_coef_err :  8.300431e-03   max_trunc_err : 7.216450e-15  max_Λ_err : 1.948883e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 28 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 1.817859e-02  
+┌ Info:  Up move of CTMRG Iterations 28 ==>  
+└             max_trunc_err_u :  7.105427e-15   max_Λ_err_u : 1.871272e-02  
+┌ Info:  Left move of CTMRG Iterations 28 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 1.833634e-02  
+┌ Info:  Right move of CTMRG Iterations 28 ==>  
+└             max_trunc_err_r :  6.661338e-15   max_Λ_err_r : 1.745466e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 28 ==>  Δt : 0.3717   
+└         max_coef_err :  8.250291e-03   max_trunc_err : 7.105427e-15  max_Λ_err : 1.871272e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 29 ==>  
+└             max_trunc_err_d :  7.105427e-15   max_Λ_err_d : 1.745466e-02  
+┌ Info:  Up move of CTMRG Iterations 29 ==>  
+└             max_trunc_err_u :  7.105427e-15   max_Λ_err_u : 1.796752e-02  
+┌ Info:  Left move of CTMRG Iterations 29 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 1.760612e-02  
+┌ Info:  Right move of CTMRG Iterations 29 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 1.675956e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 29 ==>  Δt : 0.3278   
+└         max_coef_err :  8.185217e-03   max_trunc_err : 7.105427e-15  max_Λ_err : 1.796752e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 30 ==>  
+└             max_trunc_err_d :  7.105427e-15   max_Λ_err_d : 1.675956e-02  
+┌ Info:  Up move of CTMRG Iterations 30 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 1.725199e-02  
+┌ Info:  Left move of CTMRG Iterations 30 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 1.690499e-02  
+┌ Info:  Right move of CTMRG Iterations 30 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 1.609214e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 30 ==>  Δt : 0.2792   
+└         max_coef_err :  8.071298e-03   max_trunc_err : 7.105427e-15  max_Λ_err : 1.725199e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 31 ==>  
+└             max_trunc_err_d :  7.105427e-15   max_Λ_err_d : 1.609214e-02  
+┌ Info:  Up move of CTMRG Iterations 31 ==>  
+└             max_trunc_err_u :  7.216450e-15   max_Λ_err_u : 1.656496e-02  
+┌ Info:  Left move of CTMRG Iterations 31 ==>  
+└             max_trunc_err_l :  6.772360e-15   max_Λ_err_l : 1.623177e-02  
+┌ Info:  Right move of CTMRG Iterations 31 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 1.545129e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 31 ==>  Δt : 0.3070   
+└         max_coef_err :  8.005384e-03   max_trunc_err : 7.216450e-15  max_Λ_err : 1.656496e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 32 ==>  
+└             max_trunc_err_d :  7.216450e-15   max_Λ_err_d : 1.545129e-02  
+┌ Info:  Up move of CTMRG Iterations 32 ==>  
+└             max_trunc_err_u :  7.105427e-15   max_Λ_err_u : 1.590529e-02  
+┌ Info:  Left move of CTMRG Iterations 32 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 1.558537e-02  
+┌ Info:  Right move of CTMRG Iterations 32 ==>  
+└             max_trunc_err_r :  6.661338e-15   max_Λ_err_r : 1.483597e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 32 ==>  Δt : 0.3206   
+└         max_coef_err :  7.964881e-03   max_trunc_err : 7.216450e-15  max_Λ_err : 1.590529e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 33 ==>  
+└             max_trunc_err_d :  6.883383e-15   max_Λ_err_d : 1.483597e-02  
+┌ Info:  Up move of CTMRG Iterations 33 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 1.527189e-02  
+┌ Info:  Left move of CTMRG Iterations 33 ==>  
+└             max_trunc_err_l :  6.772360e-15   max_Λ_err_l : 1.496471e-02  
+┌ Info:  Right move of CTMRG Iterations 33 ==>  
+└             max_trunc_err_r :  6.661338e-15   max_Λ_err_r : 1.424515e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 33 ==>  Δt : 0.3323   
+└         max_coef_err :  7.797294e-03   max_trunc_err : 6.994405e-15  max_Λ_err : 1.527189e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 34 ==>  
+└             max_trunc_err_d :  6.883383e-15   max_Λ_err_d : 1.424515e-02  
+┌ Info:  Up move of CTMRG Iterations 34 ==>  
+└             max_trunc_err_u :  6.772360e-15   max_Λ_err_u : 1.466371e-02  
+┌ Info:  Left move of CTMRG Iterations 34 ==>  
+└             max_trunc_err_l :  6.994405e-15   max_Λ_err_l : 1.436876e-02  
+┌ Info:  Right move of CTMRG Iterations 34 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 1.367786e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 34 ==>  Δt : 0.9927   
+└         max_coef_err :  7.775566e-03   max_trunc_err : 6.994405e-15  max_Λ_err : 1.466371e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 35 ==>  
+└             max_trunc_err_d :  6.772360e-15   max_Λ_err_d : 1.367786e-02  
+┌ Info:  Up move of CTMRG Iterations 35 ==>  
+└             max_trunc_err_u :  6.772360e-15   max_Λ_err_u : 1.407975e-02  
+┌ Info:  Left move of CTMRG Iterations 35 ==>  
+└             max_trunc_err_l :  6.994405e-15   max_Λ_err_l : 1.379655e-02  
+┌ Info:  Right move of CTMRG Iterations 35 ==>  
+└             max_trunc_err_r :  6.994405e-15   max_Λ_err_r : 1.313317e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 35 ==>  Δt : 0.2623   
+└         max_coef_err :  7.657603e-03   max_trunc_err : 6.994405e-15  max_Λ_err : 1.407975e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 36 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 1.313317e-02  
+┌ Info:  Up move of CTMRG Iterations 36 ==>  
+└             max_trunc_err_u :  6.772360e-15   max_Λ_err_u : 1.351905e-02  
+┌ Info:  Left move of CTMRG Iterations 36 ==>  
+└             max_trunc_err_l :  6.994405e-15   max_Λ_err_l : 1.324713e-02  
+┌ Info:  Right move of CTMRG Iterations 36 ==>  
+└             max_trunc_err_r :  6.550316e-15   max_Λ_err_r : 1.261016e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 36 ==>  Δt : 0.2532   
+└         max_coef_err :  7.532326e-03   max_trunc_err : 6.994405e-15  max_Λ_err : 1.351905e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 37 ==>  
+└             max_trunc_err_d :  6.439294e-15   max_Λ_err_d : 1.261016e-02  
+┌ Info:  Up move of CTMRG Iterations 37 ==>  
+└             max_trunc_err_u :  6.772360e-15   max_Λ_err_u : 1.298068e-02  
+┌ Info:  Left move of CTMRG Iterations 37 ==>  
+└             max_trunc_err_l :  6.883383e-15   max_Λ_err_l : 1.271958e-02  
+┌ Info:  Right move of CTMRG Iterations 37 ==>  
+└             max_trunc_err_r :  6.439294e-15   max_Λ_err_r : 1.210798e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 37 ==>  Δt : 0.2598   
+└         max_coef_err :  7.623882e-03   max_trunc_err : 6.883383e-15  max_Λ_err : 1.298068e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 38 ==>  
+└             max_trunc_err_d :  6.550316e-15   max_Λ_err_d : 1.210798e-02  
+┌ Info:  Up move of CTMRG Iterations 38 ==>  
+└             max_trunc_err_u :  6.661338e-15   max_Λ_err_u : 1.246374e-02  
+┌ Info:  Left move of CTMRG Iterations 38 ==>  
+└             max_trunc_err_l :  6.439294e-15   max_Λ_err_l : 1.221305e-02  
+┌ Info:  Right move of CTMRG Iterations 38 ==>  
+└             max_trunc_err_r :  6.550316e-15   max_Λ_err_r : 1.162580e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 38 ==>  Δt : 0.2735   
+└         max_coef_err :  7.474756e-03   max_trunc_err : 6.661338e-15  max_Λ_err : 1.246374e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 39 ==>  
+└             max_trunc_err_d :  6.439294e-15   max_Λ_err_d : 1.162580e-02  
+┌ Info:  Up move of CTMRG Iterations 39 ==>  
+└             max_trunc_err_u :  6.661338e-15   max_Λ_err_u : 1.196739e-02  
+┌ Info:  Left move of CTMRG Iterations 39 ==>  
+└             max_trunc_err_l :  6.439294e-15   max_Λ_err_l : 1.172668e-02  
+┌ Info:  Right move of CTMRG Iterations 39 ==>  
+└             max_trunc_err_r :  6.439294e-15   max_Λ_err_r : 1.116282e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 39 ==>  Δt : 0.2614   
+└         max_coef_err :  7.375654e-03   max_trunc_err : 6.661338e-15  max_Λ_err : 1.196739e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 40 ==>  
+└             max_trunc_err_d :  6.550316e-15   max_Λ_err_d : 1.116282e-02  
+┌ Info:  Up move of CTMRG Iterations 40 ==>  
+└             max_trunc_err_u :  6.550316e-15   max_Λ_err_u : 1.149081e-02  
+┌ Info:  Left move of CTMRG Iterations 40 ==>  
+└             max_trunc_err_l :  6.550316e-15   max_Λ_err_l : 1.125969e-02  
+┌ Info:  Right move of CTMRG Iterations 40 ==>  
+└             max_trunc_err_r :  6.328271e-15   max_Λ_err_r : 1.071828e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 40 ==>  Δt : 0.3048   
+└         max_coef_err :  7.321193e-03   max_trunc_err : 6.550316e-15  max_Λ_err : 1.149081e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 41 ==>  
+└             max_trunc_err_d :  6.328271e-15   max_Λ_err_d : 1.071828e-02  
+┌ Info:  Up move of CTMRG Iterations 41 ==>  
+└             max_trunc_err_u :  6.328271e-15   max_Λ_err_u : 1.103321e-02  
+┌ Info:  Left move of CTMRG Iterations 41 ==>  
+└             max_trunc_err_l :  6.439294e-15   max_Λ_err_l : 1.081129e-02  
+┌ Info:  Right move of CTMRG Iterations 41 ==>  
+└             max_trunc_err_r :  6.217249e-15   max_Λ_err_r : 1.029144e-02  
+[ Info:         
+┌ Info:  CTMRG Iterations 41 ==>  Δt : 0.3381   
+└         max_coef_err :  7.162065e-03   max_trunc_err : 6.439294e-15  max_Λ_err : 1.103321e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 42 ==>  
+└             max_trunc_err_d :  6.550316e-15   max_Λ_err_d : 1.029144e-02  
+┌ Info:  Up move of CTMRG Iterations 42 ==>  
+└             max_trunc_err_u :  6.439294e-15   max_Λ_err_u : 1.059383e-02  
+┌ Info:  Left move of CTMRG Iterations 42 ==>  
+└             max_trunc_err_l :  6.328271e-15   max_Λ_err_l : 1.038075e-02  
+┌ Info:  Right move of CTMRG Iterations 42 ==>  
+└             max_trunc_err_r :  6.439294e-15   max_Λ_err_r : 9.881604e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 42 ==>  Δt : 0.3623   
+└         max_coef_err :  6.385684e-03   max_trunc_err : 6.550316e-15  max_Λ_err : 1.059383e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 43 ==>  
+└             max_trunc_err_d :  6.661338e-15   max_Λ_err_d : 9.881604e-03  
+┌ Info:  Up move of CTMRG Iterations 43 ==>  
+└             max_trunc_err_u :  6.439294e-15   max_Λ_err_u : 1.017195e-02  
+┌ Info:  Left move of CTMRG Iterations 43 ==>  
+└             max_trunc_err_l :  6.439294e-15   max_Λ_err_l : 9.967351e-03  
+┌ Info:  Right move of CTMRG Iterations 43 ==>  
+└             max_trunc_err_r :  6.439294e-15   max_Λ_err_r : 9.488086e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 43 ==>  Δt : 0.9854   
+└         max_coef_err :  7.582460e-03   max_trunc_err : 6.661338e-15  max_Λ_err : 1.017195e-02  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 44 ==>  
+└             max_trunc_err_d :  6.439294e-15   max_Λ_err_d : 9.488086e-03  
+┌ Info:  Up move of CTMRG Iterations 44 ==>  
+└             max_trunc_err_u :  6.550316e-15   max_Λ_err_u : 9.766868e-03  
+┌ Info:  Left move of CTMRG Iterations 44 ==>  
+└             max_trunc_err_l :  6.439294e-15   max_Λ_err_l : 9.570418e-03  
+┌ Info:  Right move of CTMRG Iterations 44 ==>  
+└             max_trunc_err_r :  6.439294e-15   max_Λ_err_r : 9.110239e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 44 ==>  Δt : 0.3789   
+└         max_coef_err :  7.382650e-03   max_trunc_err : 6.550316e-15  max_Λ_err : 9.766868e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 45 ==>  
+└             max_trunc_err_d :  6.661338e-15   max_Λ_err_d : 9.110239e-03  
+┌ Info:  Up move of CTMRG Iterations 45 ==>  
+└             max_trunc_err_u :  6.661338e-15   max_Λ_err_u : 9.377919e-03  
+┌ Info:  Left move of CTMRG Iterations 45 ==>  
+└             max_trunc_err_l :  6.439294e-15   max_Λ_err_l : 9.189292e-03  
+┌ Info:  Right move of CTMRG Iterations 45 ==>  
+└             max_trunc_err_r :  6.550316e-15   max_Λ_err_r : 8.747439e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 45 ==>  Δt : 0.2790   
+└         max_coef_err :  6.846012e-03   max_trunc_err : 6.661338e-15  max_Λ_err : 9.377919e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 46 ==>  
+└             max_trunc_err_d :  6.550316e-15   max_Λ_err_d : 8.747439e-03  
+┌ Info:  Up move of CTMRG Iterations 46 ==>  
+└             max_trunc_err_u :  6.661338e-15   max_Λ_err_u : 9.004459e-03  
+┌ Info:  Left move of CTMRG Iterations 46 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 8.823343e-03  
+┌ Info:  Right move of CTMRG Iterations 46 ==>  
+└             max_trunc_err_r :  6.439294e-15   max_Λ_err_r : 8.399086e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 46 ==>  Δt : 0.3107   
+└         max_coef_err :  6.880848e-03   max_trunc_err : 6.661338e-15  max_Λ_err : 9.004459e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 47 ==>  
+└             max_trunc_err_d :  6.550316e-15   max_Λ_err_d : 8.399086e-03  
+┌ Info:  Up move of CTMRG Iterations 47 ==>  
+└             max_trunc_err_u :  6.661338e-15   max_Λ_err_u : 8.645871e-03  
+┌ Info:  Left move of CTMRG Iterations 47 ==>  
+└             max_trunc_err_l :  6.439294e-15   max_Λ_err_l : 8.471968e-03  
+┌ Info:  Right move of CTMRG Iterations 47 ==>  
+└             max_trunc_err_r :  6.439294e-15   max_Λ_err_r : 8.064607e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 47 ==>  Δt : 0.2699   
+└         max_coef_err :  7.117963e-03   max_trunc_err : 6.661338e-15  max_Λ_err : 8.645871e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 48 ==>  
+└             max_trunc_err_d :  6.661338e-15   max_Λ_err_d : 8.064607e-03  
+┌ Info:  Up move of CTMRG Iterations 48 ==>  
+└             max_trunc_err_u :  6.772360e-15   max_Λ_err_u : 8.301564e-03  
+┌ Info:  Left move of CTMRG Iterations 48 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 8.134586e-03  
+┌ Info:  Right move of CTMRG Iterations 48 ==>  
+└             max_trunc_err_r :  6.661338e-15   max_Λ_err_r : 7.743447e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 48 ==>  Δt : 0.3037   
+└         max_coef_err :  7.391108e-03   max_trunc_err : 6.772360e-15  max_Λ_err : 8.301564e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 49 ==>  
+└             max_trunc_err_d :  6.661338e-15   max_Λ_err_d : 7.743447e-03  
+┌ Info:  Up move of CTMRG Iterations 49 ==>  
+└             max_trunc_err_u :  6.661338e-15   max_Λ_err_u : 7.970968e-03  
+┌ Info:  Left move of CTMRG Iterations 49 ==>  
+└             max_trunc_err_l :  6.439294e-15   max_Λ_err_l : 7.810640e-03  
+┌ Info:  Right move of CTMRG Iterations 49 ==>  
+└             max_trunc_err_r :  6.550316e-15   max_Λ_err_r : 7.435077e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 49 ==>  Δt : 0.3004   
+└         max_coef_err :  6.812201e-03   max_trunc_err : 6.661338e-15  max_Λ_err : 7.970968e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 50 ==>  
+└             max_trunc_err_d :  6.661338e-15   max_Λ_err_d : 7.435077e-03  
+┌ Info:  Up move of CTMRG Iterations 50 ==>  
+└             max_trunc_err_u :  6.661338e-15   max_Λ_err_u : 7.653537e-03  
+┌ Info:  Left move of CTMRG Iterations 50 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 7.499594e-03  
+┌ Info:  Right move of CTMRG Iterations 50 ==>  
+└             max_trunc_err_r :  6.550316e-15   max_Λ_err_r : 7.138988e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 50 ==>  Δt : 1.0897   
+└         max_coef_err :  6.180657e-03   max_trunc_err : 6.661338e-15  max_Λ_err : 7.653537e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 51 ==>  
+└             max_trunc_err_d :  6.550316e-15   max_Λ_err_d : 7.138988e-03  
+┌ Info:  Up move of CTMRG Iterations 51 ==>  
+└             max_trunc_err_u :  6.883383e-15   max_Λ_err_u : 7.348748e-03  
+┌ Info:  Left move of CTMRG Iterations 51 ==>  
+└             max_trunc_err_l :  6.550316e-15   max_Λ_err_l : 7.200935e-03  
+┌ Info:  Right move of CTMRG Iterations 51 ==>  
+└             max_trunc_err_r :  6.550316e-15   max_Λ_err_r : 6.854689e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 51 ==>  Δt : 0.3229   
+└         max_coef_err :  6.650193e-03   max_trunc_err : 6.883383e-15  max_Λ_err : 7.348748e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 52 ==>  
+└             max_trunc_err_d :  6.661338e-15   max_Λ_err_d : 6.854689e-03  
+┌ Info:  Up move of CTMRG Iterations 52 ==>  
+└             max_trunc_err_u :  6.550316e-15   max_Λ_err_u : 7.056096e-03  
+┌ Info:  Left move of CTMRG Iterations 52 ==>  
+└             max_trunc_err_l :  6.550316e-15   max_Λ_err_l : 6.914170e-03  
+┌ Info:  Right move of CTMRG Iterations 52 ==>  
+└             max_trunc_err_r :  6.439294e-15   max_Λ_err_r : 6.581713e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 52 ==>  Δt : 0.3095   
+└         max_coef_err :  6.579650e-03   max_trunc_err : 6.661338e-15  max_Λ_err : 7.056096e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 53 ==>  
+└             max_trunc_err_d :  6.661338e-15   max_Λ_err_d : 6.581713e-03  
+┌ Info:  Up move of CTMRG Iterations 53 ==>  
+└             max_trunc_err_u :  6.772360e-15   max_Λ_err_u : 6.775099e-03  
+┌ Info:  Left move of CTMRG Iterations 53 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 6.638825e-03  
+┌ Info:  Right move of CTMRG Iterations 53 ==>  
+└             max_trunc_err_r :  6.439294e-15   max_Λ_err_r : 6.319607e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 53 ==>  Δt : 0.3439   
+└         max_coef_err :  5.928726e-03   max_trunc_err : 6.772360e-15  max_Λ_err : 6.775099e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 54 ==>  
+└             max_trunc_err_d :  6.661338e-15   max_Λ_err_d : 6.319607e-03  
+┌ Info:  Up move of CTMRG Iterations 54 ==>  
+└             max_trunc_err_u :  6.661338e-15   max_Λ_err_u : 6.505292e-03  
+┌ Info:  Left move of CTMRG Iterations 54 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 6.374445e-03  
+┌ Info:  Right move of CTMRG Iterations 54 ==>  
+└             max_trunc_err_r :  6.550316e-15   max_Λ_err_r : 6.067939e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 54 ==>  Δt : 0.2975   
+└         max_coef_err :  6.569368e-03   max_trunc_err : 6.661338e-15  max_Λ_err : 6.505292e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 55 ==>  
+└             max_trunc_err_d :  6.550316e-15   max_Λ_err_d : 6.067939e-03  
+┌ Info:  Up move of CTMRG Iterations 55 ==>  
+└             max_trunc_err_u :  6.661338e-15   max_Λ_err_u : 6.246229e-03  
+┌ Info:  Left move of CTMRG Iterations 55 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 6.120593e-03  
+┌ Info:  Right move of CTMRG Iterations 55 ==>  
+└             max_trunc_err_r :  6.550316e-15   max_Λ_err_r : 5.826294e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 55 ==>  Δt : 0.3647   
+└         max_coef_err :  6.639976e-03   max_trunc_err : 6.661338e-15  max_Λ_err : 6.246229e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 56 ==>  
+└             max_trunc_err_d :  6.772360e-15   max_Λ_err_d : 5.826294e-03  
+┌ Info:  Up move of CTMRG Iterations 56 ==>  
+└             max_trunc_err_u :  6.661338e-15   max_Λ_err_u : 5.997484e-03  
+┌ Info:  Left move of CTMRG Iterations 56 ==>  
+└             max_trunc_err_l :  6.772360e-15   max_Λ_err_l : 5.876851e-03  
+┌ Info:  Right move of CTMRG Iterations 56 ==>  
+└             max_trunc_err_r :  6.550316e-15   max_Λ_err_r : 5.594271e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 56 ==>  Δt : 0.2576   
+└         max_coef_err :  5.763884e-03   max_trunc_err : 6.772360e-15  max_Λ_err : 5.997484e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 57 ==>  
+└             max_trunc_err_d :  6.550316e-15   max_Λ_err_d : 5.594271e-03  
+┌ Info:  Up move of CTMRG Iterations 57 ==>  
+└             max_trunc_err_u :  6.550316e-15   max_Λ_err_u : 5.758644e-03  
+┌ Info:  Left move of CTMRG Iterations 57 ==>  
+└             max_trunc_err_l :  6.772360e-15   max_Λ_err_l : 5.642815e-03  
+┌ Info:  Right move of CTMRG Iterations 57 ==>  
+└             max_trunc_err_r :  6.439294e-15   max_Λ_err_r : 5.371489e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 57 ==>  Δt : 0.3191   
+└         max_coef_err :  6.381333e-03   max_trunc_err : 6.772360e-15  max_Λ_err : 5.758644e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 58 ==>  
+└             max_trunc_err_d :  6.661338e-15   max_Λ_err_d : 5.371489e-03  
+┌ Info:  Up move of CTMRG Iterations 58 ==>  
+└             max_trunc_err_u :  6.550316e-15   max_Λ_err_u : 5.529315e-03  
+┌ Info:  Left move of CTMRG Iterations 58 ==>  
+└             max_trunc_err_l :  6.772360e-15   max_Λ_err_l : 5.418099e-03  
+┌ Info:  Right move of CTMRG Iterations 58 ==>  
+└             max_trunc_err_r :  6.661338e-15   max_Λ_err_r : 5.157578e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 58 ==>  Δt : 0.9918   
+└         max_coef_err :  6.398973e-03   max_trunc_err : 6.772360e-15  max_Λ_err : 5.529315e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 59 ==>  
+└             max_trunc_err_d :  6.439294e-15   max_Λ_err_d : 5.157578e-03  
+┌ Info:  Up move of CTMRG Iterations 59 ==>  
+└             max_trunc_err_u :  6.772360e-15   max_Λ_err_u : 5.309120e-03  
+┌ Info:  Left move of CTMRG Iterations 59 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 5.202332e-03  
+┌ Info:  Right move of CTMRG Iterations 59 ==>  
+└             max_trunc_err_r :  6.439294e-15   max_Λ_err_r : 4.952186e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 59 ==>  Δt : 0.3657   
+└         max_coef_err :  7.155929e-03   max_trunc_err : 6.772360e-15  max_Λ_err : 5.309120e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 60 ==>  
+└             max_trunc_err_d :  6.883383e-15   max_Λ_err_d : 4.952186e-03  
+┌ Info:  Up move of CTMRG Iterations 60 ==>  
+└             max_trunc_err_u :  6.661338e-15   max_Λ_err_u : 5.097693e-03  
+┌ Info:  Left move of CTMRG Iterations 60 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 4.995158e-03  
+┌ Info:  Right move of CTMRG Iterations 60 ==>  
+└             max_trunc_err_r :  6.550316e-15   max_Λ_err_r : 4.754973e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 60 ==>  Δt : 0.3416   
+└         max_coef_err :  6.460590e-03   max_trunc_err : 6.883383e-15  max_Λ_err : 5.097693e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 61 ==>  
+└             max_trunc_err_d :  6.550316e-15   max_Λ_err_d : 4.754973e-03  
+┌ Info:  Up move of CTMRG Iterations 61 ==>  
+└             max_trunc_err_u :  6.550316e-15   max_Λ_err_u : 4.894686e-03  
+┌ Info:  Left move of CTMRG Iterations 61 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 4.796234e-03  
+┌ Info:  Right move of CTMRG Iterations 61 ==>  
+└             max_trunc_err_r :  6.550316e-15   max_Λ_err_r : 4.565615e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 61 ==>  Δt : 0.2727   
+└         max_coef_err :  6.072685e-03   max_trunc_err : 6.661338e-15  max_Λ_err : 4.894686e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 62 ==>  
+└             max_trunc_err_d :  6.661338e-15   max_Λ_err_d : 4.565615e-03  
+┌ Info:  Up move of CTMRG Iterations 62 ==>  
+└             max_trunc_err_u :  6.661338e-15   max_Λ_err_u : 4.699763e-03  
+┌ Info:  Left move of CTMRG Iterations 62 ==>  
+└             max_trunc_err_l :  6.883383e-15   max_Λ_err_l : 4.605232e-03  
+┌ Info:  Right move of CTMRG Iterations 62 ==>  
+└             max_trunc_err_r :  6.550316e-15   max_Λ_err_r : 4.383797e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 62 ==>  Δt : 0.3060   
+└         max_coef_err :  1.292546e-02   max_trunc_err : 6.883383e-15  max_Λ_err : 4.699763e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 63 ==>  
+└             max_trunc_err_d :  6.772360e-15   max_Λ_err_d : 4.383797e-03  
+┌ Info:  Up move of CTMRG Iterations 63 ==>  
+└             max_trunc_err_u :  6.772360e-15   max_Λ_err_u : 4.512603e-03  
+┌ Info:  Left move of CTMRG Iterations 63 ==>  
+└             max_trunc_err_l :  6.772360e-15   max_Λ_err_l : 4.421836e-03  
+┌ Info:  Right move of CTMRG Iterations 63 ==>  
+└             max_trunc_err_r :  6.439294e-15   max_Λ_err_r : 4.209219e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 63 ==>  Δt : 0.2796   
+└         max_coef_err :  6.228621e-03   max_trunc_err : 6.772360e-15  max_Λ_err : 4.512603e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 64 ==>  
+└             max_trunc_err_d :  6.550316e-15   max_Λ_err_d : 4.209219e-03  
+┌ Info:  Up move of CTMRG Iterations 64 ==>  
+└             max_trunc_err_u :  6.772360e-15   max_Λ_err_u : 4.332896e-03  
+┌ Info:  Left move of CTMRG Iterations 64 ==>  
+└             max_trunc_err_l :  6.550316e-15   max_Λ_err_l : 4.245744e-03  
+┌ Info:  Right move of CTMRG Iterations 64 ==>  
+└             max_trunc_err_r :  6.439294e-15   max_Λ_err_r : 4.041594e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 64 ==>  Δt : 0.3430   
+└         max_coef_err :  1.613171e-02   max_trunc_err : 6.772360e-15  max_Λ_err : 4.332896e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 65 ==>  
+└             max_trunc_err_d :  6.661338e-15   max_Λ_err_d : 4.041594e-03  
+┌ Info:  Up move of CTMRG Iterations 65 ==>  
+└             max_trunc_err_u :  6.550316e-15   max_Λ_err_u : 4.160345e-03  
+┌ Info:  Left move of CTMRG Iterations 65 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 4.076664e-03  
+┌ Info:  Right move of CTMRG Iterations 65 ==>  
+└             max_trunc_err_r :  6.661338e-15   max_Λ_err_r : 3.880644e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 65 ==>  Δt : 1.0937   
+└         max_coef_err :  8.184485e-03   max_trunc_err : 6.661338e-15  max_Λ_err : 4.160345e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 66 ==>  
+└             max_trunc_err_d :  6.772360e-15   max_Λ_err_d : 3.880644e-03  
+┌ Info:  Up move of CTMRG Iterations 66 ==>  
+└             max_trunc_err_u :  6.439294e-15   max_Λ_err_u : 3.994667e-03  
+┌ Info:  Left move of CTMRG Iterations 66 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 3.914318e-03  
+┌ Info:  Right move of CTMRG Iterations 66 ==>  
+└             max_trunc_err_r :  6.661338e-15   max_Λ_err_r : 3.726104e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 66 ==>  Δt : 0.2859   
+└         max_coef_err :  3.449463e-03   max_trunc_err : 6.772360e-15  max_Λ_err : 3.994667e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 67 ==>  
+└             max_trunc_err_d :  6.883383e-15   max_Λ_err_d : 3.726104e-03  
+┌ Info:  Up move of CTMRG Iterations 67 ==>  
+└             max_trunc_err_u :  6.661338e-15   max_Λ_err_u : 3.835586e-03  
+┌ Info:  Left move of CTMRG Iterations 67 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 3.758437e-03  
+┌ Info:  Right move of CTMRG Iterations 67 ==>  
+└             max_trunc_err_r :  6.439294e-15   max_Λ_err_r : 3.577718e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 67 ==>  Δt : 0.2852   
+└         max_coef_err :  4.996287e-03   max_trunc_err : 6.883383e-15  max_Λ_err : 3.835586e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 68 ==>  
+└             max_trunc_err_d :  6.661338e-15   max_Λ_err_d : 3.577718e-03  
+┌ Info:  Up move of CTMRG Iterations 68 ==>  
+└             max_trunc_err_u :  6.661338e-15   max_Λ_err_u : 3.682840e-03  
+┌ Info:  Left move of CTMRG Iterations 68 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 3.608763e-03  
+┌ Info:  Right move of CTMRG Iterations 68 ==>  
+└             max_trunc_err_r :  6.550316e-15   max_Λ_err_r : 3.435241e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 68 ==>  Δt : 0.3694   
+└         max_coef_err :  1.037682e-02   max_trunc_err : 6.661338e-15  max_Λ_err : 3.682840e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 69 ==>  
+└             max_trunc_err_d :  6.661338e-15   max_Λ_err_d : 3.435241e-03  
+┌ Info:  Up move of CTMRG Iterations 69 ==>  
+└             max_trunc_err_u :  6.661338e-15   max_Λ_err_u : 3.536177e-03  
+┌ Info:  Left move of CTMRG Iterations 69 ==>  
+└             max_trunc_err_l :  6.883383e-15   max_Λ_err_l : 3.465050e-03  
+┌ Info:  Right move of CTMRG Iterations 69 ==>  
+└             max_trunc_err_r :  6.550316e-15   max_Λ_err_r : 3.298439e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 69 ==>  Δt : 0.3005   
+└         max_coef_err :  1.227639e-02   max_trunc_err : 6.883383e-15  max_Λ_err : 3.536177e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 70 ==>  
+└             max_trunc_err_d :  6.883383e-15   max_Λ_err_d : 3.298439e-03  
+┌ Info:  Up move of CTMRG Iterations 70 ==>  
+└             max_trunc_err_u :  6.661338e-15   max_Λ_err_u : 3.395354e-03  
+┌ Info:  Left move of CTMRG Iterations 70 ==>  
+└             max_trunc_err_l :  6.883383e-15   max_Λ_err_l : 3.327060e-03  
+┌ Info:  Right move of CTMRG Iterations 70 ==>  
+└             max_trunc_err_r :  6.883383e-15   max_Λ_err_r : 3.167084e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 70 ==>  Δt : 0.2918   
+└         max_coef_err :  8.007513e-03   max_trunc_err : 6.883383e-15  max_Λ_err : 3.395354e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 71 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 3.167084e-03  
+┌ Info:  Up move of CTMRG Iterations 71 ==>  
+└             max_trunc_err_u :  7.105427e-15   max_Λ_err_u : 3.260140e-03  
+┌ Info:  Left move of CTMRG Iterations 71 ==>  
+└             max_trunc_err_l :  6.883383e-15   max_Λ_err_l : 3.194566e-03  
+┌ Info:  Right move of CTMRG Iterations 71 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 3.040960e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 71 ==>  Δt : 0.2817   
+└         max_coef_err :  3.593913e-03   max_trunc_err : 7.105427e-15  max_Λ_err : 3.260140e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 72 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 3.040960e-03  
+┌ Info:  Up move of CTMRG Iterations 72 ==>  
+└             max_trunc_err_u :  6.772360e-15   max_Λ_err_u : 3.130310e-03  
+┌ Info:  Left move of CTMRG Iterations 72 ==>  
+└             max_trunc_err_l :  6.994405e-15   max_Λ_err_l : 3.067348e-03  
+┌ Info:  Right move of CTMRG Iterations 72 ==>  
+└             max_trunc_err_r :  6.550316e-15   max_Λ_err_r : 2.919859e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 72 ==>  Δt : 0.3414   
+└         max_coef_err :  1.338254e-02   max_trunc_err : 6.994405e-15  max_Λ_err : 3.130310e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 73 ==>  
+└             max_trunc_err_d :  6.772360e-15   max_Λ_err_d : 2.919859e-03  
+┌ Info:  Up move of CTMRG Iterations 73 ==>  
+└             max_trunc_err_u :  6.772360e-15   max_Λ_err_u : 3.005651e-03  
+┌ Info:  Left move of CTMRG Iterations 73 ==>  
+└             max_trunc_err_l :  6.994405e-15   max_Λ_err_l : 2.945196e-03  
+┌ Info:  Right move of CTMRG Iterations 73 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 2.803580e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 73 ==>  Δt : 1.0620   
+└         max_coef_err :  1.110878e-02   max_trunc_err : 6.994405e-15  max_Λ_err : 3.005651e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 74 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 2.803580e-03  
+┌ Info:  Up move of CTMRG Iterations 74 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 2.885956e-03  
+┌ Info:  Left move of CTMRG Iterations 74 ==>  
+└             max_trunc_err_l :  6.994405e-15   max_Λ_err_l : 2.827908e-03  
+┌ Info:  Right move of CTMRG Iterations 74 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 2.691932e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 74 ==>  Δt : 0.2950   
+└         max_coef_err :  2.016140e-02   max_trunc_err : 6.994405e-15  max_Λ_err : 2.885956e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 75 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 2.691932e-03  
+┌ Info:  Up move of CTMRG Iterations 75 ==>  
+└             max_trunc_err_u :  6.772360e-15   max_Λ_err_u : 2.771028e-03  
+┌ Info:  Left move of CTMRG Iterations 75 ==>  
+└             max_trunc_err_l :  6.994405e-15   max_Λ_err_l : 2.715291e-03  
+┌ Info:  Right move of CTMRG Iterations 75 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 2.584731e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 75 ==>  Δt : 0.3293   
+└         max_coef_err :  9.727749e-03   max_trunc_err : 6.994405e-15  max_Λ_err : 2.771028e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 76 ==>  
+└             max_trunc_err_d :  6.883383e-15   max_Λ_err_d : 2.584731e-03  
+┌ Info:  Up move of CTMRG Iterations 76 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 2.660676e-03  
+┌ Info:  Left move of CTMRG Iterations 76 ==>  
+└             max_trunc_err_l :  6.772360e-15   max_Λ_err_l : 2.607159e-03  
+┌ Info:  Right move of CTMRG Iterations 76 ==>  
+└             max_trunc_err_r :  6.883383e-15   max_Λ_err_r : 2.481798e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 76 ==>  Δt : 0.3225   
+└         max_coef_err :  1.382954e-02   max_trunc_err : 6.994405e-15  max_Λ_err : 2.660676e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 77 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 2.481798e-03  
+┌ Info:  Up move of CTMRG Iterations 77 ==>  
+└             max_trunc_err_u :  6.883383e-15   max_Λ_err_u : 2.554719e-03  
+┌ Info:  Left move of CTMRG Iterations 77 ==>  
+└             max_trunc_err_l :  6.883383e-15   max_Λ_err_l : 2.503334e-03  
+┌ Info:  Right move of CTMRG Iterations 77 ==>  
+└             max_trunc_err_r :  6.883383e-15   max_Λ_err_r : 2.382965e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 77 ==>  Δt : 0.2543   
+└         max_coef_err :  1.400481e-02   max_trunc_err : 6.994405e-15  max_Λ_err : 2.554719e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 78 ==>  
+└             max_trunc_err_d :  6.883383e-15   max_Λ_err_d : 2.382965e-03  
+┌ Info:  Up move of CTMRG Iterations 78 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 2.452982e-03  
+┌ Info:  Left move of CTMRG Iterations 78 ==>  
+└             max_trunc_err_l :  6.994405e-15   max_Λ_err_l : 2.403642e-03  
+┌ Info:  Right move of CTMRG Iterations 78 ==>  
+└             max_trunc_err_r :  6.883383e-15   max_Λ_err_r : 2.288067e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 78 ==>  Δt : 0.2920   
+└         max_coef_err :  1.638142e-02   max_trunc_err : 6.994405e-15  max_Λ_err : 2.452982e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 79 ==>  
+└             max_trunc_err_d :  6.883383e-15   max_Λ_err_d : 2.288067e-03  
+┌ Info:  Up move of CTMRG Iterations 79 ==>  
+└             max_trunc_err_u :  6.883383e-15   max_Λ_err_u : 2.355296e-03  
+┌ Info:  Left move of CTMRG Iterations 79 ==>  
+└             max_trunc_err_l :  6.883383e-15   max_Λ_err_l : 2.307921e-03  
+┌ Info:  Right move of CTMRG Iterations 79 ==>  
+└             max_trunc_err_r :  6.661338e-15   max_Λ_err_r : 2.196948e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 79 ==>  Δt : 0.2654   
+└         max_coef_err :  1.673366e-02   max_trunc_err : 6.883383e-15  max_Λ_err : 2.355296e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 80 ==>  
+└             max_trunc_err_d :  7.105427e-15   max_Λ_err_d : 2.196948e-03  
+┌ Info:  Up move of CTMRG Iterations 80 ==>  
+└             max_trunc_err_u :  7.105427e-15   max_Λ_err_u : 2.261500e-03  
+┌ Info:  Left move of CTMRG Iterations 80 ==>  
+└             max_trunc_err_l :  6.883383e-15   max_Λ_err_l : 2.216012e-03  
+┌ Info:  Right move of CTMRG Iterations 80 ==>  
+└             max_trunc_err_r :  6.883383e-15   max_Λ_err_r : 2.109459e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 80 ==>  Δt : 0.3238   
+└         max_coef_err :  1.834697e-02   max_trunc_err : 7.105427e-15  max_Λ_err : 2.261500e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 81 ==>  
+└             max_trunc_err_d :  6.883383e-15   max_Λ_err_d : 2.109459e-03  
+┌ Info:  Up move of CTMRG Iterations 81 ==>  
+└             max_trunc_err_u :  7.105427e-15   max_Λ_err_u : 2.171439e-03  
+┌ Info:  Left move of CTMRG Iterations 81 ==>  
+└             max_trunc_err_l :  6.661338e-15   max_Λ_err_l : 2.127763e-03  
+┌ Info:  Right move of CTMRG Iterations 81 ==>  
+└             max_trunc_err_r :  6.883383e-15   max_Λ_err_r : 2.025453e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 81 ==>  Δt : 0.3423   
+└         max_coef_err :  3.842885e-02   max_trunc_err : 7.105427e-15  max_Λ_err : 2.171439e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 82 ==>  
+└             max_trunc_err_d :  6.883383e-15   max_Λ_err_d : 2.025453e-03  
+┌ Info:  Up move of CTMRG Iterations 82 ==>  
+└             max_trunc_err_u :  6.883383e-15   max_Λ_err_u : 2.084966e-03  
+┌ Info:  Left move of CTMRG Iterations 82 ==>  
+└             max_trunc_err_l :  6.883383e-15   max_Λ_err_l : 2.043029e-03  
+┌ Info:  Right move of CTMRG Iterations 82 ==>  
+└             max_trunc_err_r :  6.883383e-15   max_Λ_err_r : 1.944793e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 82 ==>  Δt : 0.9650   
+└         max_coef_err :  4.054012e-02   max_trunc_err : 6.883383e-15  max_Λ_err : 2.084966e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 83 ==>  
+└             max_trunc_err_d :  6.883383e-15   max_Λ_err_d : 1.944793e-03  
+┌ Info:  Up move of CTMRG Iterations 83 ==>  
+└             max_trunc_err_u :  6.883383e-15   max_Λ_err_u : 2.001935e-03  
+┌ Info:  Left move of CTMRG Iterations 83 ==>  
+└             max_trunc_err_l :  6.883383e-15   max_Λ_err_l : 1.961668e-03  
+┌ Info:  Right move of CTMRG Iterations 83 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 1.867345e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 83 ==>  Δt : 0.2921   
+└         max_coef_err :  3.455108e-02   max_trunc_err : 6.883383e-15  max_Λ_err : 2.001935e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 84 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 1.867345e-03  
+┌ Info:  Up move of CTMRG Iterations 84 ==>  
+└             max_trunc_err_u :  6.883383e-15   max_Λ_err_u : 1.922211e-03  
+┌ Info:  Left move of CTMRG Iterations 84 ==>  
+└             max_trunc_err_l :  6.883383e-15   max_Λ_err_l : 1.883548e-03  
+┌ Info:  Right move of CTMRG Iterations 84 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 1.792981e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 84 ==>  Δt : 0.2953   
+└         max_coef_err :  2.587083e-02   max_trunc_err : 6.994405e-15  max_Λ_err : 1.922211e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 85 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 1.792981e-03  
+┌ Info:  Up move of CTMRG Iterations 85 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 1.845663e-03  
+┌ Info:  Left move of CTMRG Iterations 85 ==>  
+└             max_trunc_err_l :  6.994405e-15   max_Λ_err_l : 1.808539e-03  
+┌ Info:  Right move of CTMRG Iterations 85 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 1.721578e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 85 ==>  Δt : 0.3035   
+└         max_coef_err :  2.446519e-02   max_trunc_err : 6.994405e-15  max_Λ_err : 1.845663e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 86 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 1.721578e-03  
+┌ Info:  Up move of CTMRG Iterations 86 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 1.772162e-03  
+┌ Info:  Left move of CTMRG Iterations 86 ==>  
+└             max_trunc_err_l :  6.772360e-15   max_Λ_err_l : 1.736517e-03  
+┌ Info:  Right move of CTMRG Iterations 86 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 1.653019e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 86 ==>  Δt : 0.2809   
+└         max_coef_err :  1.613855e-02   max_trunc_err : 6.994405e-15  max_Λ_err : 1.772162e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 87 ==>  
+└             max_trunc_err_d :  6.772360e-15   max_Λ_err_d : 1.653019e-03  
+┌ Info:  Up move of CTMRG Iterations 87 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 1.701589e-03  
+┌ Info:  Left move of CTMRG Iterations 87 ==>  
+└             max_trunc_err_l :  6.994405e-15   max_Λ_err_l : 1.667363e-03  
+┌ Info:  Right move of CTMRG Iterations 87 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 1.587190e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 87 ==>  Δt : 0.2576   
+└         max_coef_err :  1.371080e-02   max_trunc_err : 6.994405e-15  max_Λ_err : 1.701589e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 88 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 1.587190e-03  
+┌ Info:  Up move of CTMRG Iterations 88 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 1.633826e-03  
+┌ Info:  Left move of CTMRG Iterations 88 ==>  
+└             max_trunc_err_l :  6.994405e-15   max_Λ_err_l : 1.600963e-03  
+┌ Info:  Right move of CTMRG Iterations 88 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 1.523983e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 88 ==>  Δt : 0.3116   
+└         max_coef_err :  3.430606e-02   max_trunc_err : 6.994405e-15  max_Λ_err : 1.633826e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 89 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 1.523983e-03  
+┌ Info:  Up move of CTMRG Iterations 89 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 1.568761e-03  
+┌ Info:  Left move of CTMRG Iterations 89 ==>  
+└             max_trunc_err_l :  6.994405e-15   max_Λ_err_l : 1.537207e-03  
+┌ Info:  Right move of CTMRG Iterations 89 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 1.463293e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 89 ==>  Δt : 0.3098   
+└         max_coef_err :  3.420952e-02   max_trunc_err : 6.994405e-15  max_Λ_err : 1.568761e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 90 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 1.463293e-03  
+┌ Info:  Up move of CTMRG Iterations 90 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 1.506288e-03  
+┌ Info:  Left move of CTMRG Iterations 90 ==>  
+└             max_trunc_err_l :  6.994405e-15   max_Λ_err_l : 1.475991e-03  
+┌ Info:  Right move of CTMRG Iterations 90 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 1.405020e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 90 ==>  Δt : 0.9207   
+└         max_coef_err :  3.500580e-02   max_trunc_err : 6.994405e-15  max_Λ_err : 1.506288e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 91 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 1.405020e-03  
+┌ Info:  Up move of CTMRG Iterations 91 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 1.446303e-03  
+┌ Info:  Left move of CTMRG Iterations 91 ==>  
+└             max_trunc_err_l :  6.994405e-15   max_Λ_err_l : 1.417212e-03  
+┌ Info:  Right move of CTMRG Iterations 91 ==>  
+└             max_trunc_err_r :  6.994405e-15   max_Λ_err_r : 1.349067e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 91 ==>  Δt : 0.3485   
+└         max_coef_err :  2.700429e-02   max_trunc_err : 6.994405e-15  max_Λ_err : 1.446303e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 92 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 1.349067e-03  
+┌ Info:  Up move of CTMRG Iterations 92 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 1.388706e-03  
+┌ Info:  Left move of CTMRG Iterations 92 ==>  
+└             max_trunc_err_l :  6.772360e-15   max_Λ_err_l : 1.360774e-03  
+┌ Info:  Right move of CTMRG Iterations 92 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 1.295343e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 92 ==>  Δt : 0.3238   
+└         max_coef_err :  3.633879e-02   max_trunc_err : 6.994405e-15  max_Λ_err : 1.388706e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 93 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 1.295343e-03  
+┌ Info:  Up move of CTMRG Iterations 93 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 1.333403e-03  
+┌ Info:  Left move of CTMRG Iterations 93 ==>  
+└             max_trunc_err_l :  6.772360e-15   max_Λ_err_l : 1.306583e-03  
+┌ Info:  Right move of CTMRG Iterations 93 ==>  
+└             max_trunc_err_r :  6.772360e-15   max_Λ_err_r : 1.243758e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 93 ==>  Δt : 0.2896   
+└         max_coef_err :  3.161074e-02   max_trunc_err : 6.994405e-15  max_Λ_err : 1.333403e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 94 ==>  
+└             max_trunc_err_d :  6.883383e-15   max_Λ_err_d : 1.243758e-03  
+┌ Info:  Up move of CTMRG Iterations 94 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 1.280303e-03  
+┌ Info:  Left move of CTMRG Iterations 94 ==>  
+└             max_trunc_err_l :  6.994405e-15   max_Λ_err_l : 1.254551e-03  
+┌ Info:  Right move of CTMRG Iterations 94 ==>  
+└             max_trunc_err_r :  6.883383e-15   max_Λ_err_r : 1.194228e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 94 ==>  Δt : 0.3042   
+└         max_coef_err :  5.213473e-02   max_trunc_err : 6.994405e-15  max_Λ_err : 1.280303e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 95 ==>  
+└             max_trunc_err_d :  6.994405e-15   max_Λ_err_d : 1.194228e-03  
+┌ Info:  Up move of CTMRG Iterations 95 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 1.229317e-03  
+┌ Info:  Left move of CTMRG Iterations 95 ==>  
+└             max_trunc_err_l :  6.994405e-15   max_Λ_err_l : 1.204590e-03  
+┌ Info:  Right move of CTMRG Iterations 95 ==>  
+└             max_trunc_err_r :  6.883383e-15   max_Λ_err_r : 1.146669e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 95 ==>  Δt : 0.3256   
+└         max_coef_err :  2.606888e-02   max_trunc_err : 6.994405e-15  max_Λ_err : 1.229317e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 96 ==>  
+└             max_trunc_err_d :  7.105427e-15   max_Λ_err_d : 1.146669e-03  
+┌ Info:  Up move of CTMRG Iterations 96 ==>  
+└             max_trunc_err_u :  6.994405e-15   max_Λ_err_u : 1.180361e-03  
+┌ Info:  Left move of CTMRG Iterations 96 ==>  
+└             max_trunc_err_l :  6.994405e-15   max_Λ_err_l : 1.156619e-03  
+┌ Info:  Right move of CTMRG Iterations 96 ==>  
+└             max_trunc_err_r :  6.661338e-15   max_Λ_err_r : 1.101005e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 96 ==>  Δt : 0.2724   
+└         max_coef_err :  3.008855e-02   max_trunc_err : 7.105427e-15  max_Λ_err : 1.180361e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 97 ==>  
+└             max_trunc_err_d :  7.105427e-15   max_Λ_err_d : 1.101005e-03  
+┌ Info:  Up move of CTMRG Iterations 97 ==>  
+└             max_trunc_err_u :  7.105427e-15   max_Λ_err_u : 1.133355e-03  
+┌ Info:  Left move of CTMRG Iterations 97 ==>  
+└             max_trunc_err_l :  7.105427e-15   max_Λ_err_l : 1.110559e-03  
+┌ Info:  Right move of CTMRG Iterations 97 ==>  
+└             max_trunc_err_r :  7.105427e-15   max_Λ_err_r : 1.057159e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 97 ==>  Δt : 1.0957   
+└         max_coef_err :  2.574278e-02   max_trunc_err : 7.105427e-15  max_Λ_err : 1.133355e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 98 ==>  
+└             max_trunc_err_d :  7.105427e-15   max_Λ_err_d : 1.057159e-03  
+┌ Info:  Up move of CTMRG Iterations 98 ==>  
+└             max_trunc_err_u :  7.105427e-15   max_Λ_err_u : 1.088221e-03  
+┌ Info:  Left move of CTMRG Iterations 98 ==>  
+└             max_trunc_err_l :  7.105427e-15   max_Λ_err_l : 1.066333e-03  
+┌ Info:  Right move of CTMRG Iterations 98 ==>  
+└             max_trunc_err_r :  6.883383e-15   max_Λ_err_r : 1.015060e-03  
+[ Info:         
+┌ Info:  CTMRG Iterations 98 ==>  Δt : 0.2676   
+└         max_coef_err :  6.576489e-02   max_trunc_err : 7.105427e-15  max_Λ_err : 1.088221e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 99 ==>  
+└             max_trunc_err_d :  6.883383e-15   max_Λ_err_d : 1.015060e-03  
+┌ Info:  Up move of CTMRG Iterations 99 ==>  
+└             max_trunc_err_u :  7.105427e-15   max_Λ_err_u : 1.044885e-03  
+┌ Info:  Left move of CTMRG Iterations 99 ==>  
+└             max_trunc_err_l :  7.105427e-15   max_Λ_err_l : 1.023868e-03  
+┌ Info:  Right move of CTMRG Iterations 99 ==>  
+└             max_trunc_err_r :  6.883383e-15   max_Λ_err_r : 9.746368e-04  
+[ Info:         
+┌ Info:  CTMRG Iterations 99 ==>  Δt : 0.3228   
+└         max_coef_err :  9.082620e-02   max_trunc_err : 7.105427e-15  max_Λ_err : 1.044885e-03  
+[ Info:         
+┌ Info:  Down move of CTMRG Iterations 100 ==>  
+└             max_trunc_err_d :  7.105427e-15   max_Λ_err_d : 9.746368e-04  
+┌ Info:  Up move of CTMRG Iterations 100 ==>  
+└             max_trunc_err_u :  7.105427e-15   max_Λ_err_u : 1.003274e-03  
+┌ Info:  Left move of CTMRG Iterations 100 ==>  
+└             max_trunc_err_l :  7.105427e-15   max_Λ_err_l : 9.830941e-04  
+┌ Info:  Right move of CTMRG Iterations 100 ==>  
+└             max_trunc_err_r :  6.661338e-15   max_Λ_err_r : 9.358235e-04  
+[ Info:         
+┌ Info:  CTMRG Iterations 100 ==>  Δt : 0.3296   
+└         max_coef_err :  1.053828e-01   max_trunc_err : 7.105427e-15  max_Λ_err : 1.003274e-03  
+[ Info:         
+Average ground energy per site: -6.584935248353296 at t = -1.0, γ = 2.0, λ = 3.0
+Average ground energy per site: -6.584935248353322 at t = -1.0, γ = 2.0, λ = 3.0
+Average ground energy per site: -6.584935248178369 at t = -1.0, γ = 2.0, λ = 3.0
+--------- Running Time -------
+Running time of the scripts： 159s

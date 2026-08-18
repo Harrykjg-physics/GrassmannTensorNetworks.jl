@@ -336,9 +336,6 @@ end
     hleft, hright = _bond_operator_gsvd(hamiltonian)
     hleft_x = _nested_x_bond_operator(hnested, hpeps, hsource, hleft)
     hright_x = _nested_x_bond_operator(hnested, hpeps, hneighbor, hright)
-    hright_x = add_parity_sign(
-        hright_x, 5; sign_function=GrassmannTensorNetworks.global_sign
-    )
     halpha = _contract_nested_hpatch3_alpha(
         hnested, henv, hsource, hleft_x, hright_x
     )
@@ -349,7 +346,8 @@ end
         term = _contract_nested_hpatch3(
             hnested, henv, hsource, left_x, right_x
         )
-        hsum += _nested_scalar_or_zero(term)
+        hsum += (-one(eltype(hamiltonian)))^tensor_parity(left_slice) *
+                _nested_scalar_or_zero(term)
     end
     @test _nested_scalar_or_zero(halpha) ≈ hsum rtol=1e-12 atol=1e-12
 
@@ -359,15 +357,11 @@ end
     venv = initialize_nested_environment(vnested, 4, 2)
     vsource = CartesianIndex(1, 1)
     vneighbor = _layout_down_source(vnested.layout, vsource)
-    vtop, vbottom = _bond_operator_gsvd(hamiltonian)
+    vbottom, vtop = _bond_operator_gsvd(hamiltonian)
     vtop_x = _nested_x_bond_operator(vnested, vpeps, vsource, vtop)
     vbottom_x = _nested_x_bond_operator(vnested, vpeps, vneighbor, vbottom)
     valpha = _contract_nested_vpatch3_alpha(
-        vnested,
-        venv,
-        vsource,
-        add_parity_sign(vtop_x, 5; sign_function=GrassmannTensorNetworks.global_sign),
-        vbottom_x,
+        vnested, venv, vsource, vtop_x, vbottom_x
     )
     vsum = zero(eltype(hamiltonian))
     for (top_slice, bottom_slice) in bond_factor_slices(vtop, vbottom)
@@ -379,6 +373,60 @@ end
         vsum += _nested_scalar_or_zero(term)
     end
     @test _nested_scalar_or_zero(valpha) ≈ vsum rtol=1e-12 atol=1e-12
+end
+
+function nested_hbond_without_alpha_parity_sign(nested, peps, operator, env, source)
+    neighbor = _layout_right_source(nested.layout, source)
+    closed_left = nested[_layout_x_site(nested.layout, source)]
+    closed_right = nested[_layout_x_site(nested.layout, neighbor)]
+    denominator = _contract_nested_hpatch3(nested, env, source, closed_left, closed_right)
+    left_op, right_op = _bond_operator_gsvd(operator)
+    left_x = _nested_x_bond_operator(nested, peps, source, left_op)
+    right_x = _nested_x_bond_operator(nested, peps, neighbor, right_op)
+    numerator = _contract_nested_hpatch3_alpha(nested, env, source, left_x, right_x)
+
+    return _nested_scalar_or_zero(numerator) / _nested_scalar_or_zero(denominator)
+end
+
+function nested_vbond_with_swapped_alpha_factors(nested, peps, operator, env, source)
+    neighbor = _layout_down_source(nested.layout, source)
+    closed_top = nested[_layout_x_site(nested.layout, source)]
+    closed_bottom = nested[_layout_x_site(nested.layout, neighbor)]
+    denominator = _contract_nested_vpatch3(nested, env, source, closed_top, closed_bottom)
+    bottom_op, top_op = _bond_operator_gsvd(operator)
+    top_x = _nested_x_bond_operator(nested, peps, source, top_op)
+    bottom_x = _nested_x_bond_operator(nested, peps, neighbor, bottom_op)
+    numerator = _contract_nested_vpatch3_alpha(nested, env, source, top_x, bottom_x)
+
+    return _nested_scalar_or_zero(numerator) / _nested_scalar_or_zero(denominator)
+end
+
+@testset "Nested bond measurements use orientation-specific GSVD factors" begin
+    offdiagonal_bond = nn_bond(SpinlessFermionModel(1.0, 2.0, 0.0))
+
+    Random.seed!(0x484e4f5347)
+    hpeps = Square_GPEPS(2, 1, 2, 1, 2, Float64, false)
+    hnested = adapt_CTMRG(nested_network(hpeps))
+    henv = initialize_nested_environment(hnested, 4, 2)
+    hsource = CartesianIndex(1, 1)
+    _, hvalue = compute_nested_exp_hbond(
+        hnested, hpeps, offdiagonal_bond, henv, hsource
+    )
+    @test hvalue ≈ nested_hbond_without_alpha_parity_sign(
+        hnested, hpeps, offdiagonal_bond, henv, hsource
+    ) rtol=1e-12 atol=1e-12
+
+    Random.seed!(0x564e4f5347)
+    vpeps = Square_GPEPS(2, 1, 2, 2, 1, Float64, false)
+    vnested = adapt_CTMRG(nested_network(vpeps))
+    venv = initialize_nested_environment(vnested, 4, 2)
+    vsource = CartesianIndex(1, 1)
+    _, vvalue = compute_nested_exp_vbond(
+        vnested, vpeps, offdiagonal_bond, venv, vsource
+    )
+    @test vvalue ≈ nested_vbond_with_swapped_alpha_factors(
+        vnested, vpeps, offdiagonal_bond, venv, vsource
+    ) rtol=1e-12 atol=1e-12
 end
 
 function exact_site_networks(

@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+exec "$HOME/bin/julia_clean" --project=/home/jkkong/software/juliaenv/env_grassmann "$@"
