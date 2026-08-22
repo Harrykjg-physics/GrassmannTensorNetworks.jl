@@ -19,6 +19,7 @@ struct SpinlessFermionModel{T<:Real} <: AbstractModel
 end
 
 function SpinlessFermionModel(t::Real, γ::Real, λ::Real)
+    t, γ, λ = promote(t, γ, λ)
     return SpinlessFermionModel{typeof(t)}(t, γ, λ)
 end
 
@@ -70,6 +71,153 @@ function gate(model::SpinlessFermionModel, dτ::Real)
 end
 
 """
+2D interacting spinless fermion model on the square lattice
+
+H = ∑_(⟨i,j⟩) [ -t (c†_{i} c_{j} + h.c.) ]
+    - μ ∑_i c†_{i} c_{i}
+    + V ∑_(⟨i,j⟩) c†_{i} c_{i} c†_{j} c_{j}
+
+H_nn_bond = - t (c†i ⊗ cj + c†j ⊗ ci)
+            - μ/4 (c†i ci ⊗ Ij + Ii ⊗ c†j cj)
+            + V (c†i ci ⊗ c†j cj)
+"""
+
+struct InteractingSpinlessFermion{T<:Real} <: AbstractModel
+    t::T
+    μ::T
+    V::T
+end
+
+function InteractingSpinlessFermion(t::Real, μ::Real, V::Real)
+    t, μ, V = promote(t, μ, V)
+    return InteractingSpinlessFermion{typeof(t)}(t, μ, V)
+end
+
+function n_site_Fock_basis(model::InteractingSpinlessFermion{T}) where {T}
+    n_coef = zeros(T, (2, 2))
+    n_coef[2, 2] = 1
+    return n_coef
+end
+
+function n_site(model::InteractingSpinlessFermion)
+    n_coef = n_site_Fock_basis(model)
+    n_site_out = Grassmann(n_coef, (2, 2), (1, 1), (:out, :in))
+end
+
+function nn_bond_Fock_basis(model::InteractingSpinlessFermion{T}) where {T}
+
+    t = model.t
+    μ = model.μ
+    V = model.V
+
+    H_coef = zeros(T, (2, 2, 2, 2))
+    # < 1ᵢ0ⱼ | c†i ⊗ cj | 0ᵢ1ⱼ > = 1; < 0ᵢ1ⱼ | c†j ⊗ ci | 1ᵢ0ⱼ > = 1
+    H_coef[2, 1, 1, 2] = -t; H_coef[1, 2, 2, 1] = -t
+    # < 1ᵢ0ⱼ | c†i ci ⊗ Ij | 1ᵢ0ⱼ > = 1; < 1ᵢ1ⱼ | c†i ci ⊗ Ij | 1ᵢ1ⱼ > = 1
+    H_coef[2, 1, 2, 1] = -μ/4; H_coef[2, 2, 2, 2] = -μ/4
+    # < 0ᵢ1ⱼ | Ii ⊗ c†j cj | 0ᵢ1ⱼ > = 1; < 1ᵢ1ⱼ | Ii ⊗ c†j cj | 1ᵢ1ⱼ > = 1
+    H_coef[1, 2, 1, 2] = -μ/4; H_coef[2, 2, 2, 2] += -μ/4
+    # < 1ᵢ1ⱼ | c†i ci ⊗ c†j cj | 1ᵢ1ⱼ > = 1
+    H_coef[2, 2, 2, 2] += V
+
+    return H_coef
+end
+
+function nn_bond(model::InteractingSpinlessFermion)
+
+    H_coef = nn_bond_Fock_basis(model)
+    nn_bond_out1 = Grassmann(H_coef, (2, 2, 2, 2), (1, 1, 1, 1), (:out, :out, :in, :in))
+    nn_bond_out2 = add_perm_sign(nn_bond_out1, (1, 2, 4, 3))
+end
+
+function gate(model::InteractingSpinlessFermion, dτ::Real)
+
+    H_coef = nn_bond_Fock_basis(model)
+    H_coef_mat = reshape(H_coef, (4, 4))
+    G_coef_mat = exp(-dτ * H_coef_mat)
+    G_coef = reshape(G_coef_mat, (2, 2, 2, 2))
+    G = Grassmann(G_coef, (2, 2, 2, 2), (1, 1, 1, 1), (:out, :out, :in, :in))
+    G_out = add_perm_sign(G, (1, 2, 4, 3))
+end
+
+"""
+2D t-J model on the square lattice
+
+H = -t ∑_(⟨i,j⟩,σ) (c̃†_{iσ} c̃_{jσ} + h.c.)
+    + J ∑_(⟨i,j⟩) (S_i ⋅ S_j - 1/4 n_i n_j)
+    - μ ∑_i n_i
+
+The local basis is (0, ↑, ↓), with double occupancy projected out.
+
+H_nn_bond = -t projected hopping
+            + J (S_i ⋅ S_j - 1/4 n_i n_j)
+            - μ/4 (n_i ⊗ Ij + Ii ⊗ n_j)
+"""
+
+struct TJModel{T<:Real} <: AbstractModel
+    t::T
+    J::T
+    μ::T
+end
+
+function TJModel(t::Real, J::Real, μ::Real)
+    t, J, μ = promote(t, J, μ)
+    return TJModel{typeof(t)}(t, J, μ)
+end
+
+function n_site_Fock_basis(model::TJModel{T}) where {T}
+    n_coef = zeros(T, (3, 3))
+    n_coef[2, 2] = 1
+    n_coef[3, 3] = 1
+    return n_coef
+end
+
+function n_site(model::TJModel)
+    n_coef = n_site_Fock_basis(model)
+    n_site_out = Grassmann(n_coef, (3, 3), (1, 1), (:out, :in))
+end
+
+function nn_bond_Fock_basis(model::TJModel{T}) where {T}
+
+    t = model.t
+    J = model.J
+    μ = model.μ
+
+    H_coef = zeros(T, (3, 3, 3, 3))
+    # < ↑ᵢ0ⱼ | c̃†i↑ ⊗ c̃j↑ | 0ᵢ↑ⱼ > = 1; < 0ᵢ↑ⱼ | c̃†j↑ ⊗ c̃i↑ | ↑ᵢ0ⱼ > = 1
+    H_coef[2, 1, 1, 2] = -t; H_coef[1, 2, 2, 1] = -t
+    # < ↓ᵢ0ⱼ | c̃†i↓ ⊗ c̃j↓ | 0ᵢ↓ⱼ > = 1; < 0ᵢ↓ⱼ | c̃†j↓ ⊗ c̃i↓ | ↓ᵢ0ⱼ > = 1
+    H_coef[3, 1, 1, 3] = -t; H_coef[1, 3, 3, 1] = -t
+    # Onsite chemical potential, split over the four square-lattice bonds touching each site.
+    H_coef[2, 1, 2, 1] = -μ/4; H_coef[3, 1, 3, 1] = -μ/4
+    H_coef[1, 2, 1, 2] = -μ/4; H_coef[1, 3, 1, 3] = -μ/4
+    H_coef[2, 2, 2, 2] = -μ/2; H_coef[3, 3, 3, 3] = -μ/2
+    H_coef[2, 3, 2, 3] = -μ/2; H_coef[3, 2, 3, 2] = -μ/2
+    # S_i ⋅ S_j - 1/4 n_i n_j: only antiparallel spins have diagonal -1/2 and spin-flip +1/2.
+    H_coef[2, 3, 2, 3] += -J/2; H_coef[3, 2, 3, 2] += -J/2
+    H_coef[3, 2, 2, 3] += J/2; H_coef[2, 3, 3, 2] += J/2
+
+    return H_coef
+end
+
+function nn_bond(model::TJModel)
+
+    H_coef = nn_bond_Fock_basis(model)
+    nn_bond_out1 = Grassmann(H_coef, (3, 3, 3, 3), (1, 1, 1, 1), (:out, :out, :in, :in))
+    nn_bond_out2 = add_perm_sign(nn_bond_out1, (1, 2, 4, 3))
+end
+
+function gate(model::TJModel, dτ::Real)
+
+    H_coef = nn_bond_Fock_basis(model)
+    H_coef_mat = reshape(H_coef, (9, 9))
+    G_coef_mat = exp(-dτ * H_coef_mat)
+    G_coef = reshape(G_coef_mat, (3, 3, 3, 3))
+    G = Grassmann(G_coef, (3, 3, 3, 3), (1, 1, 1, 1), (:out, :out, :in, :in))
+    G_out = add_perm_sign(G, (1, 2, 4, 3))
+end
+
+"""
 2D Fermi-Hubbard model on the square lattice
 
 H = -t ∑_(⟨i,j⟩,σ) (c†_{iσ} c_{jσ} + h.c.) 
@@ -88,16 +236,17 @@ struct HubbardModel{T<:Real} <: AbstractModel
 end
 
 function HubbardModel(t::Real, U::Real, μ::Real)
+    t, U, μ = promote(t, U, μ)
     return HubbardModel{typeof(t)}(t, U, μ)
 end
 
 function nu_site_Fock_basis(model::HubbardModel{T}) where {T}
     
     Nu_coef = zeros(T, (4, 4))
-    # < ↑ | c†↑ c↑ | ↑ > = 1 
-    Nu_coef[1, 1] = 1
     # < D | c†↑ c↑ | D > = 1
-    Nu_coef[4, 4] = 1
+    Nu_coef[2, 2] = 1
+    # < ↑ | c†↑ c↑ | ↑ > = 1 
+    Nu_coef[3, 3] = 1
 
     return Nu_coef
 end
@@ -105,9 +254,9 @@ end
 function nd_site_Fock_basis(model::HubbardModel{T}) where {T}
     
     Nd_coef = zeros(T, (4, 4))
-    # < ↓ | c†↓ c↓ | ↓ > = 1 
-    Nd_coef[2, 2] = 1
     # < D | c†↓ c↓ | D > = 1
+    Nd_coef[2, 2] = 1
+    # < ↓ | c†↓ c↓ | ↓ > = 1 
     Nd_coef[4, 4] = 1
 
     return Nd_coef
@@ -151,15 +300,27 @@ function nn_bond_Fock_basis(model::HubbardModel{T}) where {T}
     # < ~ᵢDⱼ | Ii ⊗ nj↑ nj↓ | ~ᵢDⱼ > = 1
     H_coef[1, 2, 1, 2] += U/4; H_coef[2, 2, 2, 2] += U/4
     H_coef[3, 2, 3, 2] += U/4; H_coef[4, 2, 4, 2] += U/4
+    # < Dᵢ~ⱼ | ni↑ ⊗ Ij | Dᵢ~ⱼ > = 1
+    H_coef[2, 1, 2, 1] -= μ/4; H_coef[2, 2, 2, 2] -= μ/4 
+    H_coef[2, 3, 2, 3] -= μ/4; H_coef[2, 4, 2, 4] -= μ/4
     # < ↑ᵢ~ⱼ | ni↑ ⊗ Ij | ↑ᵢ~ⱼ > = 1
     H_coef[3, 1, 3, 1] -= μ/4; H_coef[3, 2, 3, 2] -= μ/4 
     H_coef[3, 3, 3, 3] -= μ/4; H_coef[3, 4, 3, 4] -= μ/4 
+    # < Dᵢ~ⱼ | ni↓ ⊗ Ij | Dᵢ~ⱼ > = 1
+    H_coef[2, 1, 2, 1] -= μ/4; H_coef[2, 2, 2, 2] -= μ/4
+    H_coef[2, 3, 2, 3] -= μ/4; H_coef[2, 4, 2, 4] -= μ/4 
     # < ↓ᵢ~ⱼ | ni↓ ⊗ Ij | ↓ᵢ~ⱼ > = 1
     H_coef[4, 1, 4, 1] -= μ/4; H_coef[4, 2, 4, 2] -= μ/4
     H_coef[4, 3, 4, 3] -= μ/4; H_coef[4, 4, 4, 4] -= μ/4 
+    # < ~ᵢDⱼ | Ii ⊗ nj↑ | ~ᵢDⱼ > = 1
+    H_coef[1, 2, 1, 2] -= μ/4; H_coef[2, 2, 2, 2] -= μ/4 
+    H_coef[3, 2, 3, 2] -= μ/4; H_coef[4, 2, 4, 2] -= μ/4 
     # < ~ᵢ↑ⱼ | Ii ⊗ nj↑ | ~ᵢ↑ⱼ > = 1
     H_coef[1, 3, 1, 3] -= μ/4; H_coef[2, 3, 2, 3] -= μ/4 
     H_coef[3, 3, 3, 3] -= μ/4; H_coef[4, 3, 4, 3] -= μ/4 
+    # < ~ᵢDⱼ | Ii ⊗ nj↓ | ~ᵢDⱼ > = 1
+    H_coef[1, 2, 1, 2] -= μ/4; H_coef[2, 2, 2, 2] -= μ/4
+    H_coef[3, 2, 3, 2] -= μ/4; H_coef[4, 2, 4, 2] -= μ/4
     # < ~ᵢ↓ⱼ | Ii ⊗ nj↓ | ~ᵢ↓ⱼ > = 1
     H_coef[1, 4, 1, 4] -= μ/4; H_coef[2, 4, 2, 4] -= μ/4
     H_coef[3, 4, 3, 4] -= μ/4; H_coef[4, 4, 4, 4] -= μ/4

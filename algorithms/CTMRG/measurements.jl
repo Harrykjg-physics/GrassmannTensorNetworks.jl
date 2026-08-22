@@ -11,8 +11,7 @@ function compute_exp_site(
         for x = 1:Lx
             Z[x, y] = compute_exp_site(Tbulk[x, y], 
             env.El[x, y], env.Er[x, y], env.Eu[x, y], env.Ed[x, y], 
-            env.Clu[x, y], env.Cru[x, y], env.Cld[x, y], env.Crd[x, y]
-            )  
+            env.Clu[x, y], env.Cru[x, y], env.Cld[x, y], env.Crd[x, y])  
         end
     end
 
@@ -287,8 +286,128 @@ function compute_exp_hbond(
             Tbulk[r, c], Tbulk[r, c_p1], Timp[r, c],
             env.El[r, c], env.Er[r, c_p1], env.Eu[r, c], env.Eu[r, c_p1], 
             env.Ed[r, c], env.Ed[r, c_p1], 
-            env.Clu[r, c], env.Cru[r, c_p1], env.Cld[r, c], env.Crd[r, c_p1]
-            ) 
+            env.Clu[r, c], env.Cru[r, c_p1], env.Cld[r, c], env.Crd[r, c_p1]) 
+    end
+
+    return Z, O
+end
+
+function _compute_exp_hbond_denominator(
+    Tbulk1::Grassmann{Q1, 4},
+    Tbulk2::Grassmann{Q1, 4},
+    El1::Grassmann{Q1, 3},
+    Er2::Grassmann{Q1, 3},
+    Eu1::Grassmann{Q1, 3},
+    Eu2::Grassmann{Q1, 3},
+    Ed1::Grassmann{Q1, 3},
+    Ed2::Grassmann{Q1, 3},
+    Clu1::Grassmann{Q1, 2},
+    Cru2::Grassmann{Q1, 2},
+    Cld1::Grassmann{Q1, 2},
+    Crd2::Grassmann{Q1, 2}) where {Q1}
+
+    # left_top[h1, v5, h4] = Clu1[h1, v1] * El1[v1, v5, h4]
+    left_top = contract(Clu1, El1, (2, 1); sign_function=global_sign)
+    # state[h1, h4, h7] = left_top[h1, v5, h4] * Cld1[h7, v5]
+    state = contract(left_top, Cld1, (2, 2); sign_function=global_sign)
+    state, _ = left_move(state, Ed1, Tbulk1, Eu1)
+    state, _ = left_move(state, Ed2, Tbulk2, Eu2)
+    # right_top[h3, v8, h6] = Cru2[h3, v4] * Er2[v4, v8, h6]
+    right_top = contract(Cru2, Er2, (2, 1); sign_function=global_sign)
+    # right[h3, h6, h9] = right_top[h3, v8, h6] * Crd2[h9, v8]
+    right = contract(right_top, Crd2, (2, 2); sign_function=global_sign)
+    # out = state[h3, h6, h9] * right[h3, h6, h9]
+    out = contract(state, right, ((1, 2, 3), (1, 2, 3)); sign_function=global_sign)
+
+    return out
+end
+
+function _bond_operator_gsvd(operator::Grassmann{T, 4}) where {T}
+
+    row_size = size(operator)[1] * size(operator)[3]
+    col_size = size(operator)[2] * size(operator)[4]
+    Dcut = min(row_size, col_size)
+
+    # operator_perm[pul, pdl, pur, pdr] <-- operator[pul, pur, pdl, pdr]
+    operator_perm = permutedims(operator, (1, 3, 2, 4); sign_function=global_sign)
+    # U[(pul, pdl), b], S[b, b], Vdag[b, (pur, pdr)] <-- operator_perm[pul, pdl, pur, pdr]
+    # V[(pur, pdr), b] <-- Vdag[b, (pur, pdr)]
+    U, S, V, _ = gsvd(operator_perm, (1, 2), (3, 4), Dcut; trunc=false, sign_function=global_sign)
+    sqrtS = sqrt(S)
+
+    # L[pul, pdl, a] = U[pul, pdl, b] * sqrt(S)[b, a]
+    L = contract(U, sqrtS, (3, 1); sign_function=global_sign)
+    # R0[a, pur, pdr] = sqrt(S)[a, b] * conj(V)[(pur, pdr), b]
+    R0 = contract(sqrtS, V, (2, 3); cj=(false, true), sign_function=global_sign)
+    # R[pur, pdr, a] <-- R0[a, pur, pdr]
+    R = permutedims(R0, (2, 3, 1); sign_function=global_sign)
+
+    return L, R
+end
+
+function compute_exp_hbond_alpha(
+    Tbulk1::Grassmann{Q1, 4},
+    Tbulk2::Grassmann{Q1, 4},
+    Talpha1::Grassmann{Q2, 5},
+    Talpha2::Grassmann{Q2, 5},
+    El1::Grassmann{Q1, 3},
+    Er2::Grassmann{Q1, 3},
+    Eu1::Grassmann{Q1, 3},
+    Eu2::Grassmann{Q1, 3},
+    Ed1::Grassmann{Q1, 3},
+    Ed2::Grassmann{Q1, 3},
+    Clu1::Grassmann{Q1, 2},
+    Cru2::Grassmann{Q1, 2},
+    Cld1::Grassmann{Q1, 2},
+    Crd2::Grassmann{Q1, 2}) where {Q1, Q2}
+
+    Den = _compute_exp_hbond_denominator(Tbulk1, Tbulk2, 
+    El1, Er2, Eu1, Eu2, Ed1, Ed2, Clu1, Cru2, Cld1, Crd2)
+
+    left_top = contract(Clu1, El1, (2, 1); sign_function=global_sign)
+    state = contract(left_top, Cld1, (2, 2); sign_function=global_sign)
+    state, _ = _left_move_keep_open(state, Ed1, Talpha1, Eu1)
+    state, _ = _left_move_keep_open(state, Ed2, Talpha2, Eu2)
+    # trace out the alpha indices
+    state = trace(state, (4, 5); sign_function=global_sign)
+
+    right_top = contract(Cru2, Er2, (2, 1); sign_function=global_sign)
+    right = contract(right_top, Crd2, (2, 2); sign_function=global_sign)
+    Num = contract(state, right, ((1, 2, 3), (1, 2, 3)); sign_function=global_sign)
+
+    return scalar(Den), scalar(Num)/scalar(Den)
+end
+
+function compute_exp_hbond(
+    Tbulk::Matrix{Grassmann{Q1, 4}},
+    peps::Square_GPEPS{Q2},
+    H_bond::Grassmann{Q2, 4},
+    env::CTMRGEnv) where {Q1, Q2}
+
+    size(Tbulk) == size(peps) || throw(DimensionMismatch("Tbulk and peps should have the same unit cell size"))
+    size(Tbulk) == size(env) || throw(DimensionMismatch("Tbulk and CTMRG environment should have the same unit cell size"))
+
+    Lx, Ly = size(Tbulk)
+    Q = promote_type(Q1, Q2)
+
+    Z = Matrix{Q}(undef, Lx, Ly)
+    O = Matrix{Q}(undef, Lx, Ly)
+    left_op, right_op = _bond_operator_gsvd(H_bond)
+
+    for c in 1:Ly, r in 1:Lx
+        c_p1 = Nmod(c + 1, Ly)
+        Timp1 = reduced_tensor_alpha(peps.A[r, c], left_op)
+        Timp2 = reduced_tensor_alpha(peps.A[r, c_p1], right_op)
+
+        Z[r, c], O[r, c] = compute_exp_hbond_alpha(
+            Tbulk[r, c], Tbulk[r, c_p1], Timp1, Timp2, 
+            env.El[r, c], env.Er[r, c_p1], env.Eu[r, c], env.Eu[r, c_p1], 
+            env.Ed[r, c], env.Ed[r, c_p1], 
+            env.Clu[r, c], env.Cru[r, c_p1], env.Cld[r, c], env.Crd[r, c_p1])
+
+        # Release the memory of Timp1 and Timp2 
+        Timp1 = nothing
+        Timp2 = nothing
     end
 
     return Z, O
@@ -416,6 +535,104 @@ function compute_exp_vbond(
             env.Ed[r_p1, c], env.Eu[r, c], env.Er[r_p1, c], env.Er[r, c], 
             env.El[r_p1, c], env.El[r, c], 
             env.Crd[r_p1, c], env.Cru[r, c], env.Cld[r_p1, c], env.Clu[r, c]) 
+    end
+
+    return Z, O
+end
+
+function _compute_exp_vbond_denominator(
+    Ttop::Grassmann{Q1, 4},
+    Tbottom::Grassmann{Q1, 4},
+    El_top::Grassmann{Q1, 3},
+    Er_top::Grassmann{Q1, 3},
+    El_bottom::Grassmann{Q1, 3},
+    Er_bottom::Grassmann{Q1, 3},
+    Eu_top::Grassmann{Q1, 3},
+    Ed_bottom::Grassmann{Q1, 3},
+    Clu_top::Grassmann{Q1, 2},
+    Cru_top::Grassmann{Q1, 2},
+    Cld_bottom::Grassmann{Q1, 2},
+    Crd_bottom::Grassmann{Q1, 2}) where {Q1}
+
+    upper_left = contract(Clu_top, Eu_top, (1, 1); sign_function=global_sign)
+    state = contract(upper_left, Cru_top, (2, 1); sign_function=global_sign)
+    state, _ = up_move(state, El_top, Ttop, Er_top)
+    state, _ = up_move(state, El_bottom, Tbottom, Er_bottom)
+
+    lower_left = contract(Cld_bottom, Ed_bottom, (1, 1); sign_function=global_sign)
+    lower = contract(lower_left, Crd_bottom, (2, 1); sign_function=global_sign)
+
+    out = contract(state, lower, ((1, 2, 3), (1, 2, 3)); sign_function=global_sign)
+
+    return out
+end
+
+function compute_exp_vbond_alpha(
+    Ttop::Grassmann{Q1, 4},
+    Tbottom::Grassmann{Q1, 4},
+    Talpha_top::Grassmann{Q2, 5},
+    Talpha_bottom::Grassmann{Q2, 5},
+    El_top::Grassmann{Q1, 3},
+    Er_top::Grassmann{Q1, 3},
+    El_bottom::Grassmann{Q1, 3},
+    Er_bottom::Grassmann{Q1, 3},
+    Eu_top::Grassmann{Q1, 3},
+    Ed_bottom::Grassmann{Q1, 3},
+    Clu_top::Grassmann{Q1, 2},
+    Cru_top::Grassmann{Q1, 2},
+    Cld_bottom::Grassmann{Q1, 2},
+    Crd_bottom::Grassmann{Q1, 2}) where {Q1, Q2}
+
+    Den = _compute_exp_vbond_denominator(
+        Ttop, Tbottom, 
+        El_top, Er_top, El_bottom, Er_bottom, 
+        Eu_top, Ed_bottom, 
+        Clu_top, Cru_top, Cld_bottom, Crd_bottom)
+
+    upper_left = contract(Clu_top, Eu_top, (1, 1); sign_function=global_sign)
+    state = contract(upper_left, Cru_top, (2, 1); sign_function=global_sign)
+    state, _ = _up_move_keep_open(state, El_top, Talpha_top, Er_top)
+    state, _ = _up_move_keep_open(state, El_bottom, Talpha_bottom, Er_bottom)
+    state = trace(state, (4, 5); sign_function=global_sign)
+
+    lower_left = contract(Cld_bottom, Ed_bottom, (1, 1); sign_function=global_sign)
+    lower = contract(lower_left, Crd_bottom, (2, 1); sign_function=global_sign)
+    Num = contract(state, lower, ((1, 2, 3), (1, 2, 3)); sign_function=global_sign)
+
+    return scalar(Den), scalar(Num)/scalar(Den)
+end
+
+function compute_exp_vbond(
+    Tbulk::Matrix{Grassmann{Q1, 4}}, 
+    peps::Square_GPEPS{Q2}, 
+    H_bond::Grassmann{Q2, 4}, 
+    env::CTMRGEnv) where {Q1, Q2}
+
+    size(Tbulk) == size(peps) || throw(DimensionMismatch("Tbulk and peps should have the same unit cell size"))
+    size(Tbulk) == size(env) || throw(DimensionMismatch("Tbulk and CTMRG environment should have the same unit cell size"))
+
+    Lx, Ly = size(Tbulk)
+    Q = promote_type(Q1, Q2)
+
+    Z = Matrix{Q}(undef, Lx, Ly)
+    O = Matrix{Q}(undef, Lx, Ly)
+    bottom_op, top_op = _bond_operator_gsvd(H_bond)
+
+    for c in 1:Ly, r in 1:Lx
+
+        r_p1 = Nmod(r + 1, Lx)
+        Talpha_top = reduced_tensor_alpha(peps.A[r, c], top_op)
+        Talpha_bottom = reduced_tensor_alpha(peps.A[r_p1, c], bottom_op)
+
+        Z[r, c], O[r, c] = compute_exp_vbond_alpha(
+            Tbulk[r, c], Tbulk[r_p1, c], Talpha_top, Talpha_bottom, 
+            env.El[r, c], env.Er[r, c], env.El[r_p1, c], env.Er[r_p1, c], 
+            env.Eu[r, c], env.Ed[r_p1, c], 
+            env.Clu[r, c], env.Cru[r, c], env.Cld[r_p1, c], env.Crd[r_p1, c])
+
+        # Release the memory of Talpha_top and Talpha_bottom
+        Talpha_top = nothing
+        Talpha_bottom = nothing
     end
 
     return Z, O
@@ -750,4 +967,52 @@ function down_move(
     coef = norm(out)
 
     return out, coef
+end
+
+function _left_move_keep_open(
+    Lenv::Grassmann{Q1, N1},
+    Ed::Grassmann{Q2, 3},
+    T::Grassmann{Q3, N2},
+    Eu::Grassmann{Q2, 3}) where {Q1, Q2, Q3, N1, N2}
+
+    N1 >= 3 || throw(ArgumentError("left environment must have at least three legs"))
+    N2 >= 4 || throw(ArgumentError("bulk tensor must have at least four lattice legs"))
+    open_env = N1 - 3
+    open_bulk = N2 - 4
+
+    # out1[h1, h2, open_env..., h6, v2] = Lenv[h1, h2, h3, open_env...] * Ed[h3, h6, v2]
+    out1 = contract(Lenv, Ed, (3, 1); sign_function=global_sign)
+    # out2[h1, open_env..., h6, h5, v1, open_bulk...] = out1[h1, h2, open_env..., h6, v2] * T[h2, h5, v1, v2, open_bulk...]
+    out2 = contract(out1, T, ((2, open_env + 4), (1, 4)); sign_function=global_sign)
+    # out3[h4, open_env..., h6, h5, open_bulk...] = Eu[h1, h4, v1] * out2[...]
+    out3 = contract(Eu, out2, ((1, 3), (1, open_env + 4)); sign_function=global_sign)
+
+    nout = 3 + open_env + open_bulk
+    perm_dst = (1, open_env + 3, open_env + 2, (2:(open_env + 1))..., ((open_env + 4):nout)...)
+
+    return permutedims(out3, perm_dst; sign_function=global_sign), norm(out3)
+end
+
+function _up_move_keep_open(
+    Uenv::Grassmann{Q1, N1},
+    El::Grassmann{Q2, 3},
+    T::Grassmann{Q3, N2},
+    Er::Grassmann{Q2, 3}) where {Q1, Q2, Q3, N1, N2}
+
+    N1 >= 3 || throw(ArgumentError("upper environment must have at least three legs"))
+    N2 >= 4 || throw(ArgumentError("bulk tensor must have at least four lattice legs"))
+    open_env = N1 - 3
+    open_bulk = N2 - 4
+
+    # Uenv1[v2, v3, open_env..., v4, h1] = Uenv[v1, v2, v3, open_env...] * El[v1, v4, h1]
+    Uenv1 = contract(Uenv, El, (1, 1); sign_function=global_sign)
+    # Uenv2[v3, open_env..., v4, h2, v5, open_bulk...] = Uenv1[v2, v3, open_env..., v4, h1] * T[h1, h2, v2, v5, open_bulk...]
+    Uenv2 = contract(Uenv1, T, ((1, open_env + 4), (3, 1)); sign_function=global_sign)
+    # out[open_env..., v4, v5, open_bulk..., v6] = Uenv2[v3, open_env..., v4, h2, v5, open_bulk...] * Er[v3, v6, h2]
+    out = contract(Uenv2, Er, ((1, open_env + 3), (1, 3)); sign_function=global_sign)
+
+    nout = 3 + open_env + open_bulk
+    perm_dst = (open_env + 1, open_env + 2, nout, (1:open_env)..., ((open_env + 3):(nout - 1))...)
+
+    return permutedims(out, perm_dst; sign_function=global_sign), norm(out)
 end

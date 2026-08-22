@@ -30,8 +30,8 @@ t = 1.0
 U = 4.0
 μ = 0.0
 Dbond = 4
-Lx = 1
-Ly = 1
+Lx = 2
+Ly = 2
 
 GrassmannTensorNetworks.global_sign = auto_sign
 

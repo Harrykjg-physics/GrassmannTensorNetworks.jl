@@ -108,6 +108,40 @@ function reduced_tensor(peps::Square_GPEPS{Q}, O::GrassmannMatrix{Q}) where {Q}
     return O_imp_mat
 end
 
+function reduced_tensor_alpha(Tdn::Grassmann{Q, 5}, O::Grassmann{Q, 3}) where {Q}
+
+    Tup = conj(Tdn; sign_function=global_sign)
+    # T_dn_O[dum1, a, l', r, u, d'] = O[dum1, dum2, a] * Tdn[dum2, l', r, u, d']
+    T_dn_O = contract(O, Tdn, (2, 1); sign_function=global_sign)
+    # O_reduced[l, l', r', r, u', u, d, d', a] <-- O_reduced[l, r', u', d, a, l', r, u, d'] = Tup[dum1, l, r', u', d] * T_dn_O[dum1, a, l', r, u, d']
+    O_reduced = contract(Tup, T_dn_O, (1, 1); perm=(1, 6, 2, 7, 3, 8, 4, 9, 5), sign_function=global_sign)
+    # O_reduced1[L', r', r, u', u, d, d', a] <-- O_reduced[(l, l'), r', r, u', u, d, d', a]
+    O_reduced = add_parity_sign(O_reduced, 1; sign_function=global_sign)
+    O_reduced1 = fuse(O_reduced, (1, 2); index_type_fused=:out)
+    # O_reduced2[L', R, u', u, d, d', a] <-- O_reduced1[L', (r', r), u', u, d, d', a]
+    O_reduced1 = add_perm_sign(O_reduced1, (1, 3, 2, 4, 5, 6, 7, 8); sign_function=global_sign)
+    O_reduced2 = fuse(O_reduced1, (2, 3); index_type_fused=:in)
+    # O_reduced3[L', R, U, d, d', a] <-- O_reduced2[L', R, (u', u), d, d', a]
+    O_reduced2 = add_perm_sign(O_reduced2, (1, 2, 4, 3, 5, 6, 7); sign_function=global_sign)
+    O_reduced3 = fuse(O_reduced2, (3, 4); index_type_fused=:in)
+    # O_reduced4[L', R, U, D', a] <-- O_reduced3[L', R, U, (d, d'), a]
+    O_reduced3 = add_parity_sign(O_reduced3, 4; sign_function=global_sign)
+    O_reduced4 = fuse(O_reduced3, (4, 5); index_type_fused=:out)
+end
+
+function reduced_tensor_alpha(peps::Square_GPEPS{Q}, O::Grassmann{Q, 3}) where {Q}
+
+    Lx, Ly = size(peps)
+
+    O_imp_mat = Matrix{Grassmann{Q, 5}}(undef, Lx, Ly)
+
+    for r in 1:Lx, c in 1:Ly
+        O_imp_mat[r, c] = reduced_tensor_alpha(peps.A[r, c], O)
+    end
+
+    return O_imp_mat
+end
+
 """ 
 
 Impurity bond along the y direction :
