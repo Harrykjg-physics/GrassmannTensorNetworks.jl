@@ -1,13 +1,6 @@
 using Pkg
-
-const GTN_ROOT = normpath(joinpath(@__DIR__, "../.."))
-
-Pkg.activate(GTN_ROOT)
+Pkg.activate(joinpath(@__DIR__, "../.."))
 Pkg.instantiate()
-Pkg.activate(@__DIR__)
-Pkg.instantiate()
-
-GTN_ROOT in LOAD_PATH || push!(LOAD_PATH, GTN_ROOT)
 
 using GrassmannTensorNetworks
 using LinearAlgebra
@@ -59,10 +52,10 @@ function compute_reduced_tensors(
     t_bulk = Matrix{Grassmann{T, 4}}([
         reduced_tensor(peps.A[r, c]) for r in 1:Lx, c in 1:Ly])
     t_vbond = Matrix{Grassmann{T, 6}}([
-        reduced_tensor_vbond(peps.A[r, c], peps.A[Nmod(r + 1, Lx), c], h_bond_t)
+        reduced_tensor_vbond(peps.A[r, c], peps.A[Nmod(r + 1, Lx), c], h_bond_t) 
         for r in 1:Lx, c in 1:Ly])
     t_hbond = Matrix{Grassmann{T, 6}}([
-        reduced_tensor_hbond(peps.A[r, c], peps.A[r, Nmod(c + 1, Ly)], h_bond_t)
+        reduced_tensor_hbond(peps.A[r, c], peps.A[r, Nmod(c + 1, Ly)], h_bond_t) 
         for r in 1:Lx, c in 1:Ly])
 
     return t_bulk, t_vbond, t_hbond
@@ -342,7 +335,8 @@ function run_Square_SpinlessFermion_AD(
             converged=Optim.converged(opt_result)))
 
         @printf(
-            "Optim outer %2d | iters %3d | E %.12f -> %.12f | E_valid = %.12f | E_raw = %.12f | E_candidate = %.12f | dx = %.3e | step = %.3e | validations = %d | |g| = %.6e%s%s\n",
+            "Optim outer %2d | iters %3d | E %.12f -> %.12f | E_valid = %.12f | 
+            E_raw = %.12f | E_candidate = %.12f | dx = %.3e | step = %.3e | validations = %d | |g| = %.6e%s%s\n",
             ad_iter, Optim.iterations(opt_result), energy_before, energy_after,
             validated_energy_after, raw_candidate_energy, candidate_energy, candidate_step_norm,
             accepted_step, validation_trials, grad_norm,

@@ -29,7 +29,6 @@ function run_CTMRG_Square_SpinlessFermion(
 
     T_square_mat = reduced_tensor(peps)
     T_n_imp_mat = reduced_tensor(peps, N_site)
-    T_vbond_imp_mat, T_hbond_imp_mat = reduced_tensor(peps, H_nn_bond)
 
     ##################### Running Grassmann CTMRG to compute environment tensors #####################
 
@@ -40,8 +39,8 @@ function run_CTMRG_Square_SpinlessFermion(
 
     _, ns = compute_exp_site(T_square_mat, T_n_imp_mat, ctmrg_env)
     ns_avg = sum(ns)/(size(ns, 1) * size(ns, 2))
-    _, Eh = compute_exp_hbond(T_square_mat, T_hbond_imp_mat, ctmrg_env)
-    _, Ev = compute_exp_vbond(T_square_mat, T_vbond_imp_mat, ctmrg_env)
+    _, Eh = compute_exp_hbond(T_square_mat, peps, H_nn_bond, ctmrg_env)
+    _, Ev = compute_exp_vbond(T_square_mat, peps, H_nn_bond, ctmrg_env)
     Es_avg = (sum(Eh) + sum(Ev))/(size(Eh, 1) * size(Eh, 2))
     println("Average ground energy per site: $Es_avg at t = $t, γ = $γ, λ = $λ")
     save("exp_ctmrg", "χ$χ", "ns", ns, "ns_avg", ns_avg, "Eh", Eh, "Ev", Ev, "Es_avg", Es_avg)
