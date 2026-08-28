@@ -17,6 +17,10 @@ import GrassmannTensorNetworks: Grassmann, AbstractGrassmann, GrassmannScalar, G
     trace, contract, gsvd, gevd, gortho, truncation, check_parity
 
 import GrassmannTensorNetworks:
+    CTMRGEnv,
+    ctmrg_spectrum, singular_value_spectrum_distance,
+    ctmrg_spectrum_distance, ctmrg_elementwise_distance,
+    fixgauge, fixgauge!,
     NestedLayout, NestedNetwork,
     nested_network, nested_x_operator, nested_y_operator,
     compute_nested_exp_hbond, compute_nested_exp_vbond,
@@ -51,6 +55,9 @@ include("fusion.jl")
 
 # AD rules for decomp.jl (gsvd, gevd, gortho)
 include("decomp.jl")
+
+# AD rules for CTMRG diagnostics and gauge fixing
+include("ctmrg.jl")
 
 include(joinpath(
     @__DIR__, "..", "..", "algorithms", "Nested_CTMRG", "nested_chainrules.jl"

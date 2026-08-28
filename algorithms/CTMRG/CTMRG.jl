@@ -72,6 +72,11 @@ Arguments:
     `verbosity` controls the printing level (default=0)
     `save_iter` determines the number of steps to save the CTMRG environment tensors (default=0)
     `save_filename` specifies the filename to store the CTMRG environment tensors (default="ctmrg_env")
+    `convergence_metric` selects the stopping criterion:
+        :spectrum compares PEPSKit-style corner/edge singular-value spectra,
+        :elementwise compares environment tensor entries after optional gauge fixing,
+        :both requires both criteria to be small.
+    `gauge_fix` optionally aligns the scalar phase/sign gauge of each environment tensor with the previous iteration.
 """
 
 function run_GCTMRG!(
@@ -85,14 +90,17 @@ function run_GCTMRG!(
     average_trunc::Bool=false, 
     verbosity::Int=0, 
     save_iter::Int=0, 
-    save_filename::String="ctmrg_env") where {Q}
+    save_filename::String="ctmrg_env",
+    convergence_metric::Symbol=:spectrum,
+    gauge_fix=false) where {Q}
  
     Lx, Ly = size(T_bulk)
 
+    gauge_alg = _ctmrg_gauge_algorithm(gauge_fix)
+    _check_ctmrg_convergence_metric(convergence_metric)
+
     coef_iter = ones(Float64, 4, Lx, Ly)
     coef = similar(coef_iter)
-
-    Λd_iter, Λu_iter, Λl_iter, Λr_iter = prepare_Λ(Lx, Ly, χ)
 
     expval_avg_tmp = one(Q)
     count = 0
@@ -100,47 +108,51 @@ function run_GCTMRG!(
     for iter = (start+1):(start+ctmrg_iter)
 
         ti = time()
+        env_iter = deepcopy(ctmrg_env)
 
-        coef[1, :, :], trunc_err_d, Λd = down_move!(T_bulk, ctmrg_env, χ; average_trunc=average_trunc)
+        coef[1, :, :], trunc_err_d, _ = down_move!(T_bulk, ctmrg_env, χ; average_trunc=average_trunc)
         max_trunc_err_d = maximum(trunc_err_d)
-        max_Λ_err_d = maximum(compare_weights(Λd, Λd_iter))
 
-        coef[2, :, :], trunc_err_u, Λu = up_move!(T_bulk, ctmrg_env, χ; average_trunc=average_trunc)
+        coef[2, :, :], trunc_err_u, _ = up_move!(T_bulk, ctmrg_env, χ; average_trunc=average_trunc)
         max_trunc_err_u = maximum(trunc_err_u)
-        max_Λ_err_u = maximum(compare_weights(Λu, Λu_iter))
 
-        coef[3, :, :], trunc_err_l, Λl = left_move!(T_bulk, ctmrg_env, χ; average_trunc=average_trunc)
+        coef[3, :, :], trunc_err_l, _ = left_move!(T_bulk, ctmrg_env, χ; average_trunc=average_trunc)
         max_trunc_err_l = maximum(trunc_err_l)
-        max_Λ_err_l = maximum(compare_weights(Λl, Λl_iter))
 
-        coef[4, :, :], trunc_err_r, Λr = right_move!(T_bulk, ctmrg_env, χ; average_trunc=average_trunc)
+        coef[4, :, :], trunc_err_r, _ = right_move!(T_bulk, ctmrg_env, χ; average_trunc=average_trunc)
         max_trunc_err_r = maximum(trunc_err_r)
-        max_Λ_err_r = maximum(compare_weights(Λr, Λr_iter))
 
         tf = time()
 
         if verbosity > 0
 
             @info @sprintf " Down move of CTMRG Iterations %i ==>  
-            max_trunc_err_d :  %.6e   max_Λ_err_d : %.6e  " iter max_trunc_err_d max_Λ_err_d
+            max_trunc_err_d :  %.6e " iter max_trunc_err_d
 
             @info @sprintf " Up move of CTMRG Iterations %i ==>  
-            max_trunc_err_u :  %.6e   max_Λ_err_u : %.6e  " iter max_trunc_err_u max_Λ_err_u
+            max_trunc_err_u :  %.6e" iter max_trunc_err_u
 
             @info @sprintf " Left move of CTMRG Iterations %i ==>  
-            max_trunc_err_l :  %.6e   max_Λ_err_l : %.6e  " iter max_trunc_err_l max_Λ_err_l
+            max_trunc_err_l :  %.6e" iter max_trunc_err_l
 
             @info @sprintf " Right move of CTMRG Iterations %i ==>  
-            max_trunc_err_r :  %.6e   max_Λ_err_r : %.6e  " iter max_trunc_err_r max_Λ_err_r
+            max_trunc_err_r :  %.6e" iter max_trunc_err_r
         end
 
         max_coef_err = maximum(abs.((coef - coef_iter)))/maximum(coef_iter)
         max_trunc_err = max(max(max_trunc_err_d, max_trunc_err_u), max(max_trunc_err_l, max_trunc_err_r))
-        max_Λ_err = max(max(max_Λ_err_d, max_Λ_err_u), max(max_Λ_err_l, max_Λ_err_r))
-        
+
+        comparison_env = gauge_alg isa CTMRGNoGaugeFix ? ctmrg_env : fixgauge(ctmrg_env, env_iter; alg=gauge_alg)
+        spectrum_metrics = ctmrg_spectrum_distance(comparison_env, env_iter)
+        max_spectrum_err = spectrum_metrics.max
+        max_elementwise_err = ctmrg_elementwise_distance(comparison_env, env_iter)
+        convergence_err = _ctmrg_convergence_error(convergence_metric, max_spectrum_err, max_elementwise_err)
+
         @info @sprintf "        "
-        @info @sprintf " CTMRG Iterations %i ==>  Δt : %.4f   
-        max_coef_err :  %.6e   max_trunc_err : %.6e  max_Λ_err : %.6e  " iter (tf-ti) max_coef_err max_trunc_err max_Λ_err
+        @info @sprintf(
+            " CTMRG Iterations %i ==>  Δt : %.4f
+            max_coef_err :  %.6e   max_trunc_err : %.6e  max_spectrum_err : %.6e   max_elementwise_err : %.6e   convergence_metric : %s   convergence_err : %.6e   corner_spectrum_err : %.6e   edge_spectrum_err : %.6e  ",
+            iter, tf-ti, max_coef_err, max_trunc_err, max_spectrum_err, max_elementwise_err, string(convergence_metric), convergence_err, spectrum_metrics.corner, spectrum_metrics.edge)
         @info @sprintf "        "
 
         # Whether to calculate and print the expectation value after each iteration
@@ -175,16 +187,12 @@ function run_GCTMRG!(
             save(ctmrg_env, save_filename, savestr)
         end
 
-        if max_Λ_err < ctmrg_tol
+        if convergence_err < ctmrg_tol
             savestr = "χ$χ"*"iter$iter"
             save(ctmrg_env, save_filename, savestr)
             break
         else
             copyto!(coef_iter, coef)
-            Λd_iter = copy(Λd)
-            Λu_iter = copy(Λu)
-            Λl_iter = copy(Λl)
-            Λr_iter = copy(Λr)
         end 
     end
 end

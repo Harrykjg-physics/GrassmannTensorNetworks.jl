@@ -41,6 +41,10 @@ export Square_GPEPS, absorb_Schmidt_weights, square_gpeps_parameter_count
 export SpinlessFermionModel, InteractingSpinlessFermion, TJModel, HubbardModel, n_site, nn_bond, gate
 export reduced_tensor, reduced_tensor_alpha, reduced_tensor_vbond, reduced_tensor_hbond
 export CTMRGEnv, run_GCTMRG!, find_maxiter, read_CTMRG_env
+export CTMRGNoGaugeFix, CTMRGPhaseGaugeFix
+export ctmrg_spectrum, singular_value_spectrum_distance
+export ctmrg_corner_spectra, ctmrg_edge_spectra, ctmrg_spectra
+export ctmrg_spectrum_distance, ctmrg_elementwise_distance, fixgauge, fixgauge!
 export compute_exp_site, compute_exp_hbond, compute_exp_vbond
 export NestedLayout, NestedNetwork
 export nested_network, adapt_CTMRG, initialize_nested_environment, run_nested_GCTMRG!
