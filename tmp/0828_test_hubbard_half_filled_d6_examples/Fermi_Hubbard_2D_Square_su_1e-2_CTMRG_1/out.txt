@@ -1,0 +1,3 @@
+Average ground energy per site: -2.073209955633672 at U = 2.0, μ = 1.0, χ = 16
+Average ground energy per site: -2.073527830298702 at U = 2.0, μ = 1.0, χ = 32
+Average ground energy per site: -1.0333255801583712 at U = 2.0, μ = 1.0, χ = 48

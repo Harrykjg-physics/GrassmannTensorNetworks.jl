@@ -1,0 +1,389 @@
+% !TEX program = xelatex
+\documentclass[11pt,a4paper]{ctexart}
+
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{siunitx}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!55!black,
+  citecolor=blue!55!black,
+  urlcolor=blue!55!black
+}
+
+\sisetup{
+  round-mode=places,
+  round-precision=6,
+  table-number-alignment=center
+}
+
+\newcommand{\ctmrg}{CTMRG}
+\newcommand{\peps}{PEPS}
+\newcommand{\ipeps}{iPEPS}
+\newcommand{\pepskit}{PEPSKit.jl}
+\newcommand{\Eraw}{E_{\mathrm{raw}}}
+\newcommand{\Ecan}{E_{\mathrm{can}}}
+\newcommand{\nb}{n_{\mathrm{avg}}}
+\newcommand{\Dbench}{\Delta E_{\mathrm{bench}}}
+
+\title{关于 Hubbard 模型 CTMRG 收敛指标与物理观测量差异的分析}
+\author{Codex 只读审计报告}
+\date{2026 年 8 月 28 日}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+本文针对 Hubbard 模型半满 $D=6$ 的 simple update、普通 \ctmrg{} 与 nested \ctmrg{} 结果，解释一个表面上矛盾的现象：
+从 $\max\Lambda$ 误差与归一化系数误差看，\ctmrg{} 环境似乎并未严格收敛；但粒子数接近半满，能量与基准结果的偏差也并非灾难性。
+本文的主要结论是：这一现象并不必然说明 \ctmrg{} 主算法存在根本错误，更可能说明当前使用的 $\max\Lambda_{\mathrm{err}}$ 与 $\max c_{\mathrm{err}}$ 属于对规范选择、近简并子空间和内部截断过程敏感的诊断量，不能单独作为物理收敛判据。
+参照 \pepskit{} 的实现，较稳健的做法是同时监控环境 corner/edge 的谱距离、局域观测量变化、截断误差以及物理一致性指标。
+\end{abstract}
+
+\section{问题背景}
+
+考虑二维 Hubbard 模型
+\begin{equation}
+  H
+  =
+  -t\sum_{\langle i,j\rangle,\sigma}
+  \left(
+    c^{\dagger}_{i\sigma}c_{j\sigma}
+    +
+    c^{\dagger}_{j\sigma}c_{i\sigma}
+  \right)
+  +
+  U\sum_i n_{i\uparrow}n_{i\downarrow}
+  -
+  \mu\sum_i (n_{i\uparrow}+n_{i\downarrow}) .
+  \label{eq:hubbard}
+\end{equation}
+在所检查的目录
+\begin{center}
+\texttt{/gpfs/home/jgkong/work/2026/0827/test\_Hubbard\_half-filled-D6/examples}
+\end{center}
+中，已有输出对应的实际参数为
+\begin{equation}
+  t=1,\qquad U=2,\qquad \mu=U/2=1,\qquad D=6,\qquad \delta\tau=10^{-2}.
+\end{equation}
+因此，若与文献中不含化学势项的 Hubbard 能量比较，应使用
+\begin{equation}
+  \Ecan
+  =
+  \Eraw + \mu\nb
+  =
+  \Eraw+\nb .
+  \label{eq:canonical-energy}
+\end{equation}
+Qin、Shi 与 Zhang 给出的二维方格 Hubbard 模型半满 $U/t=2$ 的 AFQMC 基准值约为
+\begin{equation}
+  E_{\mathrm{AFQMC}}/N = -1.1760(2).
+  \label{eq:benchmark}
+\end{equation}
+
+\section{已有数值现象}
+
+\subsection{Simple update 结果}
+
+SU 的最终 checkpoint 为 \texttt{iter5853\_delta tau 0.01}，其局域估计能量为
+\begin{equation}
+  \Eraw^{\mathrm{SU}} = -2.182382181124347 .
+\end{equation}
+在半满 $\nb\simeq 1$ 的口径下，粗略换算为
+\begin{equation}
+  \Ecan^{\mathrm{SU}}\simeq -1.182382181,
+\end{equation}
+与式~\eqref{eq:benchmark} 的差约为 $-6.4\times10^{-3}$。这说明 SU 局域能量估计本身与基准相当接近。
+不过，SU 的能量来自局域 bond-weight 环境，不等价于用无限二维环境严格收缩后得到的 \peps{} 期望值，因此它只能作为优化过程与能量尺度的参考。
+
+\subsection{\ctmrg{} 与 nested \ctmrg{} 的代表性统计}
+
+表~\ref{tab:summary} 汇总了已有 \ctmrg{} 与 nested \ctmrg{} 结果按 $\chi$ 的统计。
+其中 ``good count'' 是一个经验筛选：要求 $|\nb-1|<2\times10^{-3}$ 且水平/竖直 bond 的格点内 spread 不超过 $0.08$。
+
+\begin{table}[htbp]
+  \centering
+  \caption{按方法与 $\chi$ 汇总的 canonical 能量统计。}
+  \label{tab:summary}
+  \begin{tabular}{llrrrrrr}
+    \toprule
+    方法 & $\chi$ & 样本数 & 平均 $\Ecan$ & 中位数 $\Ecan$ & 标准差 & 平均 $\nb$ & good count\\
+    \midrule
+    普通 \ctmrg{} & 16 & 6 & -1.066258 & -1.072466 & 0.016315 & 0.999978 & 6\\
+    普通 \ctmrg{} & 32 & 6 & -1.083939 & -1.073424 & 0.039124 & 1.001518 & 4\\
+    普通 \ctmrg{} & 48 & 6 & -0.913435 & -1.053705 & 0.320062 & 0.974729 & 4\\
+    普通 \ctmrg{} & 64 & 5 & -1.055963 & -1.051976 & 0.015612 & 0.999755 & 4\\
+    nested \ctmrg{} & 16 & 6 & -1.078009 & -1.087586 & 0.021074 & 0.999011 & 3\\
+    nested \ctmrg{} & 32 & 6 & -1.066259 & -1.074241 & 0.013660 & 0.999965 & 6\\
+    nested \ctmrg{} & 48 & 6 & -1.057203 & -1.065696 & 0.018658 & 0.999558 & 5\\
+    nested \ctmrg{} & 64 & 6 & -1.062756 & -1.063180 & 0.013635 & 1.000948 & 3\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+从表~\ref{tab:summary} 可见，除少数异常点外，大部分 \ctmrg{} 与 nested \ctmrg{} 的 $\Ecan$ 位于 $-1.04$ 到 $-1.09$ 左右。
+这仍高于 AFQMC 基准值约 $0.09$--$0.14$，但并非量级错误。
+同时，多数样本的 $\nb$ 非常接近 $1$，说明至少粒子数这一局域观测量对环境误差并不极端敏感。
+
+\subsection{异常点}
+
+已有结果中也存在明显异常点，例如普通 \ctmrg{} 第 1 组 $\chi=48$：
+\begin{equation}
+  \Ecan=-0.198196,\qquad \nb=0.835129,
+\end{equation}
+并且水平 bond 能量的 spread 约为 $3.86$。这类结果显然不能视为物理收敛结果。
+因此，正确的结论不是“所有 \ctmrg{} 输出都可信”，而是“当前内部误差指标过于悲观且不够物理，但确实需要额外的物理一致性指标来筛除异常环境”。
+
+\section{当前代码中的收敛指标}
+
+当前 \ctmrg{} 主循环中记录了三类指标：
+\begin{align}
+  \max\Lambda_{\mathrm{err}}
+  &=
+  \max_{\mathrm{direction},r,c}
+  \left\Vert
+    \Lambda^{(n+1)}-\Lambda^{(n)}
+  \right\Vert_{\infty},
+  \label{eq:lambda-err}\\
+  \max c_{\mathrm{err}}
+  &=
+  \frac{
+    \max |c^{(n+1)}-c^{(n)}|
+  }{
+    \max c^{(n)}
+  },
+  \label{eq:coef-err}\\
+  \max\epsilon_{\mathrm{trunc}}
+  &=
+  \max_{\mathrm{direction},r,c}
+  \epsilon_{\mathrm{trunc}} .
+  \label{eq:trunc-err}
+\end{align}
+其中 $\Lambda$ 来自每个 directional move 中构造 projector 时的中间 SVD/eigendecomposition 谱；$c$ 是环境张量重标定或归一化时产生的系数。
+
+这些量可以作为调试信息，但它们并不是直接的物理量误差。
+特别是，局域观测量通常按
+\begin{equation}
+  \langle O\rangle
+  =
+  \frac{\mathrm{Num}(O;\mathcal{E})}{\mathrm{Den}(\mathcal{E})}
+  \label{eq:observable-ratio}
+\end{equation}
+计算。环境中的许多整体尺度变化、局部规范变化以及部分 projector 变化会同时进入分子与分母，从而发生抵消。
+因此，$\max\Lambda_{\mathrm{err}}$ 或 $\max c_{\mathrm{err}}$ 较大，并不自动推出 $\langle O\rangle$ 必然错误。
+
+\section{为什么内部指标与物理观测量会脱钩}
+
+\subsection{环境的规范自由度}
+
+\ctmrg{} 环境由 corner 与 edge 张量构成，但这种表示并不唯一。
+在环境内部 bond 上插入可逆变换 $G G^{-1}$ 不改变完整张量网络的收缩值：
+\begin{equation}
+  \mathcal{E}
+  \longrightarrow
+  \mathcal{G}\mathcal{E}\mathcal{G}^{-1},
+\end{equation}
+但会改变环境张量的元素、某些中间 SVD projector 以及归一化系数。
+因此，如果不固定 gauge，逐元素比较或某些中间量比较可能显示“不收敛”，即使物理收缩值已经相当稳定。
+
+\subsection{近简并奇异值子空间}
+
+当 projector 构造中的奇异值存在近简并时，对应奇异向量可以在近简并子空间内旋转。
+若
+\begin{equation}
+  s_i \simeq s_{i+1},
+\end{equation}
+则 SVD 返回的左右奇异向量并不唯一。一次迭代到下一次迭代之间，projector basis 可能发生较大旋转，而其张成的子空间几乎不变。
+这会放大 $\Lambda$ 或 projector 相关诊断量，却不一定显著改变低阶局域观测量。
+
+\subsection{归一化系数不是 gauge-invariant 量}
+
+环境张量在每次吸收和截断后通常需要重新归一化，以避免数值溢出或下溢。
+不同方向、不同 unit-cell site 的重标定方式可能导致 $c$ 系数抖动。
+由于式~\eqref{eq:observable-ratio} 中分子和分母共享同一个环境尺度，整体 normalization 的漂移经常会被抵消。
+因此 $\max c_{\mathrm{err}}$ 大时，首先应怀疑 normalization/gauge convention，而不是立刻判定物理结果错误。
+
+\subsection{低阶局域观测量可能比环境张量更早稳定}
+
+能量和粒子数是局域量，只依赖环境固定点中的一部分有效信息。
+环境张量的尾部谱、规范相位或近零奇异向量方向仍在变化时，这些局域量已经可能接近稳定。
+这解释了为什么粒子数可以非常接近半满，同时 $\max\Lambda_{\mathrm{err}}$ 或 $\max c_{\mathrm{err}}$ 仍然看起来很大。
+
+\section{\pepskit{} 中相关技术的比较}
+
+\subsection{收敛量的定义}
+
+\pepskit{} 的 \texttt{leading\_boundary} 接口将 \ctmrg{} 看作寻找环境 fixed point 的过程：
+\begin{equation}
+  \mathcal{E}^{*}=f(\mathcal{E}^{*};A),
+\end{equation}
+其中 $A$ 为 \ipeps{} 张量，$f$ 为一次 \ctmrg{} 迭代映射。
+在其通用 \ctmrg{} 实现中，主要收敛误差 $\eta$ 来自 corner 与 edge 环境张量奇异值谱的变化：
+\begin{align}
+  \Delta C
+  &=
+  \max_i d_{\mathrm{sv}}\!\left(S(C_i^{(n+1)}),S(C_i^{(n)})\right),\\
+  \Delta T
+  &=
+  \max_i d_{\mathrm{sv}}\!\left(S(T_i^{(n+1)}),S(T_i^{(n)})\right),\\
+  \eta
+  &=
+  \max(\Delta C,\Delta T).
+\end{align}
+这里 $C_i$ 和 $T_i$ 分别表示环境中的 corner 与 edge 张量，$S(\cdot)$ 表示奇异值谱。
+与当前代码中的 $\Lambda$ 不同，\pepskit{} 比较的是最终环境对象的谱，而不是 projector 构造过程中的中间谱。
+
+\subsection{返回显式收敛信息}
+
+\pepskit{} 的 \texttt{leading\_boundary} 返回环境以及一个信息对象，其中包括
+\begin{center}
+\texttt{info.converged},\qquad
+\texttt{info.convergence\_error},\qquad
+\texttt{info.contraction\_metrics}.
+\end{center}
+这种接口设计有两个优点：
+第一，可以明确区分“达到容差停止”和“达到最大迭代数停止”；
+第二，可以将最终误差与其它收缩质量指标一起保存，便于后续筛选异常数据。
+
+\subsection{Gauge fixing}
+
+\pepskit{} 对 fixed-point differentiation 特别强调环境 gauge fixing。
+原因是若要使用隐式微分，需要一次迭代后的环境与 fixed-point 环境在元素意义下可比较：
+\begin{equation}
+  f(\mathcal{E}^{*};A)-\mathcal{E}^{*}\approx 0.
+\end{equation}
+但由于环境 gauge 自由度，如果没有额外规范固定，上式在张量元素层面通常没有良好定义。
+\pepskit{} 因此提供了 \texttt{gauge\_fix} 例程，用相对相位与全局相位修正把新旧环境对齐。
+这说明一个重要事实：即使在成熟软件中，\ctmrg{} 环境的逐元素收敛也不是自动成立的；它依赖规范固定。
+
+\subsection{固定空间截断与动态容差}
+
+\pepskit{} 默认支持 \texttt{FixedSpaceTruncation}，即在 projector 截断时保持环境虚空间结构固定。
+这会减少因空间维数或 sector 结构变化导致的谱比较歧义。
+在变分优化中，\pepskit{} 还支持动态容差：早期优化阶段不必把环境收缩到极高精度，随着梯度变小再逐步收紧边界环境容差。
+这反映了一个实用原则：环境收敛精度应该服务于当前物理任务，而不是孤立地追求某个内部张量指标的极小值。
+
+\section{对当前结果的解释}
+
+综合已有数据，可以作如下判断。
+
+\begin{enumerate}[label=(\arabic*)]
+  \item $\nb$ 接近 $1$ 说明粒子数这一局域量已经相当稳定；这支持“当前环境在物理主导子空间上并非完全错误”的判断。
+  \item 大部分 \ctmrg{} 与 nested \ctmrg{} 的 $\Ecan$ 位于 $-1.04$ 到 $-1.09$，距离 AFQMC 约 $0.09$--$0.14$；这比量级错误或符号错误要温和得多。
+  \item SU 局域估计 $\Ecan^{\mathrm{SU}}\simeq -1.18238$ 接近 benchmark，说明波函数优化过程中得到的局域能量尺度合理。
+  \item 但 \ctmrg{} 严格环境期望值比 SU 和 benchmark 偏高，说明环境收缩、finite $\chi$、SU 波函数质量、或测量链路仍需继续检查。
+  \item 异常点显示算法流程并非完全稳定。尤其当 $\nb$ 偏离半满或 $E_h/E_v$ spread 很大时，物理量本身已经报警，这比 $\max\Lambda_{\mathrm{err}}$ 更直接。
+\end{enumerate}
+
+因此，当前最合理的结论是：
+\begin{quote}
+  \ctmrg{} 主算法未必存在根本性错误；现有 $\max\Lambda_{\mathrm{err}}$ 与 $\max c_{\mathrm{err}}$ 更像是过于 gauge-sensitive 的内部诊断量。但已有异常点表明，仅依赖平均能量也不充分，必须引入更物理、更 gauge-invariant 的收敛判据。
+\end{quote}
+
+\section{建议的收敛判据}
+
+建议后续将停止条件与日志输出改为多层指标。
+
+\subsection{局域观测量收敛}
+
+每隔若干步测量一次能量和粒子数：
+\begin{align}
+  \epsilon_E^{(n)}
+  &=
+  \frac{|E^{(n)}-E^{(n-k)}|}
+  {\max(1,|E^{(n-k)}|)},\\
+  \epsilon_n^{(n)}
+  &=
+  |n^{(n)}-n^{(n-k)}|.
+\end{align}
+要求连续 $m$ 次满足
+\begin{equation}
+  \epsilon_E < \tau_E,\qquad
+  \epsilon_n < \tau_n .
+\end{equation}
+这比单步内部谱变化更贴近最终用途。
+
+\subsection{环境谱收敛}
+
+参照 \pepskit{}，对所有 corner 与 edge 张量记录奇异值谱距离：
+\begin{equation}
+  \eta_{\mathrm{env}}
+  =
+  \max\left[
+    \max_i \|S(C_i^{(n)})-S(C_i^{(n-k)})\|_2,\,
+    \max_i \|S(T_i^{(n)})-S(T_i^{(n-k)})\|_2
+  \right].
+\end{equation}
+这比 projector 中间 $\Lambda$ 更适合作为环境 fixed-point 误差。
+
+\subsection{物理一致性筛选}
+
+对 Hubbard 半满问题，建议每个测量点同时记录：
+\begin{align}
+  |\nb-1|,\qquad
+  \mathrm{std}(n_{r,c}),\qquad
+  \max E_h-\min E_h,\qquad
+  \max E_v-\min E_v,\qquad
+  |\overline{E_h}-\overline{E_v}|.
+\end{align}
+这些指标能有效识别前述异常点。
+例如 $\nb=0.835$ 或 $E_h$ spread 达到 $O(1)$ 的结果，即使某个内部截断误差看起来不大，也应判为不可靠。
+
+\subsection{保留内部指标但降低其判定权重}
+
+$\max\Lambda_{\mathrm{err}}$、$\max c_{\mathrm{err}}$ 与 $\max\epsilon_{\mathrm{trunc}}$ 仍然有调试价值：
+\begin{itemize}
+  \item $\max\epsilon_{\mathrm{trunc}}$ 可用于判断 $\chi$ 是否过小；
+  \item $\max\Lambda_{\mathrm{err}}$ 可用于发现 projector 子空间变化；
+  \item $\max c_{\mathrm{err}}$ 可用于发现 normalization convention 或数值尺度异常。
+\end{itemize}
+但它们不宜作为唯一停止条件，更不宜直接等同于物理误差。
+
+\section{结论}
+
+当前数据所显示的“不收敛指标”与“尚可的物理观测量”之间的差异是可以理解的。
+其核心原因是：现有 $\max\Lambda_{\mathrm{err}}$ 和 $\max c_{\mathrm{err}}$ 更接近内部算法变量的变化，受到 gauge、normalization、近简并 projector basis 与截断子空间选择的影响；而粒子数和能量是归一化后的局域物理量，对这些自由度不完全敏感。
+
+参照 \pepskit{} 的实现，推荐将主收敛判据转向环境 corner/edge 谱距离与局域观测量稳定性，并在需要逐元素 fixed-point 判据时引入环境 gauge fixing。
+这样既能避免把可接受结果误判为不收敛，也能可靠筛除真正异常的环境和测量点。
+
+\begin{thebibliography}{9}
+
+\bibitem{pepskit-paper}
+P. Brehmer, L. Burgelman, Z.-Y. Yue, G. Fedorovich, J. Haegeman, and L. Devos,
+\textit{PEPSKit.jl: A Julia package for projected entangled-pair state simulations},
+arXiv:2605.19960 (2026).
+\url{https://arxiv.org/abs/2605.19960}.
+
+\bibitem{pepskit-code}
+QuantumKitHub,
+\textit{PEPSKit.jl source code: CTMRG implementation and gauge fixing}.
+\url{https://github.com/QuantumKitHub/PEPSKit.jl}.
+
+\bibitem{hubbard-benchmark}
+M. Qin, H. Shi, and S. Zhang,
+\textit{Benchmark study of the two-dimensional Hubbard model with auxiliary-field quantum Monte Carlo method},
+Physical Review B \textbf{94}, 085103 (2016).
+\url{https://doi.org/10.1103/PhysRevB.94.085103}.
+
+\bibitem{ctmrg-original}
+T. Nishino and K. Okunishi,
+\textit{Corner Transfer Matrix Renormalization Group Method},
+Journal of the Physical Society of Japan \textbf{65}, 891--894 (1996).
+
+\bibitem{ctmrg-review}
+J. Naumann, L. Vanderstraeten, and related tensor-network lecture material,
+\textit{Convergence and fixed points in CTMRG for infinite PEPS contractions}.
+See also the PEPSKit documentation and references therein.
+
+\end{thebibliography}
+
+\end{document}

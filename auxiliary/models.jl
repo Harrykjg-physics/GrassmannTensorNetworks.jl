@@ -1,6 +1,8 @@
 
 abstract type AbstractModel end
 
+############################# Non-relativistic fermions #############################
+
 """
 2D Spinless Fermion model on the square lattice
 
@@ -343,4 +345,88 @@ function gate(model::HubbardModel, dτ::Real)
     G_coef = reshape(G_coef_mat, (4, 4, 4, 4))
     G = Grassmann(G_coef, (4, 4, 4, 4), (2, 2, 2, 2), (:out, :out, :in, :in))
     G_out = add_perm_sign(G, (1, 2, 4, 3))
+end
+
+
+############################# Relativistic fermions #############################
+
+struct Gross_Neveu_Wilson_model{T<:Real} <: AbstractModel
+    μ::T
+    m::T
+    g2::T
+end
+
+function Gross_Neveu_Wilson_model(μ::Real, m::Real, g2::Real)
+    μ, m, g2 = promote(μ, m, g2)
+    return Gross_Neveu_Wilson_model{typeof(μ)}(μ, m, g2)
+end
+
+function PartitionFunctionTensor(model::Gross_Neveu_Wilson_model{T}) where {T}
+
+    # Ā[i1, i2, j1p, j2p]
+    Ā = zeros(ComplexF64, (2, 2, 2, 2))
+
+    for i1 in 0:1, i2 in 0:1, j1p in 0:1, j2p in 0:1
+
+        if (i1, i2, j1p, j2p) == (1, 1, 0, 0)
+            Ā[i1+1, i2+1, j1p+1, j2p+1] = - 1 + im
+        elseif (i1, i2, j1p, j2p) == (1, 0, 1, 0)
+            Ā[i1+1, i2+1, j1p+1, j2p+1] = - 1 - 1
+        elseif (i1, i2, j1p, j2p) == (1, 0, 0, 1)
+            Ā[i1+1, i2+1, j1p+1, j2p+1] = - 1 - im
+        elseif (i1, i2, j1p, j2p) == (0, 1, 1, 0)
+            Ā[i1+1, i2+1, j1p+1, j2p+1] = - im - 1
+        elseif (i1, i2, j1p, j2p) == (0, 1, 0, 1)
+            Ā[i1+1, i2+1, j1p+1, j2p+1] = - im - im
+        elseif (i1, i2, j1p, j2p) == (0, 0, 1, 1)
+            Ā[i1+1, i2+1, j1p+1, j2p+1] = 1 - im
+        end
+
+    end
+
+    # A[j1, j2, i1p, i2p]
+    A = zeros(ComplexF64, (2, 2, 2, 2))
+
+    for j1 in 0:1, j2 in 0:1, i1p in 0:1, i2p in 0:1
+
+        if (j1, j2, i1p, i2p) == (1, 1, 0, 0)
+            A[j1+1, j2+1, i1p+1, i2p+1] = 1 + im
+        elseif (j1, j2, i1p, i2p) == (1, 0, 1, 0)
+            A[j1+1, j2+1, i1p+1, i2p+1] = 1 + 1
+        elseif (j1, j2, i1p, i2p) == (1, 0, 0, 1)
+            A[j1+1, j2+1, i1p+1, i2p+1] = 1 - im
+        elseif (j1, j2, i1p, i2p) == (0, 1, 1, 0)
+            A[j1+1, j2+1, i1p+1, i2p+1] = - im + 1
+        elseif (j1, j2, i1p, i2p) == (0, 1, 0, 1)
+            A[j1+1, j2+1, i1p+1, i2p+1] = - im - im
+        elseif (j1, j2, i1p, i2p) == (0, 0, 1, 1)
+            A[j1+1, j2+1, i1p+1, i2p+1] = - 1 - im
+        end
+    end
+
+    T_coef = zeros(ComplexF64, (4, 4, 4, 4))
+
+    for i1 in 0:1, j1 in 0:1, i2 in 0:1, j2 in 0:1
+        for i1p in 0:1, j1p in 0:1, i2p in 0:1, j2p in 0:1
+
+            I = f(i1, j1); J = f(i2, j2)
+            Ip = f(i1p, j1p); Jp = f(i2p, j2p)
+
+            sign1 = i1 * (j1 + j2 + i1p + i2p) + i2 * (j2 + i1p + i2p) + j1p * (i1p + i2p) + j2p * i2p + i1p + i2p
+            sign2 = i2 - j2 + i2p -j2p
+            sign3 = i1 + j1 + i2 + j2 + i1p + j1p + i2p + j2p
+            sign4 = i1 + i2 + j2 + i1p
+            sign5 = i2 + j2 + i2p + j2p
+
+            T_coef[I, J, Ip, Jp] = (-1)^sign1 * exp(0.5*μ*sign2) * (1/sqrt(2))^sign3 * (
+                ((m+2*r)^2 + 2*g2) * isequal(i1 + i2 + j1p + j2p, 0) * isequal(j1 + j2 + i1p + i2p, 0) -
+                (m+2*r) * isequal(i1 + i2 + j1p + j2p, 1) * isequal(j1 + j2 + i1p + i2p, 1) - 
+                (-1)^sign4 * (+im)^sign5 * (m+2*r) * isequal(i1 + i2 + j1p + j2p, 1) * isequal(j1 + j2 + i1p + i2p, 1) - 
+                Ā[i1+1, i2+1, j1p+1, j2p+1] * A[j1+1, j2+1, i1p+1, i2p+1]
+            )
+
+        end
+    end
+
+    return T_coef
 end

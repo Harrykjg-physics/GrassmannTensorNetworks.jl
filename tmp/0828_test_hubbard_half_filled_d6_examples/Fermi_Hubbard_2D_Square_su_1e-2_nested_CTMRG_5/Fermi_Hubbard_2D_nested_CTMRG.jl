@@ -1,8 +1,9 @@
-using Pkg
-Pkg.activate(joinpath(@__DIR__, "../.."))
-Pkg.instantiate()
+#using Pkg
+#Pkg.activate(joinpath(@__DIR__, "../.."))
+#Pkg.instantiate()
 
-using GrassmannTensorNetworks
+include("../../src/GrassmannTensorNetworks.jl")
+using .GrassmannTensorNetworks
 
 function run_nested_CTMRG_Square_Hubbard(
     t::Float64,
@@ -36,8 +37,8 @@ function run_nested_CTMRG_Square_Hubbard(
     ctmrg_env = (load_env == "random" ? initialize_nested_environment(nested, χ, div(χ, 2)) : 
     load("ctmrg_nested_env", load_env, CTMRGEnv))
 
-    run_nested_GCTMRG!(peps, N_sites, nested, ctmrg_env, χ; ctmrg_iter=ctmrg_iter, ctmrg_tol=1e-12, average_trunc=true,
-    verbosity=2, save_iter=20, save_filename="ctmrg_nested_env")
+    run_nested_GCTMRG!(nested, ctmrg_env, χ; ctmrg_iter=ctmrg_iter, ctmrg_tol=1e-12, average_trunc=true,
+    verbosity=1, save_iter=20, save_filename="ctmrg_nested_env")
 
     _, ns = compute_nested_exp_site(nested, peps, N_sites, ctmrg_env)
     ns_avg = sum(ns) / length(ns)
@@ -52,7 +53,7 @@ t = 1.0
 U = 2.0
 μ = U/2
 peps_filename = "tensor_file"
-peps_param_str = "iter1000"*"_δτ0.01"
+peps_param_str = "iter4000"*"_δτ0.01"
 ctmrg_iter = 100
 load_env = "random"
 
@@ -61,3 +62,4 @@ GrassmannTensorNetworks.global_sign = auto_sign
 run_nested_CTMRG_Square_Hubbard(t, U, μ, peps_filename, peps_param_str, 16, ctmrg_iter; load_env=load_env)
 run_nested_CTMRG_Square_Hubbard(t, U, μ, peps_filename, peps_param_str, 32, ctmrg_iter; load_env=load_env)
 run_nested_CTMRG_Square_Hubbard(t, U, μ, peps_filename, peps_param_str, 48, ctmrg_iter; load_env=load_env)
+run_nested_CTMRG_Square_Hubbard(t, U, μ, peps_filename, peps_param_str, 64, ctmrg_iter; load_env=load_env)

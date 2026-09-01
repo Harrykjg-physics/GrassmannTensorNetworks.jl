@@ -1,7 +1,7 @@
 include(joinpath(@__DIR__, "..", "algorithms", "CTMRG", "environments.jl"))
+include(joinpath(@__DIR__, "..", "algorithms", "Nested_CTMRG", "nested_network.jl"))
 include(joinpath(@__DIR__, "..", "algorithms", "CTMRG", "CTMRG.jl"))
 include(joinpath(@__DIR__, "..", "algorithms", "CTMRG", "measurements.jl"))
-include(joinpath(@__DIR__, "..", "algorithms", "Nested_CTMRG", "nested_network.jl"))
 include(joinpath(@__DIR__, "..", "algorithms", "Nested_CTMRG", "environments.jl"))
 include(joinpath(@__DIR__, "..", "algorithms", "Nested_CTMRG", "CTMRG.jl"))
 include(joinpath(@__DIR__, "..", "algorithms", "Nested_CTMRG", "measurements.jl"))

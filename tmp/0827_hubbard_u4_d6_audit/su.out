@@ -1,0 +1,38 @@
+--------- Results --------
+  Activating project at `~/work/2026/0822/Hubbard_U4_D6_half_filled`
+Precompiling packages...
+   2195.8 ms  ✓ GrassmannTensorNetworks
+  1 dependency successfully precompiled in 2 seconds. 69 already precompiled.
+ERROR: LoadError: unable to determine if tensor_file.h5 is accessible in the HDF5 format (file may not exist)
+Stacktrace:
+  [1] error(s::String)
+    @ Base ./error.jl:44
+  [2] h5open(filename::String, mode::String, fapl::HDF5.FileAccessProperties, fcpl::HDF5.FileCreateProperties; swmr::Bool)
+    @ HDF5 ~/software/juliaenv/env_grassmann/packages/HDF5/8g5ny/src/file.jl:48
+  [3] h5open
+    @ ~/software/juliaenv/env_grassmann/packages/HDF5/8g5ny/src/file.jl:20 [inlined]
+  [4] h5open(filename::String, mode::String; swmr::Bool, fapl::HDF5.FileAccessProperties, fcpl::HDF5.FileCreateProperties, pv::@Kwargs{})
+    @ HDF5 ~/software/juliaenv/env_grassmann/packages/HDF5/8g5ny/src/file.jl:75
+  [5] h5open(filename::String, mode::String)
+    @ HDF5 ~/software/juliaenv/env_grassmann/packages/HDF5/8g5ny/src/file.jl:63
+  [6] #h5open#19
+    @ ~/software/juliaenv/env_grassmann/packages/HDF5/8g5ny/src/file.jl:95 [inlined]
+  [7] h5open
+    @ ~/software/juliaenv/env_grassmann/packages/HDF5/8g5ny/src/file.jl:94 [inlined]
+  [8] #load#160
+    @ ~/work/2026/0822/Hubbard_U4_D6_half_filled/auxiliary/ansatz.jl:216 [inlined]
+  [9] load
+    @ ~/work/2026/0822/Hubbard_U4_D6_half_filled/auxiliary/ansatz.jl:214 [inlined]
+ [10] run_SU_Square_Hubbard(t::Float64, U::Float64, μ::Float64, Dbond::Int64, Lx::Int64, Ly::Int64, iter_vec::Vector{Int64}, tol_vec::Vector{Float64}, dτ_vec::Vector{Float64})
+    @ Main ~/work/2026/0822/Hubbard_U4_D6_half_filled/examples/Fermi_Hubbard_2D_Square_su_1e-2/Fermi_Hubbard_2D_Simple_Update.jl:18
+ [11] top-level scope
+    @ ~/work/2026/0822/Hubbard_U4_D6_half_filled/examples/Fermi_Hubbard_2D_Square_su_1e-2/Fermi_Hubbard_2D_Simple_Update.jl:39
+ [12] include(mod::Module, _path::String)
+    @ Base ./Base.jl:306
+ [13] exec_options(opts::Base.JLOptions)
+    @ Base ./client.jl:317
+ [14] _start()
+    @ Base ./client.jl:550
+in expression starting at /home/jkkong/work/2026/0822/Hubbard_U4_D6_half_filled/examples/Fermi_Hubbard_2D_Square_su_1e-2/Fermi_Hubbard_2D_Simple_Update.jl:39
+--------- Running Time -------
+Running time of the scripts： 22s
