@@ -350,67 +350,61 @@ end
 
 ############################# Relativistic fermions #############################
 
-struct Gross_Neveu_Wilson_model{T<:Real} <: AbstractModel
-    μ::T
+struct Nf1_Gross_Neveu_Wilson_model{T<:Real} <: AbstractModel
     m::T
     g2::T
+    μ::T
+    r::T
 end
 
-function Gross_Neveu_Wilson_model(μ::Real, m::Real, g2::Real)
-    μ, m, g2 = promote(μ, m, g2)
-    return Gross_Neveu_Wilson_model{typeof(μ)}(μ, m, g2)
+function Nf1_Gross_Neveu_Wilson_model(m::Real, g2::Real, μ::Real; r::Real=1.0)
+    m, g2, μ, r = promote(m, g2, μ, r)
+    return Nf1_Gross_Neveu_Wilson_model{typeof(m)}(m, g2, μ, r)
 end
 
-function PartitionFunctionTensor(model::Gross_Neveu_Wilson_model{T}) where {T}
+function generate_Ā_tensor()
 
     # Ā[i1, i2, j1p, j2p]
-    Ā = zeros(ComplexF64, (2, 2, 2, 2))
+    Ā = zeros(ComplexF64, 2, 2, 2, 2)
 
-    for i1 in 0:1, i2 in 0:1, j1p in 0:1, j2p in 0:1
+    Ā[2, 2, 1, 1] = - 1 + im    
+    Ā[2, 1, 2, 1] = - 1 - 1
+    Ā[2, 1, 1, 2] = - 1 - im
+    Ā[1, 2, 2, 1] = - im - 1
+    Ā[1, 2, 1, 2] = - im - im
+    Ā[1, 1, 2, 2] = 1 - im
 
-        if (i1, i2, j1p, j2p) == (1, 1, 0, 0)
-            Ā[i1+1, i2+1, j1p+1, j2p+1] = - 1 + im
-        elseif (i1, i2, j1p, j2p) == (1, 0, 1, 0)
-            Ā[i1+1, i2+1, j1p+1, j2p+1] = - 1 - 1
-        elseif (i1, i2, j1p, j2p) == (1, 0, 0, 1)
-            Ā[i1+1, i2+1, j1p+1, j2p+1] = - 1 - im
-        elseif (i1, i2, j1p, j2p) == (0, 1, 1, 0)
-            Ā[i1+1, i2+1, j1p+1, j2p+1] = - im - 1
-        elseif (i1, i2, j1p, j2p) == (0, 1, 0, 1)
-            Ā[i1+1, i2+1, j1p+1, j2p+1] = - im - im
-        elseif (i1, i2, j1p, j2p) == (0, 0, 1, 1)
-            Ā[i1+1, i2+1, j1p+1, j2p+1] = 1 - im
-        end
+    return Ā
+end
 
-    end
+function generate_A_tensor()
 
     # A[j1, j2, i1p, i2p]
-    A = zeros(ComplexF64, (2, 2, 2, 2))
+    A = zeros(ComplexF64, 2, 2, 2, 2)
 
-    for j1 in 0:1, j2 in 0:1, i1p in 0:1, i2p in 0:1
+    A[2, 2, 1, 1] = 1 + im    
+    A[2, 1, 2, 1] = 1 + 1
+    A[2, 1, 1, 2] = 1 - im
+    A[1, 2, 2, 1] = - im + 1
+    A[1, 2, 1, 2] = - im - im
+    A[1, 1, 2, 2] = -1 - im
 
-        if (j1, j2, i1p, i2p) == (1, 1, 0, 0)
-            A[j1+1, j2+1, i1p+1, i2p+1] = 1 + im
-        elseif (j1, j2, i1p, i2p) == (1, 0, 1, 0)
-            A[j1+1, j2+1, i1p+1, i2p+1] = 1 + 1
-        elseif (j1, j2, i1p, i2p) == (1, 0, 0, 1)
-            A[j1+1, j2+1, i1p+1, i2p+1] = 1 - im
-        elseif (j1, j2, i1p, i2p) == (0, 1, 1, 0)
-            A[j1+1, j2+1, i1p+1, i2p+1] = - im + 1
-        elseif (j1, j2, i1p, i2p) == (0, 1, 0, 1)
-            A[j1+1, j2+1, i1p+1, i2p+1] = - im - im
-        elseif (j1, j2, i1p, i2p) == (0, 0, 1, 1)
-            A[j1+1, j2+1, i1p+1, i2p+1] = - 1 - im
-        end
-    end
+    return A
+end
+
+function PartitionFunctionTensor(model::Nf1_Gross_Neveu_Wilson_model{T}) where {T}
 
     T_coef = zeros(ComplexF64, (4, 4, 4, 4))
+    Ā = generate_Ā_tensor()
+    A = generate_A_tensor()
 
     for i1 in 0:1, j1 in 0:1, i2 in 0:1, j2 in 0:1
         for i1p in 0:1, j1p in 0:1, i2p in 0:1, j2p in 0:1
 
-            I = f(i1, j1); J = f(i2, j2)
-            Ip = f(i1p, j1p); Jp = f(i2p, j2p)
+            I = index_fuse(i1, j1)
+            J = index_fuse(i2, j2)
+            Ip = index_fuse(i1p, j1p)
+            Jp = index_fuse(i2p, j2p)
 
             sign1 = i1 * (j1 + j2 + i1p + i2p) + i2 * (j2 + i1p + i2p) + j1p * (i1p + i2p) + j2p * i2p + i1p + i2p
             sign2 = i2 - j2 + i2p -j2p
@@ -418,15 +412,31 @@ function PartitionFunctionTensor(model::Gross_Neveu_Wilson_model{T}) where {T}
             sign4 = i1 + i2 + j2 + i1p
             sign5 = i2 + j2 + i2p + j2p
 
-            T_coef[I, J, Ip, Jp] = (-1)^sign1 * exp(0.5*μ*sign2) * (1/sqrt(2))^sign3 * (
-                ((m+2*r)^2 + 2*g2) * isequal(i1 + i2 + j1p + j2p, 0) * isequal(j1 + j2 + i1p + i2p, 0) -
-                (m+2*r) * isequal(i1 + i2 + j1p + j2p, 1) * isequal(j1 + j2 + i1p + i2p, 1) - 
-                (-1)^sign4 * (+im)^sign5 * (m+2*r) * isequal(i1 + i2 + j1p + j2p, 1) * isequal(j1 + j2 + i1p + i2p, 1) - 
-                Ā[i1+1, i2+1, j1p+1, j2p+1] * A[j1+1, j2+1, i1p+1, i2p+1]
-            )
+            T_coef[I, J, Ip, Jp] = (-1)^sign1 * exp(0.5*model.μ*sign2) * (1/sqrt(2))^sign3 * (
+                ((model.m+2*model.r)^2 + 2*model.g2) * isequal(i1 + i2 + j1p + j2p, 0) * isequal(j1 + j2 + i1p + i2p, 0) -
+                (model.m+2*model.r) * isequal(i1 + i2 + j1p + j2p, 1) * isequal(j1 + j2 + i1p + i2p, 1) - 
+                (-1)^sign4 * (+im)^sign5 * (model.m+2*model.r) * isequal(i1 + i2 + j1p + j2p, 1) * isequal(j1 + j2 + i1p + i2p, 1) - 
+                Ā[i1+1, i2+1, j1p+1, j2p+1] * A[j1+1, j2+1, i1p+1, i2p+1])
 
         end
     end
 
     return T_coef
+end
+
+function index_fuse(ix::Int64, jx::Int64)
+
+    Ix = 0
+
+    if (ix, jx) == (0, 0)
+        Ix = 1
+    elseif (ix, jx) == (1, 1)
+        Ix = 2
+    elseif (ix, jx) == (0, 1)
+        Ix = 3
+    else
+        Ix = 4
+    end
+
+    return Ix
 end
