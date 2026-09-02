@@ -15,8 +15,8 @@ function run_SU_Square_Hubbard(
     tol_vec::Vector{Float64}, 
     dτ_vec::Vector{Float64})
 
-    # Initialize a random PEPS
-    peps = Square_GPEPS(4, 2, Dbond, Lx, Ly, Float64, true)
+    # Initialize a random PEPS with identity Schmidt weights
+    peps = Square_GPEPS(4, 2, Dbond, Lx, Ly, Float64, true; weight_init=:identity)
     # Initialize a PEPS from an optimized state
     # peps = load("tensor_file", "iter3000" * "_δτ0.01", Square_GPEPS)
     model = HubbardModel(t, U, μ)

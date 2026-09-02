@@ -12,6 +12,17 @@ function prepare_bond_weight(Dvir::Int64, Dvir_even::Int64)
     
 end
 
+function prepare_bond_weight(Dvir::Int64, Dvir_even::Int64, weight_init::Symbol)
+
+    if weight_init == :random
+        return prepare_bond_weight(Dvir, Dvir_even)
+    elseif weight_init == :identity
+        return diagm(ones(Float64, Dvir))
+    else
+        throw(ArgumentError("weight_init should be :random or :identity"))
+    end
+end
+
 # Compare two Schimidt weights and return the difference matrix
 function compare_weights(
     Λ1::Matrix{GrassmannMatrix{Float64}}, 

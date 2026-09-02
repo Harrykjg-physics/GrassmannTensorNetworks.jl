@@ -3,7 +3,9 @@
 """
 Grassmann iPEPS tensors on the square lattice
 
-The bond weights {Λ} are stored in the Λx and Λy matrices, which may be absent (i.e. set to Missing)
+The bond weights {Λ} are stored in the Λx and Λy matrices, which may be absent (i.e. set to Missing).
+When bond weights are requested, `weight_init=:random` keeps the historical random weights,
+and `weight_init=:identity` initializes all Schmidt weights to one.
 
 Index reading order: Phys, Left, Right, Up, Down
 Corresponding arrow: :out, :out, :in, :in, :out
@@ -27,8 +29,14 @@ struct Square_GPEPS{T<:Number}
 end
 
 function Square_GPEPS(
-    Dphys::Int, Dphys_even::Int, Dvir::Int, 
-    Lx::Int, Ly::Int, Q::Type, has_bond_weights::Bool)
+    Dphys::Int, 
+    Dphys_even::Int, 
+    Dvir::Int, 
+    Lx::Int, 
+    Ly::Int, 
+    Q::Type, 
+    has_bond_weights::Bool;
+    weight_init::Symbol=:random)
 
     A = Matrix{Grassmann{Q, 5}}(undef, Lx, Ly)
 
@@ -45,8 +53,8 @@ function Square_GPEPS(
         Λx = Matrix{GrassmannMatrix{Float64}}(undef, Lx, Ly)
         Λy = Matrix{GrassmannMatrix{Float64}}(undef, Lx, Ly)
         for row in 1:Lx, col in 1:Ly
-            Λx[row, col] = Grassmann(prepare_bond_weight(Dvir, Dvir_even), (Dvir, Dvir), (Dvir_even, Dvir_even), (:out, :in))
-            Λy[row, col] = Grassmann(prepare_bond_weight(Dvir, Dvir_even), (Dvir, Dvir), (Dvir_even, Dvir_even), (:out, :in))
+            Λx[row, col] = Grassmann(prepare_bond_weight(Dvir, Dvir_even, weight_init), (Dvir, Dvir), (Dvir_even, Dvir_even), (:out, :in))
+            Λy[row, col] = Grassmann(prepare_bond_weight(Dvir, Dvir_even, weight_init), (Dvir, Dvir), (Dvir_even, Dvir_even), (:out, :in))
         end
     else
         Λx = missing
