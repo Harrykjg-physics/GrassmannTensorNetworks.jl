@@ -39,6 +39,11 @@ function run_nested_CTMRG_Square_Hubbard(
     run_nested_GCTMRG!(peps, N_sites, nested, ctmrg_env, χ; ctmrg_iter=ctmrg_iter, ctmrg_tol=1e-12, average_trunc=true,
     verbosity=2, save_iter=20, save_filename="ctmrg_nested_env")
 
+    """
+    run_nested_GCTMRG!(peps, H_nn_bonds, nested, ctmrg_env, χ; ctmrg_iter=ctmrg_iter, ctmrg_tol=1e-12, average_trunc=true,
+    verbosity=2, save_iter=20, save_filename="ctmrg_nested_env")
+    """
+
     _, ns = compute_nested_exp_site(nested, peps, N_sites, ctmrg_env)
     ns_avg = sum(ns) / length(ns)
     _, Eh = compute_nested_exp_hbond(nested, peps, H_nn_bonds, ctmrg_env)

@@ -1,3 +1,4 @@
+
 function run_nested_GCTMRG!(
     peps::Square_GPEPS,
     Os_mat::AbstractMatrix{<:Grassmann{Q, 2}}, 
@@ -76,10 +77,13 @@ function run_nested_GCTMRG!(
         if verbosity > 1  
 
             ti = time()
-            _, expval = compute_nested_exp_site(nested, peps, Os_mat, ctmrg_env)
+            # _, expval = compute_nested_exp_site(nested, peps, Os_mat, ctmrg_env)
+            # expval_avg = sum(expval)/length(expval)
+            _, Eh = compute_nested_exp_hbond(nested, peps, Os_mat, ctmrg_env)
+            _, Ev = compute_nested_exp_vbond(nested, peps, Os_mat, ctmrg_env)
+            expval_avg = Es_avg = (sum(Eh) + sum(Ev)) / length(Eh)
             tf = time()
-
-            expval_avg = sum(expval)/length(expval)
+            
             expval_diff = abs((expval_avg - expval_avg_tmp) / expval_avg_tmp)
 
             @info @sprintf " Expectation Calculation of CTMRG Iterations %i ==>  
@@ -117,3 +121,4 @@ function run_nested_GCTMRG!(
         end 
     end
 end
+
