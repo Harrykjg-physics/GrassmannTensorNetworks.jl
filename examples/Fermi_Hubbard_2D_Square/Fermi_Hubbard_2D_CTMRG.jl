@@ -33,9 +33,17 @@ function run_CTMRG_Square_Hubbard(
     ##################### Running Grassmann CTMRG to compute environment tensors #####################
 
     ctmrg_env = (load_env == "random" ? CTMRGEnv(T_square_mat, χ, Int(χ/2)) : load("ctmrg_env", load_env, CTMRGEnv))
+
     run_GCTMRG!(T_square_mat, T_n_imp_mat, ctmrg_env, χ; 
     ctmrg_iter=ctmrg_iter, ctmrg_tol=1e-12, average_trunc=true, 
     verbosity=2, save_iter=20, save_filename="ctmrg_env")
+
+    """
+    # Monitor the convergence of the ground state energy
+    run_GCTMRG!(peps, T_square_mat, H_nn_bond, ctmrg_env, χ; 
+    ctmrg_iter=ctmrg_iter, ctmrg_tol=1e-12, average_trunc=true, 
+    verbosity=2, save_iter=20, save_filename="ctmrg_env")
+    """
 
     _, ns = compute_exp_site(T_square_mat, T_n_imp_mat, ctmrg_env)
     ns_avg = sum(ns)/(size(ns, 1) * size(ns, 2))
