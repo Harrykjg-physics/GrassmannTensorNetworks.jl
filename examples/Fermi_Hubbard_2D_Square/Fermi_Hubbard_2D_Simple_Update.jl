@@ -3,6 +3,7 @@ Pkg.activate(joinpath(@__DIR__, "../.."))
 Pkg.instantiate()
 
 using GrassmannTensorNetworks
+using Random
 
 function run_SU_Square_Hubbard(
     t::Float64, 
@@ -35,6 +36,8 @@ U = 4.0
 Dbond = 4
 Lx = 2
 Ly = 2
+
+Random.seed!(2928528937)
 
 GrassmannTensorNetworks.global_sign = auto_sign
 
