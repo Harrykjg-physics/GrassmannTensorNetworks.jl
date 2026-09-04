@@ -130,7 +130,7 @@ To update the y bond using update_x_bond() function :
                                           ↑    Λy[x, y+2]
                                           ↑     ↙
                                           ↑  ↙
-                 ⟵⟵ Λy[x, y+1] ⟵⟵ A[x, y+1] ⟵⟵ Λx[x-1, y+1] ⟵⟵
+                 ⟵⟵ Λx[x, y+1] ⟵⟵ A[x, y+1] ⟵⟵ Λx[x-1, y+1] ⟵⟵
                                        ↙   
                          ↑           ↙    
                          ↑     Λy[x, y+1]   
@@ -360,16 +360,12 @@ end
 
 function dirx2y(A::Grassmann{T, 5}) where {T}
 
-  # A_perm[np, b, bp, a, ap] <-- A[np, ap, a, b, bp] 
-  A_perm = permutedims(A, (1, 4, 5, 3, 2); sign_function=global_sign)
-  # A_out[np, bp, b, a, ap] <-- A_perm[np, b, bp, a, ap]
-  A_out = permutedims(A_perm, (1, 3, 2, 4, 5); sign_function=global_sign)
+  # A_out[np, d, u, r, l] <-- A[np, l, r, u, d]
+  A_out = permutedims(A, (1, 5, 4, 3, 2); sign_function=global_sign)
 end
 
 function diry2x(A_out::Grassmann{T, 5}) where {T}
 
-  # A_perm[np, b, bp, a, ap] <-- A_out[np, bp, b, a, ap]
-  A_perm = permutedims(A_out, (1, 3, 2, 4, 5); sign_function=global_sign)
-  # A[np, ap, a, b, bp] <-- A_perm[np, b, bp, a, ap]
-  A = permutedims(A_perm, (1, 5, 4, 2, 3); sign_function=global_sign)
+  # A[np, l, r, u, d] <-- A_out[np, d, u, r, l]
+  A = permutedims(A_out, (1, 5, 4, 3, 2); sign_function=global_sign)
 end
